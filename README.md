@@ -1,7 +1,7 @@
 
 <div align="center">
-    <img src="docs/img/front_box.png" width="300"/>
-    <img src="docs/img/dashboard_controller.png" width="270"/>
+    <img src="docs/img/front_box.png" width="400"/>
+    <img src="docs/img/dashboard_controller.png" width="358"/>
 </div>
 
 # daq-dash-26

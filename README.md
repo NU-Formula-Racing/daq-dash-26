@@ -45,7 +45,7 @@ Before updating the code on the board, make sure that there is an SD card with t
 You can then test the connection of to the controller board:
 
 ```sh
-ssh nfr@raspberrypi.local
+ssh nfr@nfr.local
 ```
 
 You should be able to ssh into the raspberry pi, at which point you are safe to update the controller board code.
@@ -55,10 +55,10 @@ First, exit your ssh session (if you tested your connection):
 ```sh
 exit
 ```
-Then, run the `setup_pi.sh` script.
+Then, run the `rpi_update` script:
 
 ```sh
-./scripts/setup_pi.sh
+source ./rpi_update.sh
 ```
 
 This will take your current version of `daq-dash` code, copy it over, then recompile the project. It should also reboot the controller board for a cold start.

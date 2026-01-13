@@ -6,10 +6,8 @@ import argparse
 import os
 import posixpath
 import shlex
-import subprocess
 import sys
 from pathlib import Path
-from dataclasses import dataclass
 from typing import *
 
 import fnmatch
@@ -105,8 +103,7 @@ def main() -> int:
     remote_app = f"{remote_apps}/{args.app}"
 
     print(f"Target: {args.user}@{args.host}:{args.port}")
-    print(f"Engine root: {args.engine_root}")
-    print(f"Engine files to upload (git/.gitignore filtered): {len(files)}")
+    print(f"Engine root: {args.engine}")
     print(f"Script dir (app payload): {script_dir}")
     print(f"Remote dash dir: {remote_dash}")
     print(f"Remote app dir : {remote_app}")
@@ -137,7 +134,7 @@ def main() -> int:
             r.mkdir_p(remote_app)
 
             print("==> Uploading engine files into dash/ ...")
-            r.put_tree_with_rpiignore(args.engine_root, remote_dash, rpiignore)
+            r.put_tree_with_rpiignore(args.args.engine, remote_dash, rpiignore)
 
             okay_install_script = posixpath.join(remote_dash, "okay", "scripts", "install.bash")
             print("==> Ensuring install.bash is executable ...")

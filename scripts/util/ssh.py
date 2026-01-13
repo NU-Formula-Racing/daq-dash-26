@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from util.rpiignore import iter_files_with_rpiignore
+
 from pathlib import Path
 from typing import *
 import paramiko

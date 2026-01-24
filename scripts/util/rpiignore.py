@@ -62,7 +62,7 @@ def iter_files_with_rpiignore(root: Path, rules: List[str]) -> Iterable[Tuple[Pa
         pruned: List[str] = []
         for dn in list(dirnames):
             rel_dir = _to_posix_rel(dpath / dn, root)
-            if not should_include(rel_dir, rules) and not should_include(rel_dir + "/__keep__", rules):
+            if not should_include(rel_dir, rules):
                 pruned.append(dn)
 
         for dn in pruned:

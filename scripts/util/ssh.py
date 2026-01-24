@@ -9,6 +9,7 @@ from dataclasses import dataclass
 import posixpath
 import shlex
 import sys
+from tqdm import tqdm
 
 @dataclass
 class SSHConfig:
@@ -16,6 +17,7 @@ class SSHConfig:
     user: str
     password: Optional[str]
     port: int = 22
+    enable_dry_run: bool = False # if True, don't actually execute commands
 
 
 class Remote:
@@ -28,6 +30,10 @@ class Remote:
         self.sftp: Optional[paramiko.SFTPClient] = None
 
     def __enter__(self) -> "Remote":
+        if self.cfg.enable_dry_run:
+            print("[dry-run] Skipping SSH connection.")
+            return self
+
         self.client = paramiko.SSHClient()
         if self.accept_unknown_host_keys:
             self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -47,6 +53,9 @@ class Remote:
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
+        if self.cfg.enable_dry_run:
+            return
+
         try:
             if self.sftp:
                 self.sftp.close()
@@ -55,7 +64,12 @@ class Remote:
                 self.client.close()
 
     def run(self, cmd: str, verbose=True) -> Tuple[int, str, str]:
-        assert self.client is not None
+        if self.cfg.enable_dry_run:
+            print(f"[dry-run] SSH command: {cmd}")
+            return 0, "", ""
+
+        assert self.client is not None, "SSH client is not initialized."
+        
         full = f"bash -lc {shlex.quote(cmd)}"
         # get currrent directory of client to print
         if verbose:
@@ -68,8 +82,11 @@ class Remote:
         return code, out, err
 
     def must(self, cmd: str, verbose=True) -> None:
+        if self.cfg.enable_dry_run:
+            print(f"[dry-run] SSH command must: {cmd}")
+            return
+        
         code, out, err = self.run(cmd, verbose=verbose)
-
         if out.strip():
             sys.stdout.write(out)
         if err.strip():
@@ -88,8 +105,10 @@ class Remote:
         self.must(f"chmod +x {shlex.quote(remote_path)}", verbose=verbose)
 
     def put_file(self, local: Path, remote: str) -> None:
-        assert self.sftp is not None
-        print(f"[upload] {local} -> {remote}")
+        if self.cfg.enable_dry_run:
+            return
+
+        assert self.sftp is not None, "SFTP client is not initialized."
 
         if not local.exists():
             raise RuntimeError(f"Local file does not exist: {local}")
@@ -97,12 +116,14 @@ class Remote:
         # ensure remote directory exists
         remote_dir = posixpath.dirname(remote)
         self.mkdir_p(remote_dir, verbose=False)
-
         self.sftp.put(str(local), remote)
 
     def put_tree_with_rpiignore(
         self, local_root: Path, remote_root: str, rules: List[str]
     ) -> None:
-        for local, rel in iter_files_with_rpiignore(local_root, rules):
+        files = list(iter_files_with_rpiignore(local_root, rules))
+        for local, rel in tqdm(files, desc="Uploading files", unit="file"):
+            # print the relative path being uploaded, but in a way that works with tqdm
+            tqdm.write(f"Uploading: {local} -> {remote_root}/{rel}")
             remote = posixpath.join(remote_root, rel)
-            self.put_file(local, remote)
+            self.put_file(local, f"{remote_root}/{rel}")

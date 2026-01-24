@@ -10,6 +10,7 @@ __pycache__/
 *.so
 
 .vscode/
+.okay/
 
 doc/
 docs/
@@ -184,8 +185,6 @@ cython_debug/
 
 # build files
 build/
-
-.okay/
 
 # user-specific .clangd -- use okay index to create
 *.clangd

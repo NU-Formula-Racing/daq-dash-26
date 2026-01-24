@@ -14,7 +14,12 @@ from typing import *
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--engine", default=None, help="Override engine root (run `okay where` to get this).", required=True)
+    ap.add_argument(
+        "--engine",
+        default=None,
+        help="Override engine root (run `okay where` to get this).",
+        required=True,
+    )
     ap.add_argument("--host", default="nfr.local")
     ap.add_argument("--user", default="nfr")
     ap.add_argument("--password", default="formula")
@@ -23,33 +28,40 @@ def main() -> int:
     ap.add_argument("--app", default="dash")
     ap.add_argument("--no-autoadd-hostkey", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--clear", action="store_true", help="Clear remote directories before upload")
+    ap.add_argument(
+        "--clear", action="store_true", help="Clear remote directories before upload"
+    )
     args = ap.parse_args()
 
-    script_dir = Path(__file__).resolve().parent
+    local_applications = Path(__file__).resolve().parent.parent
+    local_app = local_applications / args.app
+    if not local_app.is_dir():
+        print(
+            f"Error: Application directory does not exist: {local_app}",
+            file=sys.stderr,
+        )
+        return 1
 
-    remote_dash = f"{args.dash_dir}/engine"
+    remote_engine = f"{args.dash_dir}/engine"
     remote_apps = f"{args.dash_dir}/applications"
     remote_app = f"{remote_apps}/{args.app}"
 
     print(f"Target: {args.user}@{args.host}:{args.port}")
-    print(f"Engine root: {args.engine}")
-    print(f"Script dir (app payload): {script_dir}")
-    print(f"Remote dash dir: {remote_dash}")
+    print(f"Local engine: {args.engine}")
+    print(f"Remote engine dir: {remote_engine}")
+    print(f"Local app : {local_app}")
     print(f"Remote app dir : {remote_app}")
 
-    rpiignore = load_rpiignore(script_dir)
+    rpiignore = load_rpiignore(local_applications)
     print(f".rpiignore rules for app payload: {len(rpiignore)} lines")
 
-    if args.dry_run:
-        print("[dry-run] Skipping uploads/remote commands.")
-        return 0
 
     cfg = SSHConfig(
         host=args.host,
         user=args.user,
         password=args.password if args.password else None,
         port=args.port,
+        enable_dry_run=args.dry_run,
     )
 
     with Remote(cfg, accept_unknown_host_keys=not args.no_autoadd_hostkey) as r:
@@ -59,14 +71,18 @@ def main() -> int:
                 r.rm_rf(args.dash_dir)
 
             print("==> Ensuring remote dirs...")
-            r.mkdir_p(remote_dash)
+            r.mkdir_p(remote_engine)
             r.mkdir_p(remote_apps)
             r.mkdir_p(remote_app)
 
+            local_engine = Path(args.engine).resolve()
             print("==> Uploading engine files into dash/ ...")
-            r.put_tree_with_rpiignore(args.args.engine, remote_dash, rpiignore)
+            r.put_tree_with_rpiignore(local_engine, remote_engine, rpiignore)
 
-            okay_install_script = posixpath.join(remote_dash, "okay", "scripts", "install.bash")
+            okay_install_script = posixpath.join(
+                remote_engine, "okay", "scripts", "install.bash"
+            )
+
             print("==> Ensuring install.bash is executable ...")
             r.allow_exec(okay_install_script)
 
@@ -77,7 +93,7 @@ def main() -> int:
             r.must(okay_install_script)
 
             print("==> Uploading app payload (this script dir) ...")
-            r.put_tree_with_rpiignore(script_dir, remote_app, rpiignore)
+            r.put_tree_with_rpiignore(local_app, remote_app, rpiignore)
 
             print("==> Running okay br ...")
             r.must(f"cd {shlex.quote(remote_app)} && okay br")

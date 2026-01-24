@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from util.ssh import Remote, SSHConfig
-from util.rpiignore import load_rpiignore
 
 import argparse
 import os
@@ -41,20 +40,27 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    
+    local_engine = Path(args.engine).resolve()
+
+    if not local_engine.is_dir():
+        print(f"Error: Engine directory does not exist: {args.engine}", file=sys.stderr)
+        return 1
 
     remote_engine = f"{args.dash_dir}/engine"
     remote_apps = f"{args.dash_dir}/applications"
     remote_app = f"{remote_apps}/{args.app}"
 
     print(f"Target: {args.user}@{args.host}:{args.port}")
-    print(f"Local engine: {args.engine}")
+    print(f"Local engine: {local_engine}")
     print(f"Remote engine dir: {remote_engine}")
     print(f"Local app : {local_app}")
     print(f"Remote app dir : {remote_app}")
 
-    rpiignore = load_rpiignore(local_applications)
-    print(f".rpiignore rules for app payload: {len(rpiignore)} lines")
-
+    rpiignore = local_applications.joinpath(".rpiignore")
+    if rpiignore.is_file() is False:
+        print(f"Error: .rpiignore file not found at {rpiignore}", file=sys.stderr)
+        return 1
 
     cfg = SSHConfig(
         host=args.host,
@@ -75,7 +81,6 @@ def main() -> int:
             r.mkdir_p(remote_apps)
             r.mkdir_p(remote_app)
 
-            local_engine = Path(args.engine).resolve()
             print("==> Uploading engine files into dash/ ...")
             r.put_tree_with_rpiignore(local_engine, remote_engine, rpiignore)
 

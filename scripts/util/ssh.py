@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from util.rpiignore import iter_files_with_rpiignore
+from util.rpiignore import get_files_with_rpiignore
 
 from pathlib import Path
 from typing import *
@@ -69,7 +69,7 @@ class Remote:
             return 0, "", ""
 
         assert self.client is not None, "SSH client is not initialized."
-        
+
         full = f"bash -lc {shlex.quote(cmd)}"
         # get currrent directory of client to print
         if verbose:
@@ -121,7 +121,7 @@ class Remote:
     def put_tree_with_rpiignore(
         self, local_root: Path, remote_root: str, rules: List[str]
     ) -> None:
-        files = list(iter_files_with_rpiignore(local_root, rules))
+        files = get_files_with_rpiignore(local_root, rules)
         for local, rel in tqdm(files, desc="Uploading files", unit="file"):
             # print the relative path being uploaded, but in a way that works with tqdm
             tqdm.write(f"Uploading: {local} -> {remote_root}/{rel}")

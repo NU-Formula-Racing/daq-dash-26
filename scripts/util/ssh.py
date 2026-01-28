@@ -112,18 +112,44 @@ class Remote:
 
         if not local.exists():
             raise RuntimeError(f"Local file does not exist: {local}")
+        
+        remote = remote.replace("\\", "/")  # normalize to POSIX
 
         # ensure remote directory exists
         remote_dir = posixpath.dirname(remote)
         self.mkdir_p(remote_dir, verbose=False)
         self.sftp.put(str(local), remote)
 
+    def read_remote_file(self, remote: str) -> str:
+        if self.cfg.enable_dry_run:
+            print(f"[dry-run] Reading remote file: {remote}")
+            return None
+
+        assert self.sftp is not None, "SFTP client is not initialized."
+
+        # check that the remote file exists
+        try:
+            with self.sftp.open(remote, "r") as f:
+                return f.read().decode()
+        except FileNotFoundError:
+            return None
+
+
     def put_tree_with_rpiignore(
-        self, local_root: Path, remote_root: str, rules: List[str]
+        self, local_root: Path, remote_root: str, rules: List[str], on_upload_file: Optional[Callable[[Path, Path, str], None]] = None, filter_func: Optional[Callable[[Path], bool]] = None
     ) -> None:
         files = get_files_with_rpiignore(local_root, rules)
         for local, rel in tqdm(files, desc="Uploading files", unit="file"):
             # print the relative path being uploaded, but in a way that works with tqdm
-            tqdm.write(f"Uploading: {local} -> {remote_root}/{rel}")
+            rel_posix = rel.as_posix() if isinstance(rel, Path) else str(rel).replace("\\", "/")
+            remote = posixpath.join(remote_root, rel_posix)
+
             remote = posixpath.join(remote_root, rel)
+            if filter_func and not filter_func(local, remote):
+                tqdm.write(f"Skipping: {local} -> {remote_root}/{rel}")
+                continue
+
+            tqdm.write(f"Uploading: {local} -> {remote_root}/{rel}")
             self.put_file(local, f"{remote_root}/{rel}")
+            if on_upload_file:
+                on_upload_file(local, remote)

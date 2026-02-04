@@ -16,9 +16,9 @@ class FileChecksumGenerator:
                 self.checksums[filepath] = checksum
 
     def load_checksum_from_blob(self, blob : str) -> None:
-        print(f"Loading checksum from blob: {blob}")
+        # print(f"Loading checksum from blob: {blob}")
         for row in blob.split("\n"):
-            print(row)
+            # print(row)
             parts = row.split(",")
             if len(parts) != 2:
                 continue
@@ -26,7 +26,7 @@ class FileChecksumGenerator:
 
             filepath = filepath.strip()
             checksum = checksum.strip()
-            print(f"Loaded checksum for {filepath}: {checksum}")
+            # print(f"Loaded checksum for {filepath}: {checksum}")
             self.checksums[filepath] = checksum
 
     def __generate_file_checksum(self, filepath: str) -> str:

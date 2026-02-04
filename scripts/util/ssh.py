@@ -70,7 +70,7 @@ class Remote:
 
         assert self.client is not None, "SSH client is not initialized."
 
-        full = f"bash -lc {shlex.quote(cmd)}"
+        full = f"bash -lic {shlex.quote(cmd)}"
         # get currrent directory of client to print
         if verbose:
             dir = self.client.exec_command("pwd")
@@ -146,7 +146,7 @@ class Remote:
 
             remote = posixpath.join(remote_root, rel)
             if filter_func and not filter_func(local, remote):
-                tqdm.write(f"Skipping: {local} -> {remote_root}/{rel}")
+                # tqdm.write(f"Skipping: {local} -> {remote_root}/{rel}")
                 continue
 
             tqdm.write(f"Uploading: {local} -> {remote_root}/{rel}")

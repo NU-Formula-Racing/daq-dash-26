@@ -123,7 +123,11 @@ def main() -> int:
             r.must(okay_install_script)
 
             print("==> Running okay br ...")
-            r.must(f"cd {shlex.quote(remote_app)} && okay br --target rpi")
+            r.must(
+                f"source ~/.bashrc && "
+                f"cd {shlex.quote(remote_app)} && "
+                f"okay init && okay br --target rpi"
+            )
 
 
 

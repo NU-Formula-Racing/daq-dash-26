@@ -11,13 +11,14 @@ import shlex
 import sys
 from tqdm import tqdm
 
+
 @dataclass
 class SSHConfig:
     host: str
     user: str
     password: Optional[str]
     port: int = 22
-    enable_dry_run: bool = False # if True, don't actually execute commands
+    enable_dry_run: bool = False  # if True, don't actually execute commands
 
 
 class Remote:
@@ -71,21 +72,49 @@ class Remote:
         assert self.client is not None, "SSH client is not initialized."
 
         full = f"bash -lic {shlex.quote(cmd)}"
-        # get currrent directory of client to print
+
         if verbose:
-            dir = self.client.exec_command("pwd")
-            print(f"[remote @ {dir[1].read().decode().strip()}]$ {full}")
+            _, stdout_pwd, _ = self.client.exec_command("pwd")
+            print(f"[remote @ {stdout_pwd.read().decode().strip()}]$ {full}")
+
         stdin, stdout, stderr = self.client.exec_command(full, get_pty=True)
-        out = stdout.read().decode(errors="replace")
-        err = stderr.read().decode(errors="replace")
-        code = stdout.channel.recv_exit_status()
-        return code, out, err
+        channel = stdout.channel
+
+        out_chunks: list[str] = []
+        err_chunks: list[str] = []
+
+        # Stream output while the command is running
+        while True:
+            # stdout
+            if channel.recv_ready():
+                data = channel.recv(4096).decode(errors="replace")
+                if data:
+                    sys.stdout.write(data)
+                    sys.stdout.flush()
+                    out_chunks.append(data)
+
+            if channel.recv_stderr_ready():
+                data = channel.recv_stderr(4096).decode(errors="replace")
+                if data:
+                    sys.stderr.write(data)
+                    sys.stderr.flush()
+                    err_chunks.append(data)
+
+            if channel.exit_status_ready():
+                break
+
+            # avoid busy-spin
+            channel.recv_ready() or channel.recv_stderr_ready() or channel.exit_status_ready()
+            channel.settimeout(0.1)
+
+        code = channel.recv_exit_status()
+        return code, "".join(out_chunks), "".join(err_chunks)
 
     def must(self, cmd: str, verbose=True) -> None:
         if self.cfg.enable_dry_run:
             print(f"[dry-run] SSH command must: {cmd}")
             return
-        
+
         code, out, err = self.run(cmd, verbose=verbose)
         if out.strip():
             sys.stdout.write(out)
@@ -112,7 +141,7 @@ class Remote:
 
         if not local.exists():
             raise RuntimeError(f"Local file does not exist: {local}")
-        
+
         remote = remote.replace("\\", "/")  # normalize to POSIX
 
         # ensure remote directory exists
@@ -134,14 +163,20 @@ class Remote:
         except FileNotFoundError:
             return None
 
-
     def put_tree_with_rpiignore(
-        self, local_root: Path, remote_root: str, rules: List[str], on_upload_file: Optional[Callable[[Path, Path, str], None]] = None, filter_func: Optional[Callable[[Path], bool]] = None
+        self,
+        local_root: Path,
+        remote_root: str,
+        rules: List[str],
+        on_upload_file: Optional[Callable[[Path, Path, str], None]] = None,
+        filter_func: Optional[Callable[[Path], bool]] = None,
     ) -> None:
         files = get_files_with_rpiignore(local_root, rules)
         for local, rel in tqdm(files, desc="Uploading files", unit="file"):
             # print the relative path being uploaded, but in a way that works with tqdm
-            rel_posix = rel.as_posix() if isinstance(rel, Path) else str(rel).replace("\\", "/")
+            rel_posix = (
+                rel.as_posix() if isinstance(rel, Path) else str(rel).replace("\\", "/")
+            )
             remote = posixpath.join(remote_root, rel_posix)
 
             remote = posixpath.join(remote_root, rel)

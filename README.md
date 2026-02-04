@@ -42,6 +42,12 @@ Dashboard Controller Board is designed to act as an ethernet device over USB. Us
 
 Before updating the code on the board, make sure that there is an SD card with the `raspbian os lite` operating system in the controller board. Then, using a cable that supports USB 2.0, connect the controller board to your computer.
 
+**If you are on Windows**, you need to install the `rndis` driver for the raspberry pi, which can be found [here](https://github.com/raspberrypi/rpi-usb-gadget/releases). When you plug in the pi, you should check the Device Manager, and see a `Raspberry Pi USB Remote NDIS Network Device` under `Network Adapters`. 
+
+
+Optionally, if you would like to enable `Internet Connection Sharing`, which will enable you to use your computer's internet connection on the pi, you can do so by going to `Device Manager` -> `Network Adapters`. Then, choose the device that you are using to connect to the internet (most likely `Wi-Fi`), right click on it, choose `Properties`, and check the option that says something along the lines of `Allow network sharing`. You will be prompted to choose which device to share, which should be set to the `Raspberry Pi`'s device. Some common names might be `Ethernet #` or `USB Network Device`.
+
+
 You can then test the connection of to the controller board:
 
 ```sh

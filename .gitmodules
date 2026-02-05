@@ -1,0 +1,3 @@
+[submodule "dash/drivers/can"]
+	path = dash/drivers/can
+	url = https://github.com/danielk125/nfr-can-library.git

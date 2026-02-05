@@ -1,4 +1,4 @@
-#include <dash/platform/platform.hpp>
+#include <platform/platform.hpp>
 
 #include <cerrno>
 #include <cstring>
@@ -157,4 +157,3 @@ bool SPI::ISpi_write(const uint8_t *tx, size_t len) {
 }
 
 } // namespace dash::platform
-    

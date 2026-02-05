@@ -1,6 +1,6 @@
 // mock platform
 
-#include <dash/platform/platform.hpp>
+#include <platform/platform.hpp>
 
 #include <cstring>
 

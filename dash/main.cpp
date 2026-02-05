@@ -5,7 +5,7 @@
 #include <okay/core/renderer/okay_surface.hpp>
 
 
-#include <dash/platform/platform.hpp>
+#include <platform/platform.hpp>
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
 

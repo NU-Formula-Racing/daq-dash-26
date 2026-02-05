@@ -7,6 +7,7 @@ set(SOURCES
 
 set(INCLUDES
     ${OKAY_PROJECT_ROOT_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # add needed drivers
@@ -24,4 +25,6 @@ add_subdirectory(
 )
 
 target_sources(${PROJECT} PRIVATE ${SOURCES})
+target_link_libraries(${PROJECT} PRIVATE dash_platform)
 target_include_directories(${PROJECT} PRIVATE ${INCLUDES})
+

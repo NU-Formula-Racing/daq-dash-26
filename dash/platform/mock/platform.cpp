@@ -2,30 +2,39 @@
 
 #include <dash/platform/platform.hpp>
 
+#include <cstring>
+
 namespace dash::platform {
 
 struct GPIO::GPIOImpl {
-    // noop
-}; 
+  GpioLevel _level = GpioLevel::G_UNDEF;
+};
 
-void GPIO::gpio_write(GpioLevel level) {
-    // noop
-}
+GPIO::GPIO(const std::string &, unsigned, bool)
+    : _impl(std::make_unique<GPIOImpl>()) {}
 
-GpioLevel GPIO::gpio_read() {
-    return GpioLevel::G_UNDEF;
-}
+GPIO::~GPIO() = default;
+
+void GPIO::gpio_write(GpioLevel level) { _impl->_level = level; }
+
+GpioLevel GPIO::gpio_read() { return _impl->_level; }
 
 struct SPI::SPIImpl {
-    // noop
+  // noop
 };
 
-bool SPI::ISpi_write(const uint8_t* tx, size_t len) {
-    return true;
+SPI::SPI(const std::string &, uint32_t, uint8_t, uint8_t)
+    : _impl(std::make_unique<SPIImpl>()) {}
+
+SPI::~SPI() = default;
+
+bool SPI::ISpi_write(const uint8_t *, size_t) { return true; }
+
+bool SPI::ISpi_transfer(const uint8_t *tx, uint8_t *rx, size_t len) {
+  if (tx && rx && len > 0) {
+    std::memcpy(rx, tx, len); // echo for predictable tests
+  }
+  return true;
 }
 
-bool SPI::ISpi_transfer(const uint8_t* tx, uint8_t* rx, size_t len) {
-    return true;
-}
-
-};
+} // namespace dash::platform

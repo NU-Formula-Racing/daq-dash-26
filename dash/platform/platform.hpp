@@ -6,12 +6,18 @@
 #include <nfr_can/ISpi.hpp>
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
+#include <string>
+#include <thread>
 
 namespace dash::platform {
 
 class GPIO : public IGpio {
 public:
+  GPIO(const std::string &chipName, unsigned lineOffset, bool output);
+  ~GPIO();
+
   void gpio_write(GpioLevel level) override;
   GpioLevel gpio_read() override;
 
@@ -22,6 +28,10 @@ private:
 
 class SPI : public ISpi {
 public:
+  SPI(const std::string &device = "/dev/spidev0.0",
+      uint32_t speedHz = 1'000'000, uint8_t mode = 0, uint8_t bitsPerWord = 8);
+  ~SPI();
+
   bool ISpi_transfer(const uint8_t *tx, uint8_t *rx, size_t len) override;
   bool ISpi_write(const uint8_t *tx, size_t len) override;
 
@@ -37,12 +47,13 @@ public:
   }
 
   uint32_t monotonicMs() override {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(
-               std::chrono::system_clock::now().time_since_epoch())
-        .count();
+    using namespace std::chrono;
+    return static_cast<uint32_t>(
+        duration_cast<milliseconds>(steady_clock::now().time_since_epoch())
+            .count());
   }
 };
 
-}; // namespace dash::platform
+} // namespace dash::platform
 
 #endif // __PLATFORM_H__

@@ -4,10 +4,11 @@
 #include <okay/core/renderer/okay_renderer.hpp>
 #include <okay/core/renderer/okay_surface.hpp>
 
-
-#include <platform/platform.hpp>
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
+#include <platform/platform.hpp>
+
+#include <nfr_can/virtual_timer.hpp>
 
 static void __gameInitialize();
 static void __gameUpdate();
@@ -19,6 +20,7 @@ namespace can {
 dash::platform::SPI canSpi;
 dash::platform::GPIO canGPIO{"gpiochip0", 0, false};
 dash::platform::Clock canClock;
+VirtualTimerGroup timerGroup;
 MCP2515 canDriver{canSpi, canGPIO, canClock};
 CAN_Bus bus{canDriver};
 
@@ -30,13 +32,12 @@ CAN_Signal_INT16 DC_Current = MakeSignalExp(int16_t, 48, 16, 0.1, 0);
 CAN_Signal_INT16 APPS1_Throttle = MakeSignalExp(int16_t, 0, 16, 1, 0);
 CAN_Signal_INT16 APPS2_Throttle = MakeSignalExp(int16_t, 16, 16, 1, 0);
 
-
-RX_CAN_Message(4) motor_status(bus, 0x281, false, 8, __motorStatusRecv, RPM, Motor_Current, DC_Voltage, DC_Current);
-TX_CAN_Message(2) ECU_Throttle(bus, 0x202, false, 4, APPS1_Throttle, APPS2_Throttle);
+RX_CAN_Message(4) motor_status(bus, 0x281, false, 8, __motorStatusRecv, RPM,
+                               Motor_Current, DC_Voltage, DC_Current);
+TX_CAN_Message(2) ECU_Throttle(bus, 0x202, false, 4, 1000, timerGroup,
+                               APPS1_Throttle, APPS2_Throttle);
 
 }; // namespace can
-
-
 
 int main() {
   okay::SurfaceConfig surfaceConfig;
@@ -68,9 +69,13 @@ static void __gameInitialize() {
 }
 
 static void __gameUpdate() {
-    can::APPS1_Throttle->set(33);
-    can::APPS2_Throttle->set(55);
-    can::bus.send(can::ECU_Throttle);
+  can::APPS1_Throttle->set(33);
+  can::APPS2_Throttle->set(55);
+  can::bus.send(can::ECU_Throttle);
+
+  can::timerGroup.Tick(can::canClock.monotonicMs());
+  can::bus.tick_bus();
+  can::canDriver.updateMissCounter();
 }
 
 static void __gameShutdown() {
@@ -79,8 +84,8 @@ static void __gameShutdown() {
 }
 
 static void __motorStatusRecv() {
-    std::cout << "RPM: " << can::RPM->get() << std::endl;
-    std::cout << "Motor Current: " << can::Motor_Current->get() << std::endl;
-    std::cout << "DC Voltage: " << can::DC_Voltage->get() << std::endl;
-    std::cout << "DC Current: " << can::DC_Current->get() << std::endl;
+  std::cout << "RPM: " << can::RPM->get() << std::endl;
+  std::cout << "Motor Current: " << can::Motor_Current->get() << std::endl;
+  std::cout << "DC Voltage: " << can::DC_Voltage->get() << std::endl;
+  std::cout << "DC Current: " << can::DC_Current->get() << std::endl;
 }

@@ -10,10 +10,13 @@
 
 #include <nfr_can/virtual_timer.hpp>
 
+#include <csignal>
+
 static void __gameInitialize();
 static void __gameUpdate();
 static void __gameShutdown();
 static void __motorStatusRecv();
+static void __exitSignal(int sig);
 
 
 namespace can {
@@ -50,6 +53,10 @@ int main() {
   okay::OkayLevelManagerSettings levelManagerSettings;
   auto levelManager = okay::OkayLevelManager::create(levelManagerSettings);
 
+  // attach an interrupt to exit the program on ctrl c
+  std::signal(SIGINT, __exitSignal);
+
+
   okay::OkayGame::create()
       .addSystems(
             std::move(levelManager), 
@@ -82,7 +89,7 @@ static void __gameUpdate() {
   bool sent = can::bus.send(can::ECU_Throttle);
   if (!sent) {
     okay::Engine.logger.error("Failed to send message");
-    while (true) {}
+    // while (true) {}
   }
 
 
@@ -101,4 +108,9 @@ static void __motorStatusRecv() {
   std::cout << "Motor Current: " << can::Motor_Current->get() << std::endl;
   std::cout << "DC Voltage: " << can::DC_Voltage->get() << std::endl;
   std::cout << "DC Current: " << can::DC_Current->get() << std::endl;
+}
+
+static void __exitSignal(int sig) {
+  okay::Engine.logger.info("Exit signal received: {}", sig);
+  okay::Engine.shutdown();
 }

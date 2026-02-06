@@ -28,13 +28,10 @@ SPI::SPI(const std::string &, uint32_t, uint8_t, uint8_t)
 
 SPI::~SPI() = default;
 
-bool SPI::ISpi_write(const uint8_t *, size_t) { return true; }
+bool SPI::ISpi_write(const uint8_t *, size_t) { return false; }
 
 bool SPI::ISpi_transfer(const uint8_t *tx, uint8_t *rx, size_t len) {
-  if (tx && rx && len > 0) {
-    std::memcpy(rx, tx, len); // echo for predictable tests
-  }
-  return true;
+    return false;
 }
 
 } // namespace dash::platform

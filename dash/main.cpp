@@ -15,6 +15,7 @@ static void __gameUpdate();
 static void __gameShutdown();
 static void __motorStatusRecv();
 
+
 namespace can {
 
 dash::platform::SPI canSpi;
@@ -50,8 +51,10 @@ int main() {
   auto levelManager = okay::OkayLevelManager::create(levelManagerSettings);
 
   okay::OkayGame::create()
-      .addSystems(std::move(renderer), std::move(levelManager),
-                  std::make_unique<okay::OkayAssetManager>())
+      .addSystems(
+            std::move(levelManager), 
+            // std::move(renderer),
+            std::make_unique<okay::OkayAssetManager>())
       .onInitialize(__gameInitialize)
       .onUpdate(__gameUpdate)
       .onShutdown(__gameShutdown)
@@ -65,13 +68,22 @@ static void __gameInitialize() {
   // Additional game initialization logic
 
   BaudRate baud500k = BaudRate::kBaud500K;
-  can::canDriver.begin(baud500k);
+  bool canInit = can::canDriver.begin(baud500k);
+  if (!canInit) {
+    okay::Engine.logger.error("Failed to initialize CAN bus");
+    while (true) {}
+  }
 }
 
 static void __gameUpdate() {
+  okay::Engine.logger.info("Game update.");
   can::APPS1_Throttle->set(33);
   can::APPS2_Throttle->set(55);
-  can::bus.send(can::ECU_Throttle);
+  bool sent = can::bus.send(can::ECU_Throttle);
+  if (!sent) {
+    okay::Engine.logger.error("Failed to send message");
+  }
+
 
   can::timerGroup.Tick(can::canClock.monotonicMs());
   can::bus.tick_bus();

@@ -44,9 +44,7 @@ private:
 class Clock : public IClock {
 public:
   void sleepMs(uint32_t ms) override {
-    std::cout << "Sleeping for " << ms << "ms" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-    std::cout << "Done sleeping" << std::endl;
   }
 
   uint32_t monotonicMs() override {

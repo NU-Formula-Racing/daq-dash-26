@@ -11,6 +11,7 @@
 #include <nfr_can/virtual_timer.hpp>
 
 #include <csignal>
+#include <string>
 
 static void __gameInitialize();
 static void __gameUpdate();
@@ -28,10 +29,10 @@ VirtualTimerGroup timerGroup;
 MCP2515 canDriver{canSpi, canGPIO, canClock};
 CAN_Bus bus{canDriver};
 
-CAN_Signal_INT16 RPM = MakeSignalExp(int16_t, 0, 16, 1, 0);
-CAN_Signal_INT16 Motor_Current = MakeSignalExp(int16_t, 16, 16, 0.1, 0);
-CAN_Signal_INT16 DC_Voltage = MakeSignalExp(int16_t, 32, 16, 0.1, 0);
-CAN_Signal_INT16 DC_Current = MakeSignalExp(int16_t, 48, 16, 0.1, 0);
+CAN_Signal_FLOAT RPM = MakeSignalExp(float, 0, 16, 1, 0);
+CAN_Signal_FLOAT Motor_Current = MakeSignalExp(float, 16, 16, 0.1, 0);
+CAN_Signal_FLOAT DC_Voltage = MakeSignalExp(float, 32, 16, 0.1, 0);
+CAN_Signal_FLOAT DC_Current = MakeSignalExp(float, 48, 16, 0.1, 0);
 
 CAN_Signal_INT16 APPS1_Throttle = MakeSignalExp(int16_t, 0, 16, 1, 0);
 CAN_Signal_INT16 APPS2_Throttle = MakeSignalExp(int16_t, 16, 16, 1, 0);
@@ -89,6 +90,9 @@ static void __gameUpdate() {
   bool sent = can::bus.send(can::ECU_Throttle);
   if (!sent) {
     okay::Engine.logger.error("Failed to send message");
+    // while (true) {}
+  } else {
+    // okay::Engine.logger.info("Message sent");
     // while (true) {}
   }
 

@@ -19,7 +19,7 @@ static void __motorStatusRecv();
 namespace can {
 
 dash::platform::SPI canSpi;
-dash::platform::GPIO canGPIO{"gpiochip0", 0, false};
+dash::platform::GPIO canGPIO{"gpiochip0", 0, true};
 dash::platform::Clock canClock;
 VirtualTimerGroup timerGroup;
 MCP2515 canDriver{canSpi, canGPIO, canClock};
@@ -76,12 +76,13 @@ static void __gameInitialize() {
 }
 
 static void __gameUpdate() {
-  okay::Engine.logger.info("Game update.");
+//   okay::Engine.logger.info("Game update.");
   can::APPS1_Throttle->set(33);
   can::APPS2_Throttle->set(55);
   bool sent = can::bus.send(can::ECU_Throttle);
   if (!sent) {
     okay::Engine.logger.error("Failed to send message");
+    while (true) {}
   }
 
 

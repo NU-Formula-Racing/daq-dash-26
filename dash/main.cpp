@@ -8,7 +8,7 @@
 #include <nfr_can/MCP2515.hpp>
 #include <platform/platform.hpp>
 
-#include <nfr_can/virtual_timer.hpp>
+#include <can/can_dbc.hpp>
 
 #include <csignal>
 #include <string>
@@ -19,28 +19,6 @@ static void __gameShutdown();
 static void __motorStatusRecv();
 static void __exitSignal(int sig);
 
-namespace can {
-
-dash::platform::SPI canSpi;
-dash::platform::GPIO canGPIO{"gpiochip0", 0, true};
-dash::platform::Clock canClock;
-VirtualTimerGroup timerGroup;
-CAN_Bus bus{std::make_unique<MCP2515>(canSpi, canGPIO, canClock)};
-
-CAN_Signal_FLOAT RPM = MakeSignalExp(float, 0, 16, 1, 0);
-CAN_Signal_FLOAT Motor_Current = MakeSignalExp(float, 16, 16, 0.1, 0);
-CAN_Signal_FLOAT DC_Voltage = MakeSignalExp(float, 32, 16, 0.1, 0);
-CAN_Signal_FLOAT DC_Current = MakeSignalExp(float, 48, 16, 0.1, 0);
-
-CAN_Signal_INT16 APPS1_Throttle = MakeSignalExp(int16_t, 0, 16, 1, 0);
-CAN_Signal_INT16 APPS2_Throttle = MakeSignalExp(int16_t, 16, 16, 1, 0);
-
-RX_CAN_Message(4) motor_status(
-    bus, 0x281, false, 8, __motorStatusRecv, RPM, Motor_Current, DC_Voltage, DC_Current);
-TX_CAN_Message(2)
-    ECU_Throttle(bus, 0x202, false, 4, 1000, timerGroup, APPS1_Throttle, APPS2_Throttle);
-
-};  // namespace can
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
@@ -72,7 +50,7 @@ static void __gameInitialize() {
     // Additional game initialization logic
 
     BaudRate baud500k = BaudRate::kBaud500K;
-    if (can::bus.init(baud500k)) {
+    if (dbc::driveBus.init(baud500k)) {
         okay::Engine.logger.error("Failed to initialize CAN bus");
         while (true) {
         }

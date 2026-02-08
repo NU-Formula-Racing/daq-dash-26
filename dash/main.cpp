@@ -25,8 +25,7 @@ dash::platform::SPI canSpi;
 dash::platform::GPIO canGPIO{"gpiochip0", 0, true};
 dash::platform::Clock canClock;
 VirtualTimerGroup timerGroup;
-MCP2515 canDriver{canSpi, canGPIO, canClock};
-CAN_Bus bus{canDriver};
+CAN_Bus bus{std::make_unique<MCP2515>(canSpi, canGPIO, canClock)};
 
 CAN_Signal_FLOAT RPM = MakeSignalExp(float, 0, 16, 1, 0);
 CAN_Signal_FLOAT Motor_Current = MakeSignalExp(float, 16, 16, 0.1, 0);
@@ -73,40 +72,21 @@ static void __gameInitialize() {
     // Additional game initialization logic
 
     BaudRate baud500k = BaudRate::kBaud500K;
-    bool canInit = can::canDriver.begin(baud500k);
-    if (!canInit) {
+    if (can::bus.init(baud500k)) {
         okay::Engine.logger.error("Failed to initialize CAN bus");
         while (true) {
         }
     }
 }
 
-static void updateThrottleUI(float throttle1, float throttle2) {
-    // does somethign to the UI
-}
-
-bool isOnCar = false;
-static float getThrottle1FromUI() {
-}
-static float getThrottle2FromUI() {
-}
-
-static void __gameUpdate() {
-    // update the throttle UI with the current throttle values
-    if (!isOnCar) {
-        updateThrottleUI(getThrottle1FromUI(), getThrottle2FromUI());
-    } else {
-        updateThrottleUI(can::APPS1_Throttle->get(), can::APPS2_Throttle->get());
-    }
-
-    can::timerGroup.Tick(can::canClock.monotonicMs());
-    can::bus.tick_bus();
-    can::canDriver.updateMissCounter();
-}
-
 static void __gameShutdown() {
     std::cout << "Game shutdown." << std::endl;
     // Cleanup logic before game shutdown
+}
+
+static void __gameUpdate() {
+    can::timerGroup.Tick(can::canClock.monotonicMs());
+    can::bus.tick_bus();
 }
 
 static void __motorStatusRecv() {

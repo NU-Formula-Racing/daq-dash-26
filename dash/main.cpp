@@ -19,7 +19,6 @@ static void __gameShutdown();
 static void __motorStatusRecv();
 static void __exitSignal(int sig);
 
-
 namespace can {
 
 dash::platform::SPI canSpi;
@@ -37,84 +36,87 @@ CAN_Signal_FLOAT DC_Current = MakeSignalExp(float, 48, 16, 0.1, 0);
 CAN_Signal_INT16 APPS1_Throttle = MakeSignalExp(int16_t, 0, 16, 1, 0);
 CAN_Signal_INT16 APPS2_Throttle = MakeSignalExp(int16_t, 16, 16, 1, 0);
 
-RX_CAN_Message(4) motor_status(bus, 0x281, false, 8, __motorStatusRecv, RPM,
-                               Motor_Current, DC_Voltage, DC_Current);
-TX_CAN_Message(2) ECU_Throttle(bus, 0x202, false, 4, 1000, timerGroup,
-                               APPS1_Throttle, APPS2_Throttle);
+RX_CAN_Message(4) motor_status(
+    bus, 0x281, false, 8, __motorStatusRecv, RPM, Motor_Current, DC_Voltage, DC_Current);
+TX_CAN_Message(2)
+    ECU_Throttle(bus, 0x202, false, 4, 1000, timerGroup, APPS1_Throttle, APPS2_Throttle);
 
-}; // namespace can
+};  // namespace can
 
 int main() {
-  okay::SurfaceConfig surfaceConfig;
-  okay::Surface surface(surfaceConfig);
+    okay::SurfaceConfig surfaceConfig;
+    okay::Surface surface(surfaceConfig);
 
-  okay::OkayRendererSettings rendererSettings{surfaceConfig};
-  auto renderer = okay::OkayRenderer::create(rendererSettings);
+    okay::OkayRendererSettings rendererSettings{surfaceConfig};
+    auto renderer = okay::OkayRenderer::create(rendererSettings);
 
-  okay::OkayLevelManagerSettings levelManagerSettings;
-  auto levelManager = okay::OkayLevelManager::create(levelManagerSettings);
+    okay::OkayLevelManagerSettings levelManagerSettings;
+    auto levelManager = okay::OkayLevelManager::create(levelManagerSettings);
 
-  // attach an interrupt to exit the program on ctrl c
-  std::signal(SIGINT, __exitSignal);
+    // attach an interrupt to exit the program on ctrl c
+    std::signal(SIGINT, __exitSignal);
 
+    okay::OkayGame::create()
+        .addSystems(std::move(levelManager),
+                    // std::move(renderer),
+                    std::make_unique<okay::OkayAssetManager>())
+        .onInitialize(__gameInitialize)
+        .onUpdate(__gameUpdate)
+        .onShutdown(__gameShutdown)
+        .run();
 
-  okay::OkayGame::create()
-      .addSystems(
-            std::move(levelManager), 
-            // std::move(renderer),
-            std::make_unique<okay::OkayAssetManager>())
-      .onInitialize(__gameInitialize)
-      .onUpdate(__gameUpdate)
-      .onShutdown(__gameShutdown)
-      .run();
-
-  return 0;
+    return 0;
 }
 
 static void __gameInitialize() {
-  std::cout << "Game initialized." << std::endl;
-  // Additional game initialization logic
+    std::cout << "Game initialized." << std::endl;
+    // Additional game initialization logic
 
-  BaudRate baud500k = BaudRate::kBaud500K;
-  bool canInit = can::canDriver.begin(baud500k);
-  if (!canInit) {
-    okay::Engine.logger.error("Failed to initialize CAN bus");
-    while (true) {}
-  }
+    BaudRate baud500k = BaudRate::kBaud500K;
+    bool canInit = can::canDriver.begin(baud500k);
+    if (!canInit) {
+        okay::Engine.logger.error("Failed to initialize CAN bus");
+        while (true) {
+        }
+    }
+}
+
+static void updateThrottleUI(float throttle1, float throttle2) {
+    // does somethign to the UI
+}
+
+bool isOnCar = false;
+static float getThrottle1FromUI() {
+}
+static float getThrottle2FromUI() {
 }
 
 static void __gameUpdate() {
-//   okay::Engine.logger.info("Game update.");
-  can::APPS1_Throttle->set(33);
-  can::APPS2_Throttle->set(55);
-  bool sent = can::bus.send(can::ECU_Throttle);
-  if (!sent) {
-    okay::Engine.logger.error("Failed to send message");
-    // while (true) {}
-  } else {
-    // okay::Engine.logger.info("Message sent");
-    // while (true) {}
-  }
+    // update the throttle UI with the current throttle values
+    if (!isOnCar) {
+        updateThrottleUI(getThrottle1FromUI(), getThrottle2FromUI());
+    } else {
+        updateThrottleUI(can::APPS1_Throttle->get(), can::APPS2_Throttle->get());
+    }
 
-
-  can::timerGroup.Tick(can::canClock.monotonicMs());
-  can::bus.tick_bus();
-  can::canDriver.updateMissCounter();
+    can::timerGroup.Tick(can::canClock.monotonicMs());
+    can::bus.tick_bus();
+    can::canDriver.updateMissCounter();
 }
 
 static void __gameShutdown() {
-  std::cout << "Game shutdown." << std::endl;
-  // Cleanup logic before game shutdown
+    std::cout << "Game shutdown." << std::endl;
+    // Cleanup logic before game shutdown
 }
 
 static void __motorStatusRecv() {
-  std::cout << "RPM: " << can::RPM->get() << std::endl;
-  std::cout << "Motor Current: " << can::Motor_Current->get() << std::endl;
-  std::cout << "DC Voltage: " << can::DC_Voltage->get() << std::endl;
-  std::cout << "DC Current: " << can::DC_Current->get() << std::endl;
+    std::cout << "RPM: " << can::RPM->get() << std::endl;
+    std::cout << "Motor Current: " << can::Motor_Current->get() << std::endl;
+    std::cout << "DC Voltage: " << can::DC_Voltage->get() << std::endl;
+    std::cout << "DC Current: " << can::DC_Current->get() << std::endl;
 }
 
 static void __exitSignal(int sig) {
-  okay::Engine.logger.info("Exit signal received: {}", sig);
-  okay::Engine.shutdown();
+    okay::Engine.logger.info("Exit signal received: {}", sig);
+    okay::Engine.shutdown();
 }

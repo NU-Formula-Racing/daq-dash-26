@@ -22,7 +22,7 @@ pip install -r "$CAN_LIB_LOC/scripts/requirements.txt"
 mkdir -p "$(dirname "$OUTPUT_FILE")"
 
 # run the script
-python "$CAN_GEN_PY" -c camelCase -o "$OUTPUT_FILE" "$CAN_DBC"
+python "$CAN_GEN_PY" --min-max --meta -c camelCase -o "$OUTPUT_FILE" "$CAN_DBC"
 
 # deactivate the virtual environment
 deactivate

@@ -41,7 +41,7 @@ int main() {
         .onUpdate(__gameUpdate)
         .onShutdown(__gameShutdown)
         .run();
-
+        
     return 0;
 }
 

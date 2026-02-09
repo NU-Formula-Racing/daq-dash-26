@@ -61,7 +61,14 @@ First, exit your ssh session (if you tested your connection):
 ```sh
 exit
 ```
-Then, run the `rpi_update` script:
+Then you can create a python virtual environment, if you haven't already:
+```sh
+python -m venv venv
+source venv/Scripts/Activate
+pip install -r requirements.txt
+```
+
+*Once you have a python virtual environment, you can update the code on the controller board by running:*
 
 ```sh
 source ./rpi_update.sh

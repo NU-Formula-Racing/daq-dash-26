@@ -15,27 +15,38 @@
 
 namespace dash::platform {
 
+struct SPIError {
+  bool open_err = false;
+  bool config_err = false;
+
+  bool checkError() {
+    return open_err || config_err;
+  }
+}
+
 struct SPI::SPIImpl {
   int _fd = -1;
   uint32_t _speedHz = 0;
   uint8_t _mode = 0;
   uint8_t _bitsPerWord = 8;
 
+  SPIError errs;
+
   SPIImpl(const std::string &device, uint32_t speedHz, uint8_t mode,
           uint8_t bitsPerWord)
       : _speedHz(speedHz), _mode(mode), _bitsPerWord(bitsPerWord) {
     _fd = ::open(device.c_str(), O_RDWR | O_CLOEXEC);
     if (_fd < 0) {
-      throw std::runtime_error("open(spidev) failed: " +
-                               std::string(std::strerror(errno)));
+      errs.open_err = true;
+      return;
     }
 
     if (ioctl(_fd, SPI_IOC_WR_MODE, &_mode) < 0 ||
         ioctl(_fd, SPI_IOC_WR_BITS_PER_WORD, &_bitsPerWord) < 0 ||
         ioctl(_fd, SPI_IOC_WR_MAX_SPEED_HZ, &_speedHz) < 0) {
       ::close(_fd);
-      throw std::runtime_error("SPI configuration failed: " +
-                               std::string(std::strerror(errno)));
+      errs.config_err = true;
+      return;
     }
   }
 

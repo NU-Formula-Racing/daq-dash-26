@@ -131,5 +131,5 @@ static void __gameUpdate() {
 
 static void __exitSignal(int sig) {
     okay::Engine.logger.info("Exit signal received: {}", sig);
-    okay::Engine.shutdown();
+    //okay::Engine.shutdown();
 }

@@ -15,9 +15,14 @@ GPIO::GPIO(const std::string &, unsigned, bool)
 
 GPIO::~GPIO() = default;
 
-void GPIO::gpio_write(GpioLevel level) { _impl->_level = level; }
-
-GpioLevel GPIO::gpio_read() { return _impl->_level; }
+bool GPIO::gpio_write(GpioLevel level) { 
+  _impl->_level = level; 
+  return true;
+}
+bool GPIO::gpio_read(GpioLevel& out){ 
+  out = _impl->_level; 
+  return true;
+}
 
 struct SPI::SPIImpl {
   // noop

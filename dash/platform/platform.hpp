@@ -19,8 +19,10 @@ public:
   GPIO(const std::string &chipName, unsigned lineOffset, bool output);
   ~GPIO();
 
-  void gpio_write(GpioLevel level) override;
-  GpioLevel gpio_read() override;
+  bool gpio_write(GpioLevel level) override;
+  bool gpio_read(GpioLevel& out) override;
+
+  bool checkError();
 
 private:
   struct GPIOImpl;

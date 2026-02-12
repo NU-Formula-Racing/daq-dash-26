@@ -24,6 +24,20 @@ static std::string chipNameToPath(const std::string& chipName) {
   return "/dev/gpiochip" + chipName;
 }
 
+struct GPIOError {
+  bool chip_open_err = false;
+  bool config_alloc_err = false;
+  bool line_config_add_line_settings_err = false;
+  bool gpiod_chip_request_lines_err = false;
+
+  bool checkError() {
+    return  chip_open_err || 
+            config_alloc_err || 
+            line_config_add_line_settings_err || 
+            gpiod_chip_request_lines_err;
+  }
+}
+
 struct GPIO::GPIOImpl {
   gpiod_chip* _chip = nullptr;
   gpiod_line_request* _request = nullptr;
@@ -31,14 +45,16 @@ struct GPIO::GPIOImpl {
   unsigned _offset = 0;
   bool _isOutput = false;
 
+  GPIOError errs;
+
   GPIOImpl(const std::string& chipName, unsigned lineOffset, bool output)
       : _offset(lineOffset), _isOutput(output) {
     const std::string chipPath = chipNameToPath(chipName);
 
     _chip = gpiod_chip_open(chipPath.c_str());
     if (!_chip) {
-      throw std::runtime_error("gpiod_chip_open failed (" + chipPath + "): " +
-                               std::string(std::strerror(errno)));
+      errs.chip_open_err = true;
+      return;
     }
 
     gpiod_line_settings* settings = gpiod_line_settings_new();
@@ -51,7 +67,8 @@ struct GPIO::GPIOImpl {
       if (settings) gpiod_line_settings_free(settings);
       gpiod_chip_close(_chip);
       _chip = nullptr;
-      throw std::runtime_error("libgpiod: failed to allocate config objects");
+      errs.config_alloc_err = true;
+      return;
     }
 
     gpiod_request_config_set_consumer(reqConfig, "dash-platform");
@@ -70,8 +87,8 @@ struct GPIO::GPIOImpl {
       gpiod_line_settings_free(settings);
       gpiod_chip_close(_chip);
       _chip = nullptr;
-      throw std::runtime_error("gpiod_line_config_add_line_settings failed: " +
-                               std::string(std::strerror(errno)));
+      errs.line_config_add_line_settings_err = true;
+      return;
     }
 
     _request = gpiod_chip_request_lines(_chip, reqConfig, lineConfig);
@@ -83,8 +100,8 @@ struct GPIO::GPIOImpl {
     if (!_request) {
       gpiod_chip_close(_chip);
       _chip = nullptr;
-      throw std::runtime_error("gpiod_chip_request_lines failed: " +
-                               std::string(std::strerror(errno)));
+      errs.gpiod_chip_request_lines_err = true;
+      return;
     }
   }
 
@@ -99,29 +116,34 @@ struct GPIO::GPIOImpl {
     }
   }
 
-  void write(GpioLevel level) {
+  bool write(GpioLevel level) {
     if (!_isOutput) {
-      throw std::runtime_error("Attempted GPIO write on input line");
+      return false;
     }
 
     const gpiod_line_value v =
         (level == GpioLevel::G_HIGH) ? GPIOD_LINE_VALUE_ACTIVE : GPIOD_LINE_VALUE_INACTIVE;
 
     if (gpiod_line_request_set_value(_request, _offset, v) < 0) {
-      throw std::runtime_error("gpiod_line_request_set_value failed: " +
-                               std::string(std::strerror(errno)));
+      return false;
     }
+
+    return true;
   }
 
-  GpioLevel read() {
+  bool read(GpioLevel& out) {
     const gpiod_line_value v = gpiod_line_request_get_value(_request, _offset);
 
     if (v == GPIOD_LINE_VALUE_ERROR) {
-      throw std::runtime_error("gpiod_line_request_get_value failed: " +
-                               std::string(std::strerror(errno)));
+      return false;
     }
 
-    return (v == GPIOD_LINE_VALUE_ACTIVE) ? GpioLevel::G_HIGH : GpioLevel::G_LOW;
+    out = (v == GPIOD_LINE_VALUE_ACTIVE) ? GpioLevel::G_HIGH : GpioLevel::G_LOW;
+    return true;
+  }
+
+  bool checkStatus() {
+    return errs.checkError();
   }
 };
 
@@ -130,12 +152,16 @@ GPIO::GPIO(const std::string& chipName, unsigned lineOffset, bool output)
 
 GPIO::~GPIO() = default;
 
-void GPIO::gpio_write(GpioLevel level) {
-  _impl->write(level);
+bool GPIO::gpio_write(GpioLevel level) {
+  return _impl->write(level);
 }
 
-GpioLevel GPIO::gpio_read() {
-  return _impl->read();
+bool GPIO::gpio_read(GpioLevel& out) {
+  return _impl->read(out);
+}
+
+bool GPIO::checkError() {
+  return _impl->checkError();
 }
 
 } // namespace dash::platform

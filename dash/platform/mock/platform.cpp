@@ -23,6 +23,7 @@ bool GPIO::gpio_read(GpioLevel& out){
   out = _impl->_level; 
   return true;
 }
+bool GPIO::checkError() { return false; }
 
 struct SPI::SPIImpl {
   // noop

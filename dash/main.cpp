@@ -1,15 +1,18 @@
 #include <memory>
-#include <okay/core/asset/okay_asset.hpp>
-#include <okay/core/level/okay_level_manager.hpp>
 #include <okay/core/okay.hpp>
 #include <okay/core/renderer/okay_renderer.hpp>
 #include <okay/core/renderer/okay_surface.hpp>
+#include <okay/core/level/okay_level_manager.hpp>
+#include <okay/core/asset/okay_asset.hpp>
+#include <okay/core/logging/okay_logger.hpp>
+#include <okay/core/renderer/imgui/okay_imgui.hpp>
+#include <okay/core/tween/okay_tween.hpp>
 
-#include <nfr_can/CAN_interface.hpp>
-#include <nfr_can/MCP2515.hpp>
-#include <platform/platform.hpp>
+#include "drivers/can/include/nfr_can/CAN_interface.hpp"
+#include "drivers/can/include/nfr_can/MCP2515.hpp"
+#include "platform/platform.hpp"
 
-#include <can/can_dbc.hpp>
+#include "can/can_dbc.hpp"
 
 #include <csignal>
 #include <sstream>
@@ -74,9 +77,10 @@ int main() {
     std::signal(SIGINT, __exitSignal);
 
     okay::OkayGame::create()
-        .addSystems(std::move(levelManager),
-                    // std::move(renderer),
-                    std::make_unique<okay::OkayAssetManager>())
+        .addSystems(std::move(renderer), std::move(levelManager),
+                    std::make_unique<okay::OkayAssetManager>(),
+                    std::make_unique<okay::OkayTweenEngine>(),
+                    std::make_unique<okay::OkayIMGUI>())
         .onInitialize(__gameInitialize)
         .onUpdate(__gameUpdate)
         .onShutdown(__gameShutdown)

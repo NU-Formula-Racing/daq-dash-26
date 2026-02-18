@@ -35,6 +35,13 @@ struct VirtualizedNeobar {
 
 class NeopixelDisplay {
 
+    static constexpr std::vector<std::vector<uint8_t>> MAPPING_LUT = 
+     {{},
+    {},
+{}, 
+    {}
+,{}};
+
     uint8_t numPixelsAtBar(uint8_t bar) {
         // bars 0, 1, 3, 4 have 8
         // bar 2 has 7

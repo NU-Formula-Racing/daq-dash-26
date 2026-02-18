@@ -1,67 +1,68 @@
-#ifdef __LIGHTS_HPP__
+#ifndef __LIGHTS_HPP__
 #define __LIGHTS_HPP__
 
-#include <dash/drivers/neo-pixel/ws2812-rpi.h>
+#include <neo-pixel/ws2812-rpi.h>
+#include <stdint.h>
+#include <cstdint>
+#include <vector>
 
 // class/struct names are PascalCase
 // public member variables are camelCase
 // function names are camelCase
-// private memberVariables are _camelCase with a prefix _
+// private memberVariables are _camelCase with a prefix 
 
-
-struct VirtualizedNeobar
-{
-    public:
-        void setColor(uint8_t virtIdx, Color c); 
-            {
-            _strip.set_color(_mapping[virtIdx], c.r, c.g, c.b);
-            _strip.set_brightness(mapping[virtIdx], c.a);
-            }
-    private:
-        std::vector<uint8_t> _mapping; // idx -> hwIdx
-        Neopixel_strip _strip;
+struct Color {
+    uint8_t r, g, b, a;
 };
 
-struct Bar{
-    vector<Color> l;
-};
+struct VirtualizedNeobar {
+   public:
 
-class Neopixels {
-    array<Bar, 5> bars;
+    VirtualizedNeobar(uint8_t numPixels, std::vector<uint8_t> mapping) : 
+        _strip(numPixels),
+        _mapping(mapping)
+        {}
 
-};
-
-class NeopixelDisplay
-{
-    static constexpr std::array <std::vector<uint8_t>;s> MAP.LUT = 
+    void setColor(uint8_t virtIdx, Color c)
     {
-        vector<int> mapping = {8, 9, 10, 11, 12, 13, 14, 15, 7, 6, 5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5, 6, -1, 7, 6, 5, 4, 3, 2, 1, 0, 8, 9, 10, 11, 12, 13, 14, 15};
-
+        _strip.setPixelColor(_mapping[virtIdx], c.r, c.g, c.b);
     }
-    
-    std::array<VirtualizedNeobar>_bars;
 
-    void tickLights()
-        uint32_t animStart = anim.start;
-        uint32_t animEnd = anim.end;
-        uint32_t now = millis();
+   private:
+    std::vector<uint8_t> _mapping;  // idx -> hwIdx
+    NeoPixel _strip;
+};
 
-        float t = (float)(now - animStart) / (float)(animEnd - animStart);
-        
-        if (t > 1.0f) 
-        {
-            t = 1.0f;
+class NeopixelDisplay {
+
+    uint8_t numPixelsAtBar(uint8_t bar) {
+        // bars 0, 1, 3, 4 have 8
+        // bar 2 has 7
+
+        return 8;
+    }
+
+    std::vector<uint8_t> mappingAtBar(uint8_t bar) {
+        // todo, more complicated algorithm
+        return std::vector<uint8_t>();
+    }
+
+
+    void initialize() {
+        // create the bars
+        for (int i = 0; i < 5; i++) {
+            bars[i] = VirtualizedNeobar(numPixelsAtBar(i), mappingAtBar(i));
         }
+    }
 
-        anim.update(t);
+    VirtualizedNeobar &getBar(uint8_t barNum) {
+        return bars[barNum];
+    }
 
-        // is animation active
-        if (t >= 1.0f) 
-        {
-            anim.active = false;
-        }
+    private:
+    std::array<VirtualizedNeobar, 5> bars;
+};
+
 }
-}
 
-
-#endif // __LIGHTS_HPP__
+#endif  // __LIGHTS_HPP__

@@ -3,6 +3,7 @@
 # dash application
 set(SOURCES
     ${OKAY_PROJECT_ROOT_DIR}/main.cpp
+    ${OKAY_PROJECT_ROOT_DIR}/can/mock/can_imgui.cpp
 )
 
 set(INCLUDES

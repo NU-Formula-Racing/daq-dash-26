@@ -3,6 +3,9 @@
 
 #include <cstdint>
 #include <nfr_can/CAN_interface.hpp>
+#include "nfr_can/IClock.hpp"
+#include "nfr_can/IGpio.hpp"
+#include "nfr_can/ISpi.hpp"
 
 class CAN_IMGUI : public ICAN {
 private:

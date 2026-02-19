@@ -70,8 +70,32 @@ int main() {
 static void updateLights() {
     NeopixelDisplay display;
     display.initialize();
-
     
+    uint8_t br = 125;
+    Color red = {255, 0, 0, br};
+    Color orange = {255, 125, 0, br};
+    Color yellow = {255, 255, 0, br};
+    Color green = {0, 255, 0, br};
+    Color teal = {0, 255, 255, br};
+    Color blue = {0, 0, 255, br};
+    Color purple = {255, 0, 255, br};
+    Color pink = {255, 125, 125, br};
+
+    for (int i = 0; i < 5; i++)
+    {
+        display.getBar(i).setColor(0,red);
+        display.getBar(i).setColor(1,orange);
+        display.getBar(i).setColor(2,yellow);
+        display.getBar(i).setColor(3,green);
+        display.getBar(i).setColor(4,teal);
+        display.getBar(i).setColor(5,blue);
+        display.getBar(i).setColor(6,purple);
+        if (i != 2) {
+            display.getBar(i).setColor(7,pink);
+        }
+    } 
+       
+
 }
 
 static void __gameInitialize() {

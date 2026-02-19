@@ -34,7 +34,7 @@ struct VirtualizedNeobar {
 };
 
 class NeopixelDisplay {
-
+    public:
     // defines shape for project
     uint8_t numPixelsAtBar(uint8_t bar) {
         // bars 0, 1, 3, 4 have 8
@@ -78,8 +78,6 @@ class NeopixelDisplay {
         return barMap; // can you just index these like Neobar[1][0] is bottom led of middle left bar
     }
 
-
-    // i think i just made the rest of the code incompatible wth this
     void initialize() {
         // create the bars
         for (int i = 0; i < 5; i++) {

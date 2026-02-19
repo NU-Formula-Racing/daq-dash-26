@@ -3,20 +3,18 @@
 
 #include <cstdint>
 #include <nfr_can/CAN_interface.hpp>
-#include "nfr_can/IClock.hpp"
-#include "nfr_can/IGpio.hpp"
-#include "nfr_can/ISpi.hpp"
 
 class CAN_IMGUI : public ICAN {
 private:
-    ISpi& _spi;
-    IGpio& _cs;
-    IClock& _clock;
-    uint32_t missCounter;
-    uint32_t recvCount;
+    struct PDMInfo {
+        float batVoltage;
+        float batCur;
+    };
+
+    PDMInfo pdmInfo {};
 
 public:
-    CAN_IMGUI(ISpi& spi, IGpio& cs, IClock& clock) : _spi(spi), _cs(cs), _clock(clock) {}
+    CAN_IMGUI() {}
 
     bool init(const BaudRate baud) override;
     bool send(const CAN_Frame& msg) override;

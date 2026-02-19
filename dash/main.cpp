@@ -8,6 +8,7 @@
 #include <okay/core/renderer/imgui/okay_imgui.hpp>
 #include <okay/core/tween/okay_tween.hpp>
 
+#include "can/mock/can_imgui.hpp"
 #include "drivers/can/include/nfr_can/CAN_interface.hpp"
 #include "drivers/can/include/nfr_can/MCP2515.hpp"
 #include <nfr_can/virtual_timer.hpp>
@@ -238,7 +239,8 @@ static void __gameInitialize() {
     std::cout << "Game initialized." << std::endl;
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
     g_timerGroup.AddTimer(20, []() { __flushScreen(); });
-    dbc::driveBus.set_driver(std::make_unique<MCP2515>(g_canSpi, g_canGPIO, g_canClock));
+    // dbc::driveBus.set_driver(std::make_unique<MCP2515>(g_canSpi, g_canGPIO, g_canClock));
+    dbc::driveBus.set_driver(std::make_unique<CAN_IMGUI>());
 
     // check for errors
     if (g_canGPIO.checkError()) {

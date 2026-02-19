@@ -67,6 +67,13 @@ int main() {
     return 0;
 }
 
+static void updateLights() {
+    NeopixelDisplay display;
+    display.initialize();
+
+    
+}
+
 static void __gameInitialize() {
     std::cout << "Game initialized." << std::endl;
     // Additional game initialization logic
@@ -134,6 +141,8 @@ static void __gameUpdate() {
 
     std::cout << frame.str();
     std::cout.flush();
+
+    updateLights();
 }
 
 static void __exitSignal(int sig) {

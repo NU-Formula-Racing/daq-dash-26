@@ -16,18 +16,25 @@ struct VirtualizedNeobar {
     VirtualizedNeobar(platform::NeopixelStrip* strip,
                       uint8_t numPixels,
                       std::vector<uint8_t> mapping)
-        : _strip(strip), _mapping(mapping) {
+        : _strip(strip), _mapping(mapping), _numPixels(numPixels) {
     }
 
     void setColor(uint8_t virtIdx, glm::vec4 color) {
         _strip->setColor(_mapping[virtIdx], color);
     }
 
-    void show() { _strip->show(); }
+    void show() {
+        _strip->show();
+    }
+
+    uint8_t numPixels() {
+        return _numPixels;
+    }
 
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
     platform::NeopixelStrip* _strip;
+    uint8_t _numPixels;
 };
 
 class NeopixelDisplay {
@@ -56,17 +63,19 @@ class NeopixelDisplay {
     // master map
     std::vector<uint8_t> mappingAtBar(uint8_t bar) {
         static const std::vector<int> MASTER_MAP = {
-            8, 9, 10, 11, 12, 13, 14, 15, 7, 6, 5, 4, 3, 2,  1,  0,  0,  1,  2, 3,
-            4, 5, 6,  7,  6,  5,  4,  3,  2, 1, 0, 8, 9, 10, 11, 12, 13, 14, 15};
+            15, 14, 13, 12, 11, 10, 9, 8,  // bar 0
+            7,  6,  5,  4,  3,  2,  1, 0,  // bar 1
+            0,  1,  2,  3,  4,  5,  6,     // bar 2
+            7,  6,  5,  4,  3,  2,  1, 0,  // bar 3
+            15, 14, 13, 12, 11, 10, 9, 8,  // bar 4
+        };
 
         std::vector<uint8_t> barMap;
         uint8_t num = numPixelsAtBar(bar);
 
         // find starting point
         int offset = 0;
-        for (int i = 0; i < bar;
-             i++)  // counts up for the number of bars, shows where each bar starts ("offset")
-        {
+        for (int i = 0; i < bar; i++) {
             offset += numPixelsAtBar(i);
         }
 
@@ -76,8 +85,7 @@ class NeopixelDisplay {
             barMap.push_back((uint8_t)hwIdx);  // some funny mapping code
         }
 
-        return barMap;  // can you just index these like Neobar[1][0] is bottom led of middle left
-                        // bar
+        return barMap;
     }
 
     void initialize() {

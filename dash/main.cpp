@@ -14,7 +14,8 @@
 #include <csignal>
 #include <sstream>
 #include <string>
-#include "nfr_can/virtual_timer.hpp"
+#include <nfr_can/virtual_timer.hpp>
+#include <io/lights.hpp>
 
 static void __gameInitialize();
 static void __gameUpdate();
@@ -85,7 +86,39 @@ int main() {
     return 0;
 }
 
-static void __gameInitialize() {    
+static void updateLights() {
+    dash::NeopixelDisplay display;
+    display.initialize();
+    
+    uint8_t br = 125;
+    glm::vec4 red = {255, 0, 0, br};
+    glm::vec4 orange = {255, 125, 0, br};
+    glm::vec4 yellow = {255, 255, 0, br};
+    glm::vec4 green = {0, 255, 0, br};
+    glm::vec4 teal = {0, 255, 255, br};
+    glm::vec4 blue = {0, 0, 255, br};
+    glm::vec4 purple = {255, 0, 255, br};
+    glm::vec4 pink = {255, 125, 125, br};
+
+    for (int i = 0; i < 5; i++)
+    {
+        display.getBar(i).setColor(0,red);
+        display.getBar(i).setColor(1,orange);
+        display.getBar(i).setColor(2,yellow);
+        display.getBar(i).setColor(3,green);
+        display.getBar(i).setColor(4,teal);
+        display.getBar(i).setColor(5,blue);
+        display.getBar(i).setColor(6,purple);
+        if (i != 2) {
+            display.getBar(i).setColor(7,pink);
+        }
+    } 
+       
+
+}
+
+static void __gameInitialize() {
+    std::cout << "Game initialized." << std::endl;
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
     dbc::driveBus.set_driver(std::make_unique<MCP2515>(g_canSpi, g_canGPIO, g_canClock));
 
@@ -109,6 +142,10 @@ static void __gameInitialize() {
     std::cout << "\x1b[?25l"; // hide cursor
     std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
     std::cout.flush();
+
+    dash::NeopixelDisplay display;
+    dash::VirtualizedNeobar &bar = display.getBar(0);
+    bar.setColor(0, { 255, 0, 0, 255});
 }
 
 static void __gameShutdown() {
@@ -160,9 +197,11 @@ static void __gameUpdate() {
 
     std::cout << frame.str();
     std::cout.flush();
+
+    updateLights();
 }
 
 static void __exitSignal(int sig) {
     okay::Engine.logger.info("Exit signal received: {}", sig);
-    okay::Engine.shutdown();
+    //okay::Engine.shutdown();
 }

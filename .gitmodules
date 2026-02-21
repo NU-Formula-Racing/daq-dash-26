@@ -1,3 +1,6 @@
 [submodule "dash/drivers/can"]
 	path = dash/drivers/can
 	url = https://github.com/danielk125/nfr-can-library.git
+[submodule "dash/drivers/neopixel"]
+	path = dash/drivers/neopixel
+	url = https://github.com/jgarff/rpi_ws281x.git

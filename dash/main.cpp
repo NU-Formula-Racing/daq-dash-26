@@ -14,6 +14,7 @@
 #include <csignal>
 #include <sstream>
 #include <string>
+#include <nfr_can/virtual_timer.hpp>
 #include <io/lights.hpp>
 
 static void __gameInitialize();
@@ -39,6 +40,26 @@ static std::vector<ICAN_Message*> g_toPrint = {
     &dbc::rearInverterTempStatus::message
 };
 // clang-format on
+
+// heartbeat message
+inline uint64_t g_heartbeatCount = 0;
+inline VirtualTimerGroup g_timerGroup;
+
+TX_can_msg_config g_heartbeat_conf = {
+    .bus = dbc::driveBus,
+    .id = 0x510,
+    .extended = false,
+    .length = 8,
+    .period = 1000,
+    .timerGroup = g_timerGroup
+}; 
+
+inline CAN_Signal_UINT64 g_heartbeatSignal = MakeSignalExp(uint64_t, 0, 64, 1.0, 0.0);
+inline TX_CAN_Message(1) g_heartbeatMessage{g_heartbeat_conf, g_heartbeatSignal};
+
+inline dash::platform::SPI g_canSpi;
+inline dash::platform::GPIO g_canGPIO{"gpiochip0", 0, true};
+inline dash::platform::Clock g_canClock;
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
@@ -98,10 +119,22 @@ static void updateLights() {
 
 static void __gameInitialize() {
     std::cout << "Game initialized." << std::endl;
+    g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
+    dbc::driveBus.set_driver(std::make_unique<MCP2515>(g_canSpi, g_canGPIO, g_canClock));
+
+    // check for errors
+    if (g_canGPIO.checkError()) {
+        okay::Engine.logger.error("Failed to initialize GPIO");
+    }
+
     // Additional game initialization logic
     BaudRate baud500k = BaudRate::kBaud500K;
-    if (dbc::driveBus.init(baud500k)) {
+    if (!dbc::driveBus.init(baud500k)) {
         okay::Engine.logger.error("Failed to initialize CAN bus");
+
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
     }
 
     std::ios::sync_with_stdio(false);
@@ -122,6 +155,7 @@ static void __gameShutdown() {
 }
 
 static void __gameUpdate() {
+    g_timerGroup.Tick(g_canClock.monotonicMs());
     dbc::driveBus.tick_bus();
 
     std::cout << "\x1b[H\x1b[J";

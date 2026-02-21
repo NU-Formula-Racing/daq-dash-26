@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <memory>
 #include <platform/platform.hpp>
 #include <drivers/neopixel/ws2811.h>
 #include <okay/core/okay.hpp>
@@ -54,6 +55,9 @@ struct NeopixelStrip::NeopixelImpl {
     int channel;
     bool hasInitialized{false};
 };
+
+NeopixelStrip::NeopixelStrip() : _impl(std::make_unique<NeopixelStrip::NeopixelImpl>()) {}
+NeopixelStrip::~NeopixelStrip() {}
 
 void NeopixelStrip::init(const int& pin, const int& numLeds) {
     _impl->pin = pin;

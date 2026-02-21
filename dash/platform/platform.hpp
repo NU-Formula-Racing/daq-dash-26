@@ -62,6 +62,9 @@ class Clock : public IClock {
 
 class NeopixelStrip {
    public:
+    NeopixelStrip();
+    ~NeopixelStrip();
+    
     void init(const int& pin, const int& numLeds);
     void setColor(const int& ledIndex, const glm::vec4& color);
     void show();

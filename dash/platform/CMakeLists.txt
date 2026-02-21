@@ -6,7 +6,7 @@ target_include_directories(dash_platform PUBLIC
     ${OKAY_PROJECT_ROOT_DIR}
 )
 
-target_link_libraries(dash_platform PUBLIC nfr_canlib)
+target_link_libraries(dash_platform PUBLIC nfr_canlib okay)
 
 if(NOT DEFINED OKAY_PLATFORM)
     if(UNIX AND NOT APPLE)

@@ -43,7 +43,10 @@ struct NeopixelStrip::NeopixelImpl {
 
 };
 
-void NeopixelStrip::init(const int &numLeds) {
+NeopixelStrip::NeopixelStrip() : _impl(std::make_unique<NeopixelStrip::NeopixelImpl>()) {}
+NeopixelStrip::~NeopixelStrip() {} 
+
+void NeopixelStrip::init(const int& pin, const int &numLeds) {
   // noop
 }
 

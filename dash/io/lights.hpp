@@ -11,19 +11,21 @@ namespace dash {
 
 struct VirtualizedNeobar {
    public:
-    VirtualizedNeobar(platform::NeopixelStrip& strip,
+    VirtualizedNeobar() = default;
+
+    VirtualizedNeobar(platform::NeopixelStrip* strip,
                       uint8_t numPixels,
                       std::vector<uint8_t> mapping)
         : _strip(strip), _mapping(mapping) {
     }
 
     void setColor(uint8_t virtIdx, glm::vec4 color) {
-        _strip.setColor(_mapping[virtIdx], color);
+        _strip->setColor(_mapping[virtIdx], color);
     }
 
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
-    platform::NeopixelStrip& _strip;
+    platform::NeopixelStrip* _strip;
 };
 
 class NeopixelDisplay {
@@ -85,7 +87,7 @@ class NeopixelDisplay {
         // create the bars
         for (int i = 0; i < 5; i++) {
             _bars[i] = VirtualizedNeobar(
-                _strips[getHWStrpIndexForBar(i)], numPixelsAtBar(i), mappingAtBar(i));
+                &_strips[getHWStrpIndexForBar(i)], numPixelsAtBar(i), mappingAtBar(i));
         }
     }
 

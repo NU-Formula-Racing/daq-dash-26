@@ -66,18 +66,18 @@ int main() {
 }
 
 static void updateLights() {
-    NeopixelDisplay display;
+    dash::NeopixelDisplay display;
     display.initialize();
     
     uint8_t br = 125;
-    Color red = {255, 0, 0, br};
-    Color orange = {255, 125, 0, br};
-    Color yellow = {255, 255, 0, br};
-    Color green = {0, 255, 0, br};
-    Color teal = {0, 255, 255, br};
-    Color blue = {0, 0, 255, br};
-    Color purple = {255, 0, 255, br};
-    Color pink = {255, 125, 125, br};
+    glm::vec4 red = {255, 0, 0, br};
+    glm::vec4 orange = {255, 125, 0, br};
+    glm::vec4 yellow = {255, 255, 0, br};
+    glm::vec4 green = {0, 255, 0, br};
+    glm::vec4 teal = {0, 255, 255, br};
+    glm::vec4 blue = {0, 0, 255, br};
+    glm::vec4 purple = {255, 0, 255, br};
+    glm::vec4 pink = {255, 125, 125, br};
 
     for (int i = 0; i < 5; i++)
     {

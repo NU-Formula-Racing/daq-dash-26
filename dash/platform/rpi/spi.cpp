@@ -73,16 +73,16 @@ struct SPI::SPIImpl {
 
     bool ok = ioctl(_fd, SPI_IOC_MESSAGE(1), &tr) >= 0;
 
-    std::cout << "TX: ";
-    for (size_t i=0;i<len;i++) std::cout << std::hex << (int)tx[i] << " ";
-    std::cout << "\n";
+    // std::cout << "TX: ";
+    // for (size_t i=0;i<len;i++) std::cout << std::hex << (int)tx[i] << " ";
+    // std::cout << "\n";
 
-    if (rx) {
-      std::cout << "RX: ";
-      for (size_t i=0;i<len;i++) std::cout << std::hex << (int)rx[i] << " ";
-      std::cout << "\n";
-    }
-    std::cout << std::dec;
+    // if (rx) {
+    //   std::cout << "RX: ";
+    //   for (size_t i=0;i<len;i++) std::cout << std::hex << (int)rx[i] << " ";
+    //   std::cout << "\n";
+    // }
+    // std::cout << std::dec;
     return ok;
   }
 

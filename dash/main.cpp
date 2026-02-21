@@ -137,66 +137,62 @@ static void __gameInitialize() {
         }
     }
 
-    std::ios::sync_with_stdio(false);
-    std::cout.tie(nullptr);
-    std::cout << "\x1b[?25l"; // hide cursor
-    std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
-    std::cout.flush();
-
-    dash::NeopixelDisplay display;
-    dash::VirtualizedNeobar &bar = display.getBar(0);
-    bar.setColor(0, { 255, 0, 0, 255});
+    // std::ios::sync_with_stdio(false);
+    // std::cout.tie(nullptr);
+    // std::cout << "\x1b[?25l"; // hide cursor
+    // std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
+    // std::cout.flush();
 }
 
 static void __gameShutdown() {
-    std::cout << "Game shutdown." << std::endl;
-    std::cout << "\x1b[?25h\x1b[?1049l";
-    std::cout.flush();
+    // std::cout << "Game shutdown." << std::endl;
+    // std::cout << "\x1b[?25h\x1b[?1049l";
+    // std::cout.flush();
 }
 
 static void __gameUpdate() {
     g_timerGroup.Tick(g_canClock.monotonicMs());
     dbc::driveBus.tick_bus();
 
-    std::cout << "\x1b[H\x1b[J";
+    // std::cout << "\x1b[H\x1b[J";
 
-    std::cout << "NFR26 Development Dashboard\n";
+    // std::cout << "NFR26 Development Dashboard\n";
 
-    // Collect all signal strings
-    std::vector<std::string> lines;
-    for (ICAN_Message* msg : g_toPrint) {
-        for (std::uint8_t sigNum = 0; sigNum < msg->get_num_signals(); sigNum++) {
-            auto sigId = std::pair{msg->get_id().id, sigNum};
+    // // Collect all signal strings
+    // std::vector<std::string> lines;
+    // for (ICAN_Message* msg : g_toPrint) {
+    //     for (std::uint8_t sigNum = 0; sigNum < msg->get_num_signals(); sigNum++) {
+    //         auto sigId = std::pair{msg->get_id().id, sigNum};
 
-            const char* name = "(unknown)";
-            auto it = dbc::meta::signalIdToName.find(sigId);
-            if (it != dbc::meta::signalIdToName.end())
-                name = it->second;
+    //         const char* name = "(unknown)";
+    //         auto it = dbc::meta::signalIdToName.find(sigId);
+    //         if (it != dbc::meta::signalIdToName.end())
+    //             name = it->second;
 
-            lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
-        }
-    }
+    //         lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
+    //     }
+    // }
 
-    constexpr int COLS = 3;
-    constexpr int COL_WIDTH = 32;
+    // constexpr int COLS = 3;
+    // constexpr int COL_WIDTH = 32;
 
-    size_t rows = (lines.size() + COLS - 1) / COLS;
+    // size_t rows = (lines.size() + COLS - 1) / COLS;
 
-    std::ostringstream frame;
+    // std::ostringstream frame;
 
-    // Print row-wise across columns
-    for (size_t r = 0; r < rows; r++) {
-        for (size_t c = 0; c < COLS; c++) {
-            size_t idx = r + c * rows;
-            if (idx < lines.size()) {
-                frame << std::left << std::setw(COL_WIDTH) << lines[idx];
-            }
-        }
-        frame << '\n';
-    }
+    // // Print row-wise across columns
+    // for (size_t r = 0; r < rows; r++) {
+    //     for (size_t c = 0; c < COLS; c++) {
+    //         size_t idx = r + c * rows;
+    //         if (idx < lines.size()) {
+    //             frame << std::left << std::setw(COL_WIDTH) << lines[idx];
+    //         }
+    //     }
+    //     frame << '\n';
+    // }
 
-    std::cout << frame.str();
-    std::cout.flush();
+    // std::cout << frame.str();
+    // std::cout.flush();
 
     updateLights();
 }

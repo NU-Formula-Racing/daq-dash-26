@@ -23,6 +23,8 @@ struct VirtualizedNeobar {
         _strip->setColor(_mapping[virtIdx], color);
     }
 
+    void show() { _strip->show(); }
+
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
     platform::NeopixelStrip* _strip;

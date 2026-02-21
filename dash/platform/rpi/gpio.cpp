@@ -8,6 +8,11 @@
 #include <string>
 #include <utility>
 #include <iostream>
+#include <thread>
+#include <atomic>
+#include <map>
+#include <vector>
+
 
 namespace dash::platform {
 
@@ -25,19 +30,7 @@ static std::string chipNameToPath(const std::string& chipName) {
   return "/dev/gpiochip" + chipName;
 }
 
-struct GPIOError {
-  bool chip_open_err = false;
-  bool config_alloc_err = false;
-  bool line_config_add_line_settings_err = false;
-  bool gpiod_chip_request_lines_err = false;
 
-  bool checkError() {
-    return  chip_open_err || 
-            config_alloc_err || 
-            line_config_add_line_settings_err || 
-            gpiod_chip_request_lines_err;
-  }
-};
 
 struct GPIO::GPIOImpl {
   gpiod_chip* _chip = nullptr;
@@ -107,6 +100,10 @@ struct GPIO::GPIOImpl {
     }
   }
 
+  GPIOImpl(const std::string &chipName, unsigned lineOffset, std::function<void()> callback, IEdgeEventMonitor& monitor){
+    monitor.register
+  }
+
   ~GPIOImpl() {
     if (_request) {
       gpiod_line_request_release(_request);
@@ -154,6 +151,9 @@ struct GPIO::GPIOImpl {
 GPIO::GPIO(const std::string& chipName, unsigned lineOffset, bool output)
     : _impl(std::make_unique<GPIOImpl>(chipName, lineOffset, output)) {}
 
+GPIO::GPIO(const std::string &chipName, unsigned lineOffset, std::function<void()> callback, IEdgeEventMonitor& monitor)
+    : _impl(std::make_unique<GPIOImpl>(const std::string &chipName, unsigned lineOffset, std::function<void()> callback, IEdgeEventMonitor& monitor)) {}
+
 GPIO::~GPIO() = default;
 
 bool GPIO::gpio_write(GpioLevel level) {
@@ -167,5 +167,9 @@ bool GPIO::gpio_read(GpioLevel& out) {
 bool GPIO::checkError() {
   return _impl->checkStatus();
 }
+
+
+
+
 
 } // namespace dash::platform

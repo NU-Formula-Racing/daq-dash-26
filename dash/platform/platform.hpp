@@ -11,16 +11,38 @@
 #include <string>
 #include <thread>
 #include <iostream>
+#include <functional>
 
 namespace dash::platform {
+struct GPIOError {
+  bool chip_open_err = false;
+  bool config_alloc_err = false;
+  bool line_config_add_line_settings_err = false;
+  bool gpiod_chip_request_lines_err = false;
+
+  bool checkError() {
+    return  chip_open_err || 
+            config_alloc_err || 
+            line_config_add_line_settings_err || 
+            gpiod_chip_request_lines_err;
+  }
+};
 
 class GPIO : public IGpio {
 public:
-  GPIO(const std::string &chipName, unsigned lineOffset, bool output);
+  enum class EdgeType {
+    RISING,
+    FALLING,
+    BOTH
+  };
+
+  GPIO(uint8_t pin, bool output);
   ~GPIO();
 
   bool gpio_write(GpioLevel level) override;
   bool gpio_read(GpioLevel& out) override;
+
+  void attachInterrupt(std::function<void()> callback, EdgeType edge);
 
   bool checkError();
 

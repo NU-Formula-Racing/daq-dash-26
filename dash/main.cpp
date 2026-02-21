@@ -8,7 +8,7 @@
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
 #include <platform/platform.hpp>
-#include <dash/io/lights.hpp>
+#include <io/neopixel.hpp>
 
 #include <can/can_dbc.hpp>
 

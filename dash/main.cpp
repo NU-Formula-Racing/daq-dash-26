@@ -8,15 +8,13 @@
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
 #include <platform/platform.hpp>
-#include <io/neopixel.hpp>
 
 #include <can/can_dbc.hpp>
 
 #include <csignal>
 #include <sstream>
 #include <string>
-#include "io/lights.hpp"
-#include "neo-pixel/ws2812-rpi.h"
+#include <io/lights.hpp>
 
 static void __gameInitialize();
 static void __gameUpdate();
@@ -112,8 +110,8 @@ static void __gameInitialize() {
     std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
     std::cout.flush();
 
-    NeopixelDisplay display;
-    VirtualizedNeobar &bar = display.getBar(0);
+    dash::NeopixelDisplay display;
+    dash::VirtualizedNeobar &bar = display.getBar(0);
     bar.setColor(0, { 255, 0, 0, 255});
 }
 

@@ -7,7 +7,6 @@ target_include_directories(dash_platform PUBLIC
 )
 
 target_link_libraries(dash_platform PUBLIC nfr_canlib)
-target_link_libraries(dash_platform PUBLIC neopixel_lib)
 
 if(NOT DEFINED OKAY_PLATFORM)
     if(UNIX AND NOT APPLE)

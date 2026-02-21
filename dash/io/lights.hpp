@@ -11,11 +11,10 @@ namespace dash {
 
 struct VirtualizedNeobar {
    public:
-    VirtualizedNeobar(platform::NeopixelStrip &strip,
+    VirtualizedNeobar(platform::NeopixelStrip& strip,
                       uint8_t numPixels,
                       std::vector<uint8_t> mapping)
         : _strip(strip), _mapping(mapping) {
-        _strip.init(numPixels);
     }
 
     void setColor(uint8_t virtIdx, glm::vec4 color) {
@@ -24,7 +23,7 @@ struct VirtualizedNeobar {
 
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
-    platform::NeopixelStrip &_strip;
+    platform::NeopixelStrip& _strip;
 };
 
 class NeopixelDisplay {
@@ -37,6 +36,16 @@ class NeopixelDisplay {
             return 7;
         } else {
             return 8;
+        }
+    }
+
+    uint8_t getHWStrpIndexForBar(uint8_t bar) {
+        if (bar < 2) {
+            return 0;
+        } else if (bar == 2) {
+            return 1;
+        } else {
+            return 2;
         }
     }
 
@@ -68,19 +77,25 @@ class NeopixelDisplay {
     }
 
     void initialize() {
-        // create the bars
+        // create the strips
+        _strips[0].init(19, 16);  // left
+        _strips[1].init(13, 7);   // top
+        _strips[2].init(18, 16);  // right
 
+        // create the bars
         for (int i = 0; i < 5; i++) {
-            bars[i] = VirtualizedNeobar(numPixelsAtBar(i), mappingAtBar(i));
+            _bars[i] = VirtualizedNeobar(
+                _strips[getHWStrpIndexForBar(i)], numPixelsAtBar(i), mappingAtBar(i));
         }
     }
 
     VirtualizedNeobar& getBar(uint8_t barNum) {
-        return bars[barNum];
+        return _bars[barNum];
     }
 
    private:
-    std::array<VirtualizedNeobar, 5> bars;
+    std::array<VirtualizedNeobar, 5> _bars;
+    std::array<platform::NeopixelStrip, 3> _strips;
 };
 
 }  // namespace dash

@@ -19,7 +19,7 @@ struct VirtualizedNeobar {
     VirtualizedNeobar(platform::NeopixelStrip* strip,
                       uint8_t numPixels,
                       std::vector<uint8_t> mapping)
-        : _strip(strip), _mapping(mapping), _numPixels(numPixels) {
+        : _strip(strip), _mapping(mapping), _numPixels(numPixels), _dirty(true) {
         for (int i = 0; i < numPixels; i++) {
             _currentColors.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
         }
@@ -35,38 +35,26 @@ struct VirtualizedNeobar {
             // okay::Engine.logger.debug("Color is the same");
             return;
         }
-
-        _strip->setColor(_mapping[virtIdx], color);
         _currentColors[virtIdx] = color;
         _dirty = true;
     }
 
-    void show() {
-        if (!_dirty) return;
-
-        for (int i = 0; i < _numPixels; i++) {
-            uint8_t hwIdx = _mapping[i];
-            // this is a tad redundant, but is needed for
-            // the rpi implementatation, because we are
-            // using one perpheral for two bars
-            _strip->setColor(hwIdx, _currentColors[i]);
-        }
-        _strip->show();
-        _dirty = false;
-    }
-
     uint8_t numPixels() const { return _numPixels; }
-
+    const std::vector<glm::vec4>& currentColors() const { return _currentColors; }
+    uint8_t toHardwareIndex(uint8_t virtIdx) const { return _mapping[virtIdx]; }
+    platform::NeopixelStrip* strip() const { return _strip; }
+    bool isDirty() const { return _dirty; }
+    void clearDirty() { _dirty = false; }
 
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
     std::vector<glm::vec4> _currentColors;
     platform::NeopixelStrip* _strip;
     uint8_t _numPixels;
-    bool _dirty{false};
+    bool _dirty{true};
 };
 
-class NeopixelDisplay : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
+class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
    public:
     void initialize() {
         // create the strips
@@ -88,10 +76,7 @@ class NeopixelDisplay : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
             }
         }
 
-        // show the strips
-        for (int i = 0; i < 3; i++) {
-            _strips[i].show();
-        }
+        updateDisplay();
     }
 
     VirtualizedNeobar& getBar(uint8_t barNum) {
@@ -109,16 +94,31 @@ class NeopixelDisplay : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
 
         updateDisplay();
 
-        // // now cleanup
-        // for (int i = 0; i < 3; i++) {
-        //     _strips[i].cleanup();
-        // }
+        // now cleanup
+        for (int i = 0; i < 3; i++) {
+            _strips[i].cleanup();
+        }
     }
 
     void updateDisplay() {
-        // collection of strips to show
-        for (int i = 0; i < 5; i++) {
-            _bars[i].show();
+        for (int i = 0; i < 3; i++) {
+            // grab the relevant bars, and set the color on the strip
+            _strips[i].show();
+            for (int j = 0; j < 5; j++) {
+                if (!_bars[j].isDirty()) continue;
+
+                if (i != getHWIndexForBar(j)) continue;
+
+                for (int k = 0; k < _bars[j].numPixels(); k++) {
+                    _strips[i].setColor(
+                        _bars[j].toHardwareIndex(k), 
+                        _bars[j].currentColors()[k]);
+                }
+
+                _bars[j].clearDirty();
+            }
+
+            _strips[i].show();
         }
     }
 

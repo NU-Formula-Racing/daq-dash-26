@@ -4,6 +4,11 @@
 #include <drivers/neopixel/ws2811.h>
 #include <okay/core/okay.hpp>
 
+extern "C" {
+#include <drivers/neopixel/gpio.h>
+#include <drivers/neopixel/mailbox.h>  // mapmem(), unmapmem(), DEV_GPIOMEM
+}
+
 namespace dash::platform {
 
 // We use GPIO13, 19 (up, left)
@@ -13,8 +18,7 @@ namespace dash::platform {
 #define GPIO_R 18
 #define MAX_LEDS 16
 
-// defaults for cmdline options
-#define TARGET_FREQ WS2811_TARGET_FREQ
+#define TARGET_FREQ 800000
 #define DMA 10
 #define STRIP_TYPE WS2811_STRIP_GBR  // WS2812/SK6812RGB integrated chip+leds
 
@@ -44,6 +48,7 @@ static ws2811_t s_ledString = {
 };
 
 static bool s_hasInitialized{false};
+static bool s_hasCleanedUp{false};
 
 static uint32_t encodeToWWRRGGBB(glm::vec4 color) {
     color = color * color.a;
@@ -103,25 +108,53 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4& color) {
     }
 
     ws2811_channel_t* channel = &(s_ledString.channel[_impl->channel]);
-    channel->count = _impl->numLeds;
     channel->leds[ledIndex] = encodeToWWRRGGBB(color);
 }
 
 void NeopixelStrip::show() {
+    ws2811_wait(&s_ledString);
     ws2811_channel_t* channel = &(s_ledString.channel[_impl->channel]);
     if (channel->gpionum != _impl->pin) {
-        // okay::Engine.logger.info("Pin changed from {} to {}", channel->gpionum, _impl->pin);
-        channel->gpionum = _impl->pin;
+        // Capture old pin + base BEFORE fini
+        const int oldPin = channel->gpionum;
+        const int newPin = _impl->pin;
+        const uint32_t perBase = s_ledString.rpi_hw->periph_base;
+
+        volatile gpio_t* gpio =
+            (volatile gpio_t*)mapmem(GPIO_OFFSET + perBase, sizeof(gpio_t), DEV_GPIOMEM);
+        if (gpio) {
+            gpio_output_set(gpio, oldPin, 0);
+            gpio_output_set(gpio, newPin, 0);
+
+            gpio_output_set(gpio, oldPin, 1);
+            gpio_level_set(gpio, oldPin, 0);
+
+            usleep(50);
+            // enable ONLY the selected pin for PWM channel 1
+            int alt = pwm_pin_alt(_impl->channel, newPin);
+            if (alt >= 0) {
+                gpio_function_set(gpio, newPin, alt);
+            }
+        } else {
+            okay::Engine.logger.error("Unable to map gpio memory");
+            // while (true) {};
+        }
+
+        channel->gpionum = newPin;
         channel->count = MAX_LEDS;
-        // cleanup and reinit
-        ws2811_fini(&s_ledString);
-        ws2811_init(&s_ledString);
     }
+
     channel->count = _impl->numLeds;
     ws2811_render(&s_ledString);
+    ws2811_wait(&s_ledString);
 }
 
 void NeopixelStrip::cleanup() {
+    if (s_hasCleanedUp)
+        return;
+
+    s_hasCleanedUp = true;
+    s_hasInitialized = false;
     ws2811_fini(&s_ledString);
 }
 

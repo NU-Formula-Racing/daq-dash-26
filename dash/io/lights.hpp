@@ -42,17 +42,21 @@ struct VirtualizedNeobar {
     }
 
     void show() {
-        if (!_dirty) {
-            okay::Engine.logger.debug("Skipping show call");
-            return;
+        if (!_dirty) return;
+
+        for (int i = 0; i < _numPixels; i++) {
+            uint8_t hwIdx = _mapping[i];
+            // this is a tad redundant, but is needed for
+            // the rpi implementatation, because we are
+            // using one perpheral for two bars
+            _strip->setColor(hwIdx, _currentColors[i]);
         }
         _strip->show();
         _dirty = false;
     }
 
-    uint8_t numPixels() {
-        return _numPixels;
-    }
+    uint8_t numPixels() const { return _numPixels; }
+
 
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
@@ -75,6 +79,19 @@ class NeopixelDisplay : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
             _bars[i] = VirtualizedNeobar(
                 &_strips[getHWIndexForBar(i)], numPixelsForBar(i), mappingAtBar(i));
         }
+
+        // set all the bars to black
+        glm::vec4 black = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < _bars[i].numPixels(); j++) {
+                _bars[i].setColor(j, black);
+            }
+        }
+
+        // show the strips
+        for (int i = 0; i < 3; i++) {
+            _strips[i].show();
+        }
     }
 
     VirtualizedNeobar& getBar(uint8_t barNum) {
@@ -90,13 +107,18 @@ class NeopixelDisplay : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
             }
         }
 
-        for (int i = 0; i < 3; i++) {
-            _strips[i].show();
-        }
+        updateDisplay();
 
-        // now cleanup
-        for (int i = 0; i < 3; i++) {
-            _strips[i].cleanup();
+        // // now cleanup
+        // for (int i = 0; i < 3; i++) {
+        //     _strips[i].cleanup();
+        // }
+    }
+
+    void updateDisplay() {
+        // collection of strips to show
+        for (int i = 0; i < 5; i++) {
+            _bars[i].show();
         }
     }
 
@@ -105,8 +127,6 @@ class NeopixelDisplay : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
     std::array<platform::NeopixelStrip, 3> _strips;
 
     uint8_t numPixelsForBar(uint8_t bar) {
-        // bars 0, 1, 3, 4 have 8
-        // bar 2 has 7
         if (bar == 2) {
             return 7;
         } else {
@@ -115,9 +135,6 @@ class NeopixelDisplay : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
     }
 
     uint8_t getHWIndexForBar(uint8_t bar) {
-        // bar 0, 1 are on strip 0
-        // bar 2 is on strip 1
-        // bar 3, 4 are on strip 2
         switch (bar) {
             case 0:
             case 1:

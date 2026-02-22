@@ -30,6 +30,7 @@ def main() -> int:
     ap.add_argument(
         "--clear", action="store_true", help="Clear remote directories before upload"
     )
+    ap.add_argument("--release", action="store_true", help="Build in release mode (default is debug)")
     args = ap.parse_args()
 
     local_applications = Path(__file__).resolve().parent.parent
@@ -122,12 +123,20 @@ def main() -> int:
             print("==> Running install.bash ...")
             r.must(okay_install_script)
 
-            print("==> Running okay br ...")
-            r.must(
-                f"source ~/.bashrc && "
-                f"cd {shlex.quote(remote_app)} && "
-                f"okay init && okay br --target rpi"
-            )
+            if args.release:
+                print("==> Building production...")
+                r.must(
+                    f"source ~/.bashrc && "
+                    f"cd {shlex.quote(remote_app)} && "
+                    f"okay init && okay br --target rpi --build-type Release"
+                )
+            else:
+                print("==> Building debug ...")
+                r.must(
+                    f"source ~/.bashrc && "
+                    f"cd {shlex.quote(remote_app)} && "
+                    f"okay init && okay br --target rpi --build-type Debug"
+                )
 
 
 

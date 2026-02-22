@@ -110,20 +110,12 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4& color) {
 void NeopixelStrip::show() {
     ws2811_channel_t* channel = &(s_ledString.channel[_impl->channel]);
     if (channel->gpionum != _impl->pin) {
+        // okay::Engine.logger.info("Pin changed from {} to {}", channel->gpionum, _impl->pin);
         channel->gpionum = _impl->pin;
         channel->count = MAX_LEDS;
-        // make a copy of the leds, as this is cleaned up after fini
-        uint32_t leds[MAX_LEDS];
-        for (int i = 0; i < MAX_LEDS; i++) {
-            leds[i] = channel->leds[i];
-        }
         // cleanup and reinit
         ws2811_fini(&s_ledString);
         ws2811_init(&s_ledString);
-
-        for (int i = 0; i < MAX_LEDS; i++) {
-            channel->leds[i] = leds[i];
-        }
     }
     channel->count = _impl->numLeds;
     ws2811_render(&s_ledString);

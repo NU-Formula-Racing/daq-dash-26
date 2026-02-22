@@ -7,15 +7,13 @@
 
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
+#include <nfr_can/virtual_timer.hpp>
 #include <platform/platform.hpp>
-
+#include <io/lights.hpp>
 #include <can/can_dbc.hpp>
 
 #include <csignal>
-#include <sstream>
 #include <string>
-#include <nfr_can/virtual_timer.hpp>
-#include <io/lights.hpp>
 
 static void __gameInitialize();
 static void __gameUpdate();
@@ -76,7 +74,7 @@ int main() {
 
     okay::OkayGame::create()
         .addSystems(std::move(levelManager),
-                    // std::move(renderer),
+                    std::make_unique<dash::NeopixelDisplay>(),
                     std::make_unique<okay::OkayAssetManager>())
         .onInitialize(__gameInitialize)
         .onUpdate(__gameUpdate)
@@ -87,24 +85,37 @@ int main() {
 }
 
 static void updateLights() {
-    dash::NeopixelDisplay display;
-    display.initialize();
+    dash::NeopixelDisplay *display = okay::Engine.systems.getSystemChecked<dash::NeopixelDisplay>();
     
-    uint8_t br = 255;
-    glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     glm::vec4 red = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 green = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+
+    // get time since the start of the program in ms
+    std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
+    std::chrono::duration<float, std::milli> ms = now.time_since_epoch();
+    float brightness = (std::sin(ms.count() / 1000.0f) + 1.0f) / 2.0f;
 
     for (int i = 0; i < 5; i++)
     {
-        for (int j = 0; j < display.getBar(i).numPixels(); j++)
+        for (int j = 0; j < display->getBar(i).numPixels(); j++)
         {   
-            float t = (float)j / (float)display.getBar(i).numPixels();
-            glm::vec4 color = glm::mix(red, blue, t);
-            // slowly interpolate between red and blue
-            display.getBar(i).setColor(j, color);
+            float t = (float)j / (float)display->getBar(i).numPixels();
+            glm::vec4 color = red;
+            // mix between red green and blue with a gradient
+            if (t < 0.5f) {
+                // Map t from [0, 0.5] to [0, 1] for R->G
+                color = glm::mix(red, green, t * 2.0f);
+            } else {
+                // Map t from [0.5, 1] to [0, 1] for G->B
+                color = glm::mix(green, blue, (t - 0.5f) * 2.0f);
+            }
+
+            color.a = brightness;
+            display->getBar(i).setColor(j, color); 
         }
 
-        display.getBar(i).show();
+        display->getBar(i).show();
     } 
        
 
@@ -141,6 +152,7 @@ static void __gameShutdown() {
     // std::cout << "Game shutdown." << std::endl;
     // std::cout << "\x1b[?25h\x1b[?1049l";
     // std::cout.flush();
+    okay::Engine.shutdown();
 }
 
 static void __gameUpdate() {

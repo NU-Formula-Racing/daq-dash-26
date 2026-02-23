@@ -55,4 +55,12 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4 &color) {
   // noop
 }
 
+void NeopixelStrip::show() {
+  // noop
+}
+
+void NeopixelStrip::cleanup() {
+  // noop
+}
+
 } // namespace dash::platform

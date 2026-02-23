@@ -10,7 +10,7 @@ struct GPIO::GPIOImpl {
   GpioLevel _level = GpioLevel::G_UNDEF;
 };
 
-GPIO::GPIO(const std::string &, unsigned, bool)
+GPIO::GPIO(uint8_t, bool)
     : _impl(std::make_unique<GPIOImpl>()) {}
 
 GPIO::~GPIO() = default;
@@ -23,7 +23,8 @@ bool GPIO::gpio_read(GpioLevel& out){
   out = _impl->_level; 
   return true;
 }
-bool GPIO::checkError() { return false; }
+
+void GPIO::attachInterrupt(std::function<void()> callback, EdgeType edge) {}
 
 struct SPI::SPIImpl {
   // noop

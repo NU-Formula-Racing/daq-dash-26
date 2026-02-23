@@ -44,8 +44,6 @@ public:
 
   void attachInterrupt(std::function<void()> callback, EdgeType edge);
 
-  bool checkError();
-
 private:
   struct GPIOImpl;
   std::unique_ptr<GPIOImpl> _impl;

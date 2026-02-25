@@ -33,6 +33,7 @@ public:
     bool init(const BaudRate baud) override;
     bool send(const CAN_Frame& msg) override;
     bool recv(CAN_Frame& msg) override;
+    void draw_ui();
     uint32_t time_ms() override;
 };
 

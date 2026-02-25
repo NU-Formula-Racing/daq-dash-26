@@ -22,6 +22,9 @@
 #include <iomanip>
 #include <math.h>
 #include "glm/ext/vector_float4.hpp"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 static void __gameInitialize();
 static void __gameUpdate();
@@ -50,6 +53,7 @@ static std::vector<ICAN_Message*> g_toPrint = {
 // heartbeat message
 inline uint64_t g_heartbeatCount = 0;
 inline VirtualTimerGroup g_timerGroup;
+inline CAN_IMGUI* g_canImgui = nullptr;
 
 TX_can_msg_config g_heartbeat_conf = {.bus = dbc::driveBus,
                                       .id = 0x510,
@@ -240,7 +244,9 @@ static void __gameInitialize() {
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
     g_timerGroup.AddTimer(20, []() { __flushScreen(); });
     // dbc::driveBus.set_driver(std::make_unique<MCP2515>(g_canSpi, g_canGPIO, g_canClock));
-    dbc::driveBus.set_driver(std::make_unique<CAN_IMGUI>());
+    auto canImgui = std::make_unique<CAN_IMGUI>();
+    g_canImgui = canImgui.get();
+    dbc::driveBus.set_driver(std::move(canImgui));
 
     // check for errors
     if (g_canGPIO.checkError()) {
@@ -258,10 +264,10 @@ static void __gameInitialize() {
     }
 
     std::ios::sync_with_stdio(false);
-    std::cout.tie(nullptr);
-    std::cout << "\x1b[?25l";  // hide cursor
-    std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
-    std::cout.flush();
+    // std::cout.tie(nullptr);
+    // std::cout << "\x1b[?25l"; // hide cursor
+    // std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
+    // std::cout.flush();
 }
 
 static void __gameShutdown() {
@@ -272,15 +278,26 @@ static void __gameShutdown() {
 }
 
 static void __gameUpdate() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    
     g_timerGroup.Tick(g_canClock.monotonicMs());
     dbc::driveBus.tick_bus();
     __updateLights();
 
     dash::platform::tick();
+    
+    if (g_canImgui) {
+        g_canImgui->draw_ui();
+    }
+    
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    std::cout << "\x1b[H\x1b[J";
+    // std::cout << "\x1b[H\x1b[J";
 
-    std::cout << "NFR26 Development Dashboard\n";
+    // std::cout << "NFR26 Development Dashboard\n";
 
     // Collect all signal strings
     std::vector<std::string> lines;
@@ -302,21 +319,21 @@ static void __gameUpdate() {
 
     size_t rows = (lines.size() + COLS - 1) / COLS;
 
-    std::ostringstream frame;
+    // std::ostringstream frame;
 
     // Print row-wise across columns
-    for (size_t r = 0; r < rows; r++) {
-        for (size_t c = 0; c < COLS; c++) {
-            size_t idx = r + c * rows;
-            if (idx < lines.size()) {
-                frame << std::left << std::setw(COL_WIDTH) << lines[idx];
-            }
-        }
-        frame << '\n';
-    }
+    // for (size_t r = 0; r < rows; r++) {
+    //     for (size_t c = 0; c < COLS; c++) {
+    //         size_t idx = r + c * rows;
+    //         if (idx < lines.size()) {
+    //             frame << std::left << std::setw(COL_WIDTH) << lines[idx];
+    //         }
+    //     }
+    //     frame << '\n';
+    // }
 
-    std::cout << frame.str();
-    std::cout.flush();
+    // std::cout << frame.str();
+    // std::cout.flush();
 }
 
 static void __exitSignal(int sig) {

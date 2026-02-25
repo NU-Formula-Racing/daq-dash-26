@@ -4,6 +4,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "nfr_can/CAN_interface.hpp"
+#include "okay/core/okay.hpp"
 #include <unordered_map>
 
 bool CAN_IMGUI::init(const BaudRate baud) {
@@ -67,18 +68,20 @@ bool CAN_IMGUI::send(const CAN_Frame& msg) {
 } // do nothing
 
 bool CAN_IMGUI::recv(CAN_Frame& msg) {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    
+    for (ICAN_Message* message : dbc::driveBus.get_messages()) {
+        uint32_t messageId = message->get_id().id;
+        if (msg._id == messageId) {
+            message->decode_from(msg);
+        }
+    }
+    return false;
+}
+
+void CAN_IMGUI::draw_ui() {
     ImGui::Begin("CAN");
     
     for (ICAN_Message* message : dbc::driveBus.get_messages()) {
         uint32_t messageId = message->get_id().id;
-
-        if (msg._id == messageId) {
-            message->decode_from(msg);
-        }
 
         if (ImGui::CollapsingHeader(dbc::meta::messageIdToName.at(messageId), ImGuiTreeNodeFlags_DefaultOpen)) {
             for (uint8_t sigNum {}; sigNum < message->get_num_signals(); sigNum++) {
@@ -88,47 +91,70 @@ bool CAN_IMGUI::recv(CAN_Frame& msg) {
                 
                 switch (signal->getSignalType()) {
                     case SignalType::INT8:
-                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S8, &messageIdToSignalsInfo[messageId][sigNum].value.s8);
+                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S8, &messageIdToSignalsInfo[messageId][sigNum].value.s8)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.s8);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::INT16:
-                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S16, &messageIdToSignalsInfo[messageId][sigNum].value.s16);
+                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S16, &messageIdToSignalsInfo[messageId][sigNum].value.s16)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.s16);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::INT32:
-                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S32, &messageIdToSignalsInfo[messageId][sigNum].value.s32);
+                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S32, &messageIdToSignalsInfo[messageId][sigNum].value.s32)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.s32);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::INT64:
-                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S64, &messageIdToSignalsInfo[messageId][sigNum].value.s64);
+                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S64, &messageIdToSignalsInfo[messageId][sigNum].value.s64)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.s64);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::UINT8:
-                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U8, &messageIdToSignalsInfo[messageId][sigNum].value.u8);
+                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U8, &messageIdToSignalsInfo[messageId][sigNum].value.u8)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.u8);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::UINT16:
-                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U16, &messageIdToSignalsInfo[messageId][sigNum].value.u16);
+                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U16, &messageIdToSignalsInfo[messageId][sigNum].value.u16)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.u16);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::UINT32:
-                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U32, &messageIdToSignalsInfo[messageId][sigNum].value.u32);
+                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U32, &messageIdToSignalsInfo[messageId][sigNum].value.u32)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.u32);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::UINT64:
-                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U64, &messageIdToSignalsInfo[messageId][sigNum].value.u64);
+                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U64, &messageIdToSignalsInfo[messageId][sigNum].value.u64)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.u64);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::FLOAT:
-                        ImGui::InputFloat(messageIdToSignalsInfo[messageId][sigNum].name, &messageIdToSignalsInfo[messageId][sigNum].value.f);
+                        if (ImGui::InputFloat(messageIdToSignalsInfo[messageId][sigNum].name, &messageIdToSignalsInfo[messageId][sigNum].value.f)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.f);
+                            std::cout << std::flush;
+                        }
                         break;
                     case SignalType::BOOL:
-                        ImGui::Checkbox(messageIdToSignalsInfo[messageId][sigNum].name, &messageIdToSignalsInfo[messageId][sigNum].value.b);
+                        if (ImGui::Checkbox(messageIdToSignalsInfo[messageId][sigNum].name, &messageIdToSignalsInfo[messageId][sigNum].value.b)) {
+                            okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.b);
+                            std::cout << std::flush;
+                        }
                         break;
                 }
             }
         }
     }
     ImGui::End();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    
-    
-    return false;
 }
 
 uint32_t CAN_IMGUI::time_ms() {

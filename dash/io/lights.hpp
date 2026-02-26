@@ -69,15 +69,16 @@ inline void idle(){
         for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
             display->getBar(i).setColor(j, purple);
             }   
+    display->getBar(i).setColor(j, color);
     }
 }
 
-// this is just for fun we can delete later.
-inline void idle2()
+// let's bring the gay little lights back 
+inline void gayLittleLights()
 {
     dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
 
-    static std::vector<glm::vec4> = {
+    static std::vector<glm::vec4> palette = {
     glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
     glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
     glm::vec4(1.0f, 0.5f, 0.0f, 1.0f),
@@ -85,38 +86,22 @@ inline void idle2()
     glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),
     glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
     glm::vec4(1.0f, 0.0f, 1.0f, 1.0f),
-    glm::vec4(1.0f, 0.0f, 0.5f, 1.0f),
-    glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
-    glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)
+    glm::vec4(1.0f, 0.0f, 0.5f, 1.0f)
     };
-    // let's bring the gay little lights back 
-    // define some colors
-    /*
-    glm::vec4 red = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::vec4 orange = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
-    glm::vec4 yellow = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-    glm::vec4 green = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-    glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-    glm::vec4 purple = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
-    glm::vec4 pink = glm::vec4(1.0f, 0.0f, 0.5f, 1.0f);
-    glm::vec4 white = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    glm::vec4 black = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    std::vector<glm::vec4> colors = {red, orange, yellow, green, blue, purple, pink, white};
-    */
 
-    // like 
     float time = std::chrono::stead_clock::now().time_since_epoch().count() / 1000000000.0f; // in seconds
-    float brightness = (std::sin(time * 2.0f) + 1.0f)/2.0f; // +1 for normalize
+    float moveSpeed = 15.0f;
 
-    glm::vec4(1.0f, 0.0f, 1.0f, brightness);
     for (int i = 0; i < 5; i ++){ // for all 5 bars
+       int barOffset = i * 3;
+
         for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
+            int colorIndex = static_cast<int>(time * moveSpeed + j+ barOffset)
+
+            glm::vec4 color = palette[colorIndex];
             }   
-
         
-        // random
-
-        
+    display->getBar(i).setColor(j, color);    
     }
 }
 

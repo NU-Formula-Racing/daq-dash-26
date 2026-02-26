@@ -87,47 +87,48 @@ int main() {
 }
 
 static void __updateLights() {
-    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
+    // dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
+    dash::animations::idle();
 
-    glm::vec4 red = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::vec4 green = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-    glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-    glm::vec4 white = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    glm::vec4 black = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    glm::vec4 purple = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    // glm::vec4 red = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    // glm::vec4 green = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+    // glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+    // glm::vec4 white = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    // glm::vec4 black = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    // glm::vec4 purple = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 
-    // get time since the start of the program in ms
-    std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
-    std::chrono::duration<float, std::milli> ms = now.time_since_epoch();
-    float brightness = (std::sin(ms.count() / 1000.0f) + 1.0f) / 2.0f;
+    // // get time since the start of the program in ms
+    // std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
+    // std::chrono::duration<float, std::milli> ms = now.time_since_epoch();
+    // float brightness = (std::sin(ms.count() / 1000.0f) + 1.0f) / 2.0f;
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < display->getBar(i).numPixels(); j++) {
-            float t = (float)j / (float)display->getBar(i).numPixels();
-            glm::vec4 a = red;
-            glm::vec4 b = green;
-            glm::vec4 c = blue;
+    // for (int i = 0; i < 5; i++) {
+    //     for (int j = 0; j < display->getBar(i).numPixels(); j++) {
+    //         float t = (float)j / (float)display->getBar(i).numPixels();
+    //         glm::vec4 a = red;
+    //         glm::vec4 b = green;
+    //         glm::vec4 c = blue;
 
-            if (i == 2) {
-                a = purple;
-                b = black;
-                c = purple;
-            }
+    //         if (i == 2) {
+    //             a = purple;
+    //             b = black;
+    //             c = purple;
+    //         }
 
-            glm::vec4 color = a;
-            // mix between red green and blue with a gradient
-            if (t < 0.5f) {
-                // Map t from [0, 0.5] to [0, 1] for R->G
-                color = glm::mix(a, b, t * 2.0f);
-            } else {
-                // Map t from [0.5, 1] to [0, 1] for G->B
-                color = glm::mix(b, c, (t - 0.5f) * 2.0f);
-            }
+    //         glm::vec4 color = a;
+    //         // mix between red green and blue with a gradient
+    //         if (t < 0.5f) {
+    //             // Map t from [0, 0.5] to [0, 1] for R->G
+    //             color = glm::mix(a, b, t * 2.0f);
+    //         } else {
+    //             // Map t from [0.5, 1] to [0, 1] for G->B
+    //             color = glm::mix(b, c, (t - 0.5f) * 2.0f);
+    //         }
 
-            color.a = brightness;
-            display->getBar(i).setColor(j, color);
-        }
-    }
+    //         color.a = brightness;
+    //         display->getBar(i).setColor(j, color);
+    //     }
+    // }
 
     display->updateDisplay();
 }

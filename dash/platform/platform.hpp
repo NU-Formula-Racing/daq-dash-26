@@ -28,17 +28,22 @@ public:
   GPIO(uint8_t pin, bool output);
   ~GPIO();
 
-    bool gpio_write(GpioLevel level) override;
-    bool gpio_read(GpioLevel& out) override;
+  bool gpio_write(GpioLevel level) override;
+  bool gpio_read(GpioLevel& out) override;
 
   void attachInterrupt(std::function<void()> callback, EdgeType edge);
 
   bool checkError();
 
-   private:
-    struct GPIOImpl;
-    std::unique_ptr<GPIOImpl> _impl;
+private:
+  struct GPIOImpl;
+  std::unique_ptr<GPIOImpl> _impl;
 };
+
+class MockGPIO : public IGpio {
+  bool gpio_write(GpioLevel level) override {return true; }
+  bool gpio_read(GpioLevel& out) override { return true; }
+}
 
 class SPI : public ISpi {
    public:

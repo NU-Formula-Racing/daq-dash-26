@@ -54,59 +54,6 @@ struct VirtualizedNeobar {
     bool _dirty{true};
 };
 
-// start light show functions here
-namespace animations {
-
-inline void idle(){
-    const float breathePeriod = 2.0; // in seconds
-    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
-    // breathing timing; uses steady clock.
-    float time = std::chrono::stead_clock::now().time_since_epoch().count() / 1000000000.0f; // in seconds
-    float brightness = (std::sin(time * breathePeriod) + 1.0f)/2.0f; // +1 for normalize
-    // define purple
-    glm::vec4(1.0f, 0.0f, 1.0f, brightness);
-    for (int i = 0; i < 5; i ++){ // for all 5 bars
-        for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
-            display->getBar(i).setColor(j, purple);
-            }   
-    display->getBar(i).setColor(j, color);
-    }
-}
-
-// let's bring the gay little lights back 
-inline void gayLittleLights()
-{
-    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
-
-    static std::vector<glm::vec4> palette = {
-    glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-    glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-    glm::vec4(1.0f, 0.5f, 0.0f, 1.0f),
-    glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
-    glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),
-    glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
-    glm::vec4(1.0f, 0.0f, 1.0f, 1.0f),
-    glm::vec4(1.0f, 0.0f, 0.5f, 1.0f)
-    };
-
-    float time = std::chrono::stead_clock::now().time_since_epoch().count() / 1000000000.0f; // in seconds
-    float moveSpeed = 15.0f;
-
-    for (int i = 0; i < 5; i ++){ // for all 5 bars
-       int barOffset = i * 3;
-
-        for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
-            int colorIndex = static_cast<int>(time * moveSpeed + j+ barOffset)
-
-            glm::vec4 color = palette[colorIndex];
-            }   
-        
-    display->getBar(i).setColor(j, color);    
-    }
-}
-
-}
-
 class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
    public:
     void initialize() {
@@ -232,5 +179,54 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
 };
 
 }  // namespace dash
+
+// start light show functions here
+namespace animations {
+
+inline void idle(){
+    const float breathePeriod = 2.0; // in seconds
+    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
+    // breathing timing; uses steady clock.
+    float time = std::chrono::steady_clock::now().time_since_epoch().count() / 1000000000.0f; // in seconds
+    float brightness = (std::sin(time * breathePeriod) + 1.0f)/2.0f; // +1 for normalize
+    // define purple
+    glm::vec4 purple(1.0f, 0.0f, 1.0f, brightness);
+    for (int i = 0; i < 5; i ++){ // for all 5 bars
+        for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
+            display->getBar(i).setColor(j, purple);
+            }   
+    }
+}
+
+// let's bring the gay little lights back 
+inline void gayLittleLights()
+{
+    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
+
+    static std::vector<glm::vec4> palette = {
+    glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
+    glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
+    glm::vec4(1.0f, 0.5f, 0.0f, 1.0f),
+    glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
+    glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),
+    glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+    glm::vec4(1.0f, 0.0f, 1.0f, 1.0f),
+    glm::vec4(1.0f, 0.0f, 0.5f, 1.0f)
+    };
+
+    float time = std::chrono::steady_clock::now().time_since_epoch().count() / 1000000000.0f; // in seconds
+    const float moveSpeed = 15.0f;
+
+    for (int i = 0; i < 5; i ++){ // for all 5 bars
+       int barOffset = i * 3;
+        for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
+            int colorIndex = static_cast<int>(time * moveSpeed + j + barOffset);
+            glm::vec4 color = palette[colorIndex % palette.size()];
+            display->getBar(i).setColor(j, color);    
+            }   
+    }
+}
+
+}
 
 #endif  // __LIGHTS_HPP__

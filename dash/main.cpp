@@ -87,8 +87,8 @@ int main() {
 }
 
 static void __updateLights() {
-    // dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
-    dash::animations::idle();
+    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
+    animations::idle();
 
     // glm::vec4 red = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     // glm::vec4 green = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);

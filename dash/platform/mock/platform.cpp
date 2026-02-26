@@ -26,6 +26,8 @@ bool GPIO::gpio_read(GpioLevel& out){
 
 void GPIO::attachInterrupt(std::function<void()> callback, EdgeType edge) {}
 
+bool checkError(){ return true; }
+
 struct SPI::SPIImpl {
   // noop
 };
@@ -40,5 +42,7 @@ bool SPI::ISpi_write(const uint8_t *, size_t) { return false; }
 bool SPI::ISpi_transfer(const uint8_t *tx, uint8_t *rx, size_t len) {
     return false;
 }
+
+void tick() {}
 
 } // namespace dash::platform

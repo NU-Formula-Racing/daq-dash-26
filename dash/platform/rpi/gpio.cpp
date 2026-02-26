@@ -1,11 +1,12 @@
 #include <platform/platform.hpp>
-
+#include <platform/rpi/gpio_manager.hpp>
 #include <gpiod.hpp>
 
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <iostream>
 #include <thread>
@@ -20,6 +21,7 @@ struct GPIO::GPIOImpl {
   uint8_t _pin;
   bool _isOutput;
   gpiod::line_settings _settings;
+  bool err;
 
   GPIOImpl(uint8_t pin, bool output) 
       : _pin(pin), _isOutput(output) {
@@ -27,27 +29,27 @@ struct GPIO::GPIOImpl {
     _settings.set_direction(output ? gpiod::line::direction::OUTPUT 
                                       : gpiod::line::direction::INPUT);
     
-    GPIOManager::instance()->registerPin(_pin, _settings);
+    err = GPIOManager::instance().registerPin(_pin, _settings);
   }
 
   ~GPIOImpl() {
-    GPIOManager::instance()->unregisterPin(_pin);
+    GPIOManager::instance().releasePin(_pin);
   }
 
   bool write(GpioLevel level) {
-    static_assert(_isOutput, "cannot write to GPIO input pin");
+    if(!_isOutput) return false;
 
-    return GPIOManager::instance()->gpioWritePin(_pin, level);
+    return GPIOManager::instance().gpioWritePin(_pin, level);
   }
 
   bool read(GpioLevel& out) {
-    static_assert(!_isOutput, "cannot read from GPIO output pin");
+    if(_isOutput) return false;
 
-    return GPIOManager::instance()->gpioReadPin(_pin, out);
+    return GPIOManager::instance().gpioReadPin(_pin, out);
   }
 
   void attachInterrupt(std::function<void()> callback, EdgeType edge){
-    static_assert(!_isOutput, "cannot attach interrupt to GPIO output pin");
+    if(!_isOutput) return;
 
     if (edge == EdgeType::RISING) {
       _settings.set_edge_detection(gpiod::line::edge::RISING);
@@ -57,13 +59,15 @@ struct GPIO::GPIOImpl {
       _settings.set_edge_detection(gpiod::line::edge::BOTH);
     }
     
-    GPIOManager::instance()->registerInterrupt(_pin, _settings, callback);
+    GPIOManager::instance().registerInterrupt(_pin, _settings, callback);
   }
+
+  bool checkError() { return err; }
   
 };
 
 GPIO::GPIO(uint8_t pin, bool output)
-    : _impl(std::make_unique<GPIOImpl>(uint8_t pin, bool output)) {}
+    : _impl(std::make_unique<GPIOImpl>(pin, output)) {}
 
 GPIO::~GPIO() = default;
 
@@ -76,7 +80,9 @@ bool GPIO::gpio_read(GpioLevel& out) {
 }
 
 void GPIO::attachInterrupt(std::function<void()> callback, EdgeType edge){
-  _impl->attachInterrupt(std::function<void()> callback, EdgeType edge);
+  _impl->attachInterrupt(std::move(callback), edge);
 }
+
+bool GPIO::checkError() { return _impl->checkError(); }
 
 } // namespace dash::platform

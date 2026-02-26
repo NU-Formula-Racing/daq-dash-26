@@ -8,9 +8,10 @@
 namespace dash::platform {
 
 class GPIOManager {
+public:
     static GPIOManager& instance();
 
-    void registerPin(uint8_t offset, gpiod::line_settings settings);
+    bool registerPin(uint8_t offset, gpiod::line_settings settings);
     void releasePin(uint8_t offset);
     void registerInterrupt(uint8_t offset, gpiod::line_settings settings, std::function<void()> callback);
 
@@ -25,13 +26,14 @@ private:
     GPIOManager();
     GPIOManager(const GPIOManager&) = delete;
     GPIOManager& operator=(const GPIOManager&) = delete;
-    ~GPIOManager();
 
     std::unordered_map<uint8_t, std::function<void()>> _callbacks;
     std::unordered_map<uint8_t, gpiod::line_settings> _settings;
 
-    gpiod::chip _chip;
-    gpiod::line_request _request;
+    std::unique_ptr<gpiod::chip> _chip;
+    std::unique_ptr<gpiod::line_request> _request;
+
+    bool _started;
 };
 
 } // namespace dash::platform

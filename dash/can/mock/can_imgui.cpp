@@ -91,61 +91,81 @@ void CAN_IMGUI::draw_ui() {
                 
                 switch (signal->getSignalType()) {
                     case SignalType::INT8:
-                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S8, &messageIdToSignalsInfo[messageId][sigNum].value.s8)) {
+                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S8, &messageIdToSignalsInfo[messageId][sigNum].value.s8);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.s8);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::INT16:
-                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S16, &messageIdToSignalsInfo[messageId][sigNum].value.s16)) {
+                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S16, &messageIdToSignalsInfo[messageId][sigNum].value.s16);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.s16);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::INT32:
-                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S32, &messageIdToSignalsInfo[messageId][sigNum].value.s32)) {
+                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S32, &messageIdToSignalsInfo[messageId][sigNum].value.s32);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.s32);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::INT64:
-                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S64, &messageIdToSignalsInfo[messageId][sigNum].value.s64)) {
+                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_S64, &messageIdToSignalsInfo[messageId][sigNum].value.s64);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.s64);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::UINT8:
-                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U8, &messageIdToSignalsInfo[messageId][sigNum].value.u8)) {
+                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U8, &messageIdToSignalsInfo[messageId][sigNum].value.u8);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.u8);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::UINT16:
-                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U16, &messageIdToSignalsInfo[messageId][sigNum].value.u16)) {
+                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U16, &messageIdToSignalsInfo[messageId][sigNum].value.u16);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.u16);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::UINT32:
-                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U32, &messageIdToSignalsInfo[messageId][sigNum].value.u32)) {
+                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U32, &messageIdToSignalsInfo[messageId][sigNum].value.u32);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.u32);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::UINT64:
-                        if (ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U64, &messageIdToSignalsInfo[messageId][sigNum].value.u64)) {
+                        ImGui::InputScalar(messageIdToSignalsInfo[messageId][sigNum].name, ImGuiDataType_U64, &messageIdToSignalsInfo[messageId][sigNum].value.u64);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.u64);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::FLOAT:
-                        if (ImGui::InputFloat(messageIdToSignalsInfo[messageId][sigNum].name, &messageIdToSignalsInfo[messageId][sigNum].value.f)) {
+                        ImGui::InputFloat(messageIdToSignalsInfo[messageId][sigNum].name, &messageIdToSignalsInfo[messageId][sigNum].value.f);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.f);
                             std::cout << std::flush;
                         }
                         break;
                     case SignalType::BOOL:
-                        if (ImGui::Checkbox(messageIdToSignalsInfo[messageId][sigNum].name, &messageIdToSignalsInfo[messageId][sigNum].value.b)) {
+                        ImGui::Checkbox(messageIdToSignalsInfo[messageId][sigNum].name, &messageIdToSignalsInfo[messageId][sigNum].value.b);
+                        
+                        if (ImGui::IsItemDeactivatedAfterEdit()) {
                             okay::Engine.logger.debug("Value for {} changed to: {}", messageIdToSignalsInfo[messageId][sigNum].name, messageIdToSignalsInfo[messageId][sigNum].value.b);
                             std::cout << std::flush;
                         }

@@ -1,158 +1,73 @@
 #include <platform/platform.hpp>
-
-#include <gpiod.h>
+#include <platform/rpi/gpio_manager.hpp>
+#include <gpiod.hpp>
 
 #include <cerrno>
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <iostream>
+#include <thread>
+#include <atomic>
+#include <map>
+#include <vector>
+
 
 namespace dash::platform {
 
-static std::string chipNameToPath(const std::string& chipName) {
-  // Accept:
-  //   "gpiochip0"  -> "/dev/gpiochip0"
-  //   "/dev/gpiochip0" (unchanged)
-  //   "0"          -> "/dev/gpiochip0"
-  if (chipName.rfind("/dev/gpiochip", 0) == 0) {
-    return chipName;
-  }
-  if (chipName.rfind("gpiochip", 0) == 0) {
-    return "/dev/" + chipName;
-  }
-  return "/dev/gpiochip" + chipName;
-}
-
-struct GPIOError {
-  bool chip_open_err = false;
-  bool config_alloc_err = false;
-  bool line_config_add_line_settings_err = false;
-  bool gpiod_chip_request_lines_err = false;
-
-  bool checkError() {
-    return  chip_open_err || 
-            config_alloc_err || 
-            line_config_add_line_settings_err || 
-            gpiod_chip_request_lines_err;
-  }
-};
-
 struct GPIO::GPIOImpl {
-  gpiod_chip* _chip = nullptr;
-  gpiod_line_request* _request = nullptr;
+  uint8_t _pin;
+  bool _isOutput;
+  gpiod::line_settings _settings;
+  bool err;
 
-  unsigned _offset = 0;
-  bool _isOutput = false;
-
-  GPIOError errs;
-
-  GPIOImpl(const std::string& chipName, unsigned lineOffset, bool output)
-      : _offset(lineOffset), _isOutput(output) {
-    const std::string chipPath = chipNameToPath(chipName);
-
-    std::cout << "GPIOImpl::ctor()\n";
-    _chip = gpiod_chip_open(chipPath.c_str());
-    if (!_chip) {
-      errs.chip_open_err = true;
-      return;
-    }
-
-    gpiod_line_settings* settings = gpiod_line_settings_new();
-    gpiod_line_config* lineConfig = gpiod_line_config_new();
-    gpiod_request_config* reqConfig = gpiod_request_config_new();
-
-    if (!settings || !lineConfig || !reqConfig) {
-      if (reqConfig) gpiod_request_config_free(reqConfig);
-      if (lineConfig) gpiod_line_config_free(lineConfig);
-      if (settings) gpiod_line_settings_free(settings);
-      gpiod_chip_close(_chip);
-      _chip = nullptr;
-      errs.config_alloc_err = true;
-      return;
-    }
-
-    gpiod_request_config_set_consumer(reqConfig, "dash-platform");
-
-    if (_isOutput) {
-      gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_OUTPUT);
-      gpiod_line_settings_set_output_value(settings, GPIOD_LINE_VALUE_INACTIVE);
-    } else {
-      gpiod_line_settings_set_direction(settings, GPIOD_LINE_DIRECTION_INPUT);
-    }
-
-    const unsigned offsets[1] = {_offset};
-    if (gpiod_line_config_add_line_settings(lineConfig, offsets, 1, settings) < 0) {
-      gpiod_request_config_free(reqConfig);
-      gpiod_line_config_free(lineConfig);
-      gpiod_line_settings_free(settings);
-      gpiod_chip_close(_chip);
-      _chip = nullptr;
-      errs.line_config_add_line_settings_err = true;
-      return;
-    }
-
-    _request = gpiod_chip_request_lines(_chip, reqConfig, lineConfig);
-
-    gpiod_request_config_free(reqConfig);
-    gpiod_line_config_free(lineConfig);
-    gpiod_line_settings_free(settings);
-
-    if (!_request) {
-      gpiod_chip_close(_chip);
-      _chip = nullptr;
-      errs.gpiod_chip_request_lines_err = true;
-      return;
-    }
+  GPIOImpl(uint8_t pin, bool output) 
+      : _pin(pin), _isOutput(output) {
+    
+    _settings.set_direction(output ? gpiod::line::direction::OUTPUT 
+                                      : gpiod::line::direction::INPUT);
+    
+    err = GPIOManager::instance().registerPin(_pin, _settings);
   }
 
   ~GPIOImpl() {
-    if (_request) {
-      gpiod_line_request_release(_request);
-      _request = nullptr;
-    }
-    if (_chip) {
-      gpiod_chip_close(_chip);
-      _chip = nullptr;
-    }
+    GPIOManager::instance().releasePin(_pin);
   }
 
   bool write(GpioLevel level) {
-    if (!_isOutput) {
-      std::cerr << "attempt to write to input GPIO\n";
-      return false;
-    }
+    if(!_isOutput) return false;
 
-    const gpiod_line_value v =
-        (level == GpioLevel::G_HIGH) ? GPIOD_LINE_VALUE_ACTIVE : GPIOD_LINE_VALUE_INACTIVE;
-
-    if (gpiod_line_request_set_value(_request, _offset, v) < 0) {
-      return false;
-    }
-
-    return true;
+    return GPIOManager::instance().gpioWritePin(_pin, level);
   }
 
   bool read(GpioLevel& out) {
-    const gpiod_line_value v = gpiod_line_request_get_value(_request, _offset);
+    if(_isOutput) return false;
 
-    if (v == GPIOD_LINE_VALUE_ERROR) {
-      return false;
+    return GPIOManager::instance().gpioReadPin(_pin, out);
+  }
+
+  void attachInterrupt(std::function<void()> callback, EdgeType edge){
+    if(!_isOutput) return;
+
+    if (edge == EdgeType::RISING) {
+      _settings.set_edge_detection(gpiod::line::edge::RISING);
+    } else if (edge == EdgeType::FALLING) {
+      _settings.set_edge_detection(gpiod::line::edge::FALLING);
+    } else {
+      _settings.set_edge_detection(gpiod::line::edge::BOTH);
     }
-
-    out = (v == GPIOD_LINE_VALUE_ACTIVE) ? GpioLevel::G_HIGH : GpioLevel::G_LOW;
-    return true;
+    
+    GPIOManager::instance().registerInterrupt(_pin, _settings, callback);
   }
 
-  bool checkStatus() {
-    return errs.checkError();
-  }
+  bool checkError() { return err; }
   
 };
 
-GPIO::GPIO(const std::string& chipName, unsigned lineOffset, bool output)
-    : _impl(std::make_unique<GPIOImpl>(chipName, lineOffset, output)) {}
+GPIO::GPIO(uint8_t pin, bool output)
+    : _impl(std::make_unique<GPIOImpl>(pin, output)) {}
 
 GPIO::~GPIO() = default;
 
@@ -164,8 +79,10 @@ bool GPIO::gpio_read(GpioLevel& out) {
   return _impl->read(out);
 }
 
-bool GPIO::checkError() {
-  return _impl->checkStatus();
+void GPIO::attachInterrupt(std::function<void()> callback, EdgeType edge){
+  _impl->attachInterrupt(std::move(callback), edge);
 }
+
+bool GPIO::checkError() { return _impl->checkError(); }
 
 } // namespace dash::platform

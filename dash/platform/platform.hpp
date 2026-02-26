@@ -13,18 +13,27 @@
 #include <string>
 #include <thread>
 #include <iostream>
+#include <functional>
 
 namespace dash::platform {
 
 class GPIO : public IGpio {
-   public:
-    GPIO(const std::string& chipName, unsigned lineOffset, bool output);
-    ~GPIO();
+public:
+  enum class EdgeType {
+    RISING,
+    FALLING,
+    BOTH
+  };
+
+  GPIO(uint8_t pin, bool output);
+  ~GPIO();
 
     bool gpio_write(GpioLevel level) override;
     bool gpio_read(GpioLevel& out) override;
 
-    bool checkError();
+  void attachInterrupt(std::function<void()> callback, EdgeType edge);
+
+  bool checkError();
 
    private:
     struct GPIOImpl;
@@ -74,7 +83,9 @@ class NeopixelStrip {
     struct NeopixelImpl;
     std::unique_ptr<NeopixelImpl> _impl;
 };
+  
+void tick();
 
-}  // namespace dash::platform
+} // namespace dash::platform
 
 #endif  // __PLATFORM_H__

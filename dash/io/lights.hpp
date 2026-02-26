@@ -54,6 +54,24 @@ struct VirtualizedNeobar {
     bool _dirty{true};
 };
 
+// start light show functions here
+
+inline void idle(){
+    // breathing timing; uses steady clock.
+    float time = std::chrono::stead_clock::now().time_since_epoch().count() / 1000000000.0f; // in seconds
+    float brightness = (std::sin(time * 2.0f) + 1.0f)/2.0f; // +1 for normalize
+    // define purple
+    glm::vec4(1.0f, 0.0f, 1.0f, brightness);
+    for (int i = 0; i < 5; i ++){ // for all 5 bars
+        for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
+            display->getBar(i).setColor(j, purple);
+            }   
+    }
+}
+
+
+
+
 class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
    public:
     void initialize() {

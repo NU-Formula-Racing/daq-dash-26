@@ -264,10 +264,10 @@ static void __gameInitialize() {
     }
 
     std::ios::sync_with_stdio(false);
-    // std::cout.tie(nullptr);
-    // std::cout << "\x1b[?25l"; // hide cursor
-    // std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
-    // std::cout.flush();
+    std::cout.tie(nullptr);
+    std::cout << "\x1b[?25l"; // hide cursor
+    std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
+    std::cout.flush();
 }
 
 static void __gameShutdown() {
@@ -288,29 +288,39 @@ static void __gameUpdate() {
 
     dash::platform::tick();
     
-    if (g_canImgui) {
-        g_canImgui->draw_ui();
-    }
-    
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    // std::cout << "\x1b[H\x1b[J";
+    std::cout << "\x1b[H\x1b[J";
 
-    // std::cout << "NFR26 Development Dashboard\n";
+    std::cout << "NFR26 Development Dashboard\n";
 
     // Collect all signal strings
     std::vector<std::string> lines;
+    auto messageIdToSignalsInfo { g_canImgui->getMessageIdToSignalsInfo() };
     for (ICAN_Message* msg : g_toPrint) {
-        for (std::uint8_t sigNum = 0; sigNum < msg->get_num_signals(); sigNum++) {
-            auto sigId = std::pair{msg->get_id().id, sigNum};
+        for (std::uint8_t sigNum {}; sigNum < msg->get_num_signals(); sigNum++) {
+            auto sigId { std::pair{msg->get_id().id, sigNum} };
 
             const char* name = "(unknown)";
             auto it = dbc::meta::signalIdToName.find(sigId);
             if (it != dbc::meta::signalIdToName.end())
                 name = it->second;
 
-            lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
+            // lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
+            auto sigInfo { (*messageIdToSignalsInfo)[msg->get_id().id][sigNum] };
+            switch (sigInfo.type) {
+                case SignalType::INT8:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s8));   break;
+                case SignalType::INT16:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s16));  break;
+                case SignalType::INT32:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s32));  break;
+                case SignalType::INT64:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s64));  break;
+                case SignalType::UINT8:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.u8));   break;
+                case SignalType::UINT16:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.u16));  break;
+                case SignalType::UINT32:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.u32));  break;
+                case SignalType::UINT64:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.u64));  break;
+                case SignalType::FLOAT:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.f));    break;
+                case SignalType::BOOL:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.b));    break;
+            }
         }
     }
 
@@ -319,21 +329,21 @@ static void __gameUpdate() {
 
     size_t rows = (lines.size() + COLS - 1) / COLS;
 
-    // std::ostringstream frame;
+    std::ostringstream frame;
 
     // Print row-wise across columns
-    // for (size_t r = 0; r < rows; r++) {
-    //     for (size_t c = 0; c < COLS; c++) {
-    //         size_t idx = r + c * rows;
-    //         if (idx < lines.size()) {
-    //             frame << std::left << std::setw(COL_WIDTH) << lines[idx];
-    //         }
-    //     }
-    //     frame << '\n';
-    // }
+    for (size_t r = 0; r < rows; r++) {
+        for (size_t c = 0; c < COLS; c++) {
+            size_t idx = r + c * rows;
+            if (idx < lines.size()) {
+                frame << std::left << std::setw(COL_WIDTH) << lines[idx];
+            }
+        }
+        frame << '\n';
+    }
 
-    // std::cout << frame.str();
-    // std::cout.flush();
+    std::cout << frame.str();
+    std::cout.flush();
 }
 
 static void __exitSignal(int sig) {

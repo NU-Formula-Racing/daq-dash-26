@@ -5,6 +5,8 @@
 #include <nfr_can/IGpio.hpp>
 #include <nfr_can/ISpi.hpp>
 
+#include <can/mock/can_imgui.hpp>
+
 #include <glm/glm.hpp>
 
 #include <chrono>
@@ -83,7 +85,7 @@ class NeopixelStrip {
     std::unique_ptr<NeopixelImpl> _impl;
 };
 
-inline void configureCANDrivers(dash::platform::SPI &spi, dash::platform::GPIO &gpio, dash::platform::Clock &clock);
+okay::Option<CAN_IMGUI*> configureCANDrivers(dash::platform::SPI &spi, dash::platform::GPIO &gpio, dash::platform::Clock &clock);
 
 void tick();
 

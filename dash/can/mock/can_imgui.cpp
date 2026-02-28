@@ -122,5 +122,5 @@ uint32_t CAN_IMGUI::time_ms() {
 } // do nothing
 
 CAN_IMGUI::SignalInfo* CAN_IMGUI::getSignalInfo(uint32_t msgId, uint8_t sigNum) {
-    return &messageIdToSignalsInfo[msgId][sigNum];
+    return &messageIdToSignalsInfo.at(msgId).at(sigNum);
 }

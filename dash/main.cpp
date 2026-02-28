@@ -52,7 +52,7 @@ static std::vector<ICAN_Message*> g_toPrint = {
 // heartbeat message
 inline uint64_t g_heartbeatCount = 0;
 inline VirtualTimerGroup g_timerGroup;
-inline CAN_IMGUI* g_canImgui = nullptr;
+inline CAN_IMGUI* g_canIMGUI = nullptr;
 
 TX_can_msg_config g_heartbeat_conf = {.bus = dbc::driveBus,
                                       .id = 0x510,
@@ -242,7 +242,7 @@ static void __gameInitialize() {
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
     g_timerGroup.AddTimer(20, []() { __flushScreen(); });
     
-    dash::platform::configureCANDrivers(g_canSpi, g_canGPIO, g_canClock);
+    g_canIMGUI = dash::platform::configureCANDrivers(g_canSpi, g_canGPIO, g_canClock).value();
 
     // Additional game initialization logic
     BaudRate baud500k = BaudRate::kBaud500K;
@@ -297,19 +297,22 @@ static void __gameUpdate() {
             if (it != dbc::meta::signalIdToName.end())
                 name = it->second;
 
-            // lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
-            auto sigInfo { (g_canImgui->getMessageIdToSignalsInfo())[msg->get_id().id][sigNum] };
-            switch (sigInfo.type) {
-                case SignalType::INT8:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s8));   break;
-                case SignalType::INT16:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s16));  break;
-                case SignalType::INT32:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s32));  break;
-                case SignalType::INT64:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s64));  break;
-                case SignalType::UINT8:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.u8));   break;
-                case SignalType::UINT16:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.u16));  break;
-                case SignalType::UINT32:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.u32));  break;
-                case SignalType::UINT64:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.u64));  break;
-                case SignalType::FLOAT:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.f));    break;
-                case SignalType::BOOL:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.b));    break;
+            if (g_canIMGUI == nullptr){
+                lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
+            } else {
+                auto sigInfo { g_canIMGUI->getSignalInfo(msg->get_id().id, sigNum) };
+                switch (sigInfo->type) {
+                    case SignalType::INT8:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.s8));   break;
+                    case SignalType::INT16:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.s16));  break;
+                    case SignalType::INT32:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.s32));  break;
+                    case SignalType::INT64:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.s64));  break;
+                    case SignalType::UINT8:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.u8));   break;
+                    case SignalType::UINT16:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.u16));  break;
+                    case SignalType::UINT32:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.u32));  break;
+                    case SignalType::UINT64:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.u64));  break;
+                    case SignalType::FLOAT:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.f));    break;
+                    case SignalType::BOOL:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.b));    break;
+                }
             }
         }
     }

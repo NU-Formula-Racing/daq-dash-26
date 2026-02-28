@@ -209,6 +209,7 @@ static void __gameInitialize() {
         }
     );
 
+
     std::ios::sync_with_stdio(false);
     std::cout.tie(nullptr);
     std::cout << "\x1b[?25l";  // hide cursor

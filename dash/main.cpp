@@ -25,6 +25,11 @@ static void __gameShutdown();
 static void __motorStatusRecv();
 static void __exitSignal(int sig);
 
+bool up_pressed = false;
+void in_bt_up_callback(){
+    up_pressed = !up_pressed;
+}
+
 // clang-format off
 static std::vector<ICAN_Message*> g_toPrint = {
     &dbc::bmsStatus::message,
@@ -60,6 +65,7 @@ inline TX_CAN_Message(1) g_heartbeatMessage{g_heartbeat_conf, g_heartbeatSignal}
 inline dash::platform::SPI g_canSpi;
 inline dash::platform::MockGPIO g_canGPIO;
 inline dash::platform::Clock g_canClock;
+inline dash::platform::GPIO g_in_bt_u{21, false};
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
@@ -142,6 +148,7 @@ static void __flushScreen() {
     constexpr int MAX_NAME_LENGTH = 20;
     constexpr int MAX_PREFERED_VALUE_LENGTH = 10;
 
+    /*
     for (ICAN_Message* msg : g_toPrint) {
         lines.emplace_back(std::string(dbc::meta::messageIdToName.at(msg->get_id().id)), true);
 
@@ -173,6 +180,7 @@ static void __flushScreen() {
             lines.emplace_back(name + ": " + msgValue, false);
         }
     }
+    
 
 
 
@@ -221,10 +229,19 @@ static void __flushScreen() {
 
     // Now clear the rest of the screen
     out += "\x1b[J";
+    */
+    std::string out = "not pressed";
+    if (up_pressed) {
+        out = "pressed";
+    }
 
     // print to stdout, and flush
     std::cout << out;
     std::cout.flush();
+}
+
+static void __interruptInitialize(){
+    g_in_bt_u.attachInterrupt(in_bt_up_callback, dash::platform::GPIO::EdgeType::RISING);
 }
 
 static void __gameInitialize() {
@@ -242,6 +259,8 @@ static void __gameInitialize() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
+
+    __interruptInitialize();
 
     std::ios::sync_with_stdio(false);
     std::cout.tie(nullptr);

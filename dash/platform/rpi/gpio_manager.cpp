@@ -66,15 +66,24 @@ void GPIOManager::tick(){
         start();
     }
 
+    if (!_request) {
+        return;
+    }
+
+    if (!_request->wait_edge_events(std::chrono::nanoseconds(0))) {
+        return;
+    }
+
     gpiod::edge_event_buffer buffer(64);
+    std::size_t num_events = _request->read_edge_events(buffer);
 
-    _request->read_edge_events(buffer);
-
-    for (const auto& event : buffer) {
+    for (std::size_t i = 0; i < num_events; i++) {
+        const auto& event = buffer.get_event(i);
         unsigned int offset = event.line_offset();
 
-        if (_callbacks.find(offset) != _callbacks.end()) {
-            _callbacks[offset]();
+        auto it = _callbacks.find(offset);
+        if (it != _callbacks.end()) {
+            it->second();
         }
     }
 }

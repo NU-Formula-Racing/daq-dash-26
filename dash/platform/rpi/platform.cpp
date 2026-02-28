@@ -5,6 +5,7 @@ namespace dash::platform {
 
 void tick(){
     GPIOManager::instance().tick();
+    
 }
 
 }

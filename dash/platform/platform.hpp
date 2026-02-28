@@ -43,7 +43,7 @@ private:
 class MockGPIO : public IGpio {
   bool gpio_write(GpioLevel level) override {return true; }
   bool gpio_read(GpioLevel& out) override { return true; }
-}
+};
 
 class SPI : public ISpi {
    public:

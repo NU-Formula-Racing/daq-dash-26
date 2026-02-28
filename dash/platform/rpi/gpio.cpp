@@ -49,7 +49,7 @@ struct GPIO::GPIOImpl {
   }
 
   void attachInterrupt(std::function<void()> callback, EdgeType edge){
-    if(!_isOutput) return;
+    if(_isOutput) return;
 
     if (edge == EdgeType::RISING) {
       _settings.set_edge_detection(gpiod::line::edge::RISING);

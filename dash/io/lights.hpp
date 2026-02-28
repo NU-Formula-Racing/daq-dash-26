@@ -280,17 +280,19 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
     }
 
     void precharge() {
-        float nowMS = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        float nowMS = std::chrono::steady_clock::now().time_since_epoch().count() / 1000000.0f;
         float time = (nowMS - _animationStartTimeMs) / 1000.0f;
-        glm::vec4 yellow = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+        glm::vec4 yellow = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+
         glm::vec4 black = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
         float prechargePercentage = static_cast<float>(dbc::rearInverterMotorStatus::dcVoltage->get())/static_cast<float>(dbc::bmsSoe::batteryVoltage->get());
         for(int i = 0; i < 5; i++){
             //probably something here
             float t = 0.9f/getBar(i).numPixels();
             for(int j = 0; j < getBar(i).numPixels(); j++){
 
-                if(prechargePercentage >= t*i){
+                if(prechargePercentage >= t*j){
                     getBar(i).setColor(j, yellow);
                 }
                 else{

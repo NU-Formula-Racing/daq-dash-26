@@ -102,6 +102,8 @@ static void __updateLights() {
     float brightness = (std::sin(ms.count() / 1000.0f) + 1.0f) / 2.0f;
 
     for (int i = 0; i < 5; i++) {
+        if (i == 2) continue;
+
         for (int j = 0; j < display->getBar(i).numPixels(); j++) {
             float t = (float)j / (float)display->getBar(i).numPixels();
             glm::vec4 a = red;
@@ -247,6 +249,13 @@ static void __gameInitialize() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
+
+    dbc::ecuDriveStatus::message.attach_rx_callback(
+        []() {
+            auto *display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
+            display->onECUDriveStatus();
+        }
+    );
 
     std::ios::sync_with_stdio(false);
     std::cout.tie(nullptr);

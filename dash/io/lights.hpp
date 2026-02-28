@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <okay/core/okay.hpp>
+#include <can/can_dbc.hpp>
+
 #include <stdint.h>
 #include <cstdint>
 #include <vector>
@@ -118,7 +120,25 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
                 _bars[j].clearDirty();
             }
 
+            if (i == 1) continue;
+
             _strips[i].show();
+        }
+    }
+
+    void onECUDriveStatus() {
+        uint8_t state = dbc::ecuDriveStatus::driveState->get();
+
+        switch (state) {
+            case 0: // idle
+                // do something idle
+                break;
+            case 1: // precharge
+                // do something
+                break;
+            case 2: // drive
+                // do something
+                break;
         }
     }
 

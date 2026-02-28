@@ -102,6 +102,7 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                 std::string name { sigInfo.name };
                 name.append("###", 3);
                 name.append(dbc::meta::messageIdToName.at(messageId));
+                name.append(sigInfo.name);
                 
                 switch (sigInfo.type) {
                     case SignalType::INT8:    ImGui::InputScalar(name.c_str(), ImGuiDataType_S8, &sigInfo.value.s8);    logOnEdit(sigInfo.value.s8);   break;

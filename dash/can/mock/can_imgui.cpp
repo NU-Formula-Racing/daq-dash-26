@@ -1,9 +1,11 @@
 #include "can_imgui.hpp"
+#include <string.h>
 #include "can/can_dbc.hpp"
 #include "imgui.h"
 #include "nfr_can/CAN_interface.hpp"
 #include "okay/core/util/option.hpp"
 #include <cstdint>
+#include <cstdlib>
 #include <unordered_map>
 
 bool CAN_IMGUI::init(const BaudRate baud) {
@@ -97,17 +99,21 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                     result = okay::Option<CAN_IMGUI::MessageChangeInfo>::some({ messageId, sigNum, sigInfo });
                 }};
                 
+                std::string name { sigInfo.name };
+                name.append("###", 3);
+                name.append(dbc::meta::messageIdToName.at(messageId));
+                
                 switch (sigInfo.type) {
-                    case SignalType::INT8:    ImGui::InputScalar(sigInfo.name, ImGuiDataType_S8, &sigInfo.value.s8);    logOnEdit(sigInfo.value.s8);   break;
-                    case SignalType::INT16:   ImGui::InputScalar(sigInfo.name, ImGuiDataType_S16, &sigInfo.value.s16);  logOnEdit(sigInfo.value.s16);  break;
-                    case SignalType::INT32:   ImGui::InputScalar(sigInfo.name, ImGuiDataType_S32, &sigInfo.value.s32);  logOnEdit(sigInfo.value.s32);  break;
-                    case SignalType::INT64:   ImGui::InputScalar(sigInfo.name, ImGuiDataType_S64, &sigInfo.value.s64);  logOnEdit(sigInfo.value.s64);  break;
-                    case SignalType::UINT8:   ImGui::InputScalar(sigInfo.name, ImGuiDataType_U8, &sigInfo.value.u8);    logOnEdit(sigInfo.value.u8);   break;
-                    case SignalType::UINT16:  ImGui::InputScalar(sigInfo.name, ImGuiDataType_U16, &sigInfo.value.u16);  logOnEdit(sigInfo.value.u16);  break;
-                    case SignalType::UINT32:  ImGui::InputScalar(sigInfo.name, ImGuiDataType_U32, &sigInfo.value.u32);  logOnEdit(sigInfo.value.u32);  break;
-                    case SignalType::UINT64:  ImGui::InputScalar(sigInfo.name, ImGuiDataType_U64, &sigInfo.value.u64);  logOnEdit(sigInfo.value.u64);  break;
-                    case SignalType::FLOAT:   ImGui::InputFloat(sigInfo.name, &sigInfo.value.f);                        logOnEdit(sigInfo.value.f);    break;
-                    case SignalType::BOOL:    ImGui::Checkbox(sigInfo.name, &sigInfo.value.b);                          logOnEdit(sigInfo.value.b);    break;
+                    case SignalType::INT8:    ImGui::InputScalar(name.c_str(), ImGuiDataType_S8, &sigInfo.value.s8);    logOnEdit(sigInfo.value.s8);   break;
+                    case SignalType::INT16:   ImGui::InputScalar(name.c_str(), ImGuiDataType_S16, &sigInfo.value.s16);  logOnEdit(sigInfo.value.s16);  break;
+                    case SignalType::INT32:   ImGui::InputScalar(name.c_str(), ImGuiDataType_S32, &sigInfo.value.s32);  logOnEdit(sigInfo.value.s32);  break;
+                    case SignalType::INT64:   ImGui::InputScalar(name.c_str(), ImGuiDataType_S64, &sigInfo.value.s64);  logOnEdit(sigInfo.value.s64);  break;
+                    case SignalType::UINT8:   ImGui::InputScalar(name.c_str(), ImGuiDataType_U8, &sigInfo.value.u8);    logOnEdit(sigInfo.value.u8);   break;
+                    case SignalType::UINT16:  ImGui::InputScalar(name.c_str(), ImGuiDataType_U16, &sigInfo.value.u16);  logOnEdit(sigInfo.value.u16);  break;
+                    case SignalType::UINT32:  ImGui::InputScalar(name.c_str(), ImGuiDataType_U32, &sigInfo.value.u32);  logOnEdit(sigInfo.value.u32);  break;
+                    case SignalType::UINT64:  ImGui::InputScalar(name.c_str(), ImGuiDataType_U64, &sigInfo.value.u64);  logOnEdit(sigInfo.value.u64);  break;
+                    case SignalType::FLOAT:   ImGui::InputFloat(name.c_str(), &sigInfo.value.f);                        logOnEdit(sigInfo.value.f);    break;
+                    case SignalType::BOOL:    ImGui::Checkbox(name.c_str(), &sigInfo.value.b);                          logOnEdit(sigInfo.value.b);    break;
                 }
             }
         }

@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <iostream>
 
 namespace dash::platform {
 
@@ -36,7 +37,7 @@ struct GPIOError {
             line_config_add_line_settings_err || 
             gpiod_chip_request_lines_err;
   }
-}
+};
 
 struct GPIO::GPIOImpl {
   gpiod_chip* _chip = nullptr;
@@ -51,6 +52,7 @@ struct GPIO::GPIOImpl {
       : _offset(lineOffset), _isOutput(output) {
     const std::string chipPath = chipNameToPath(chipName);
 
+    std::cout << "GPIOImpl::ctor()\n";
     _chip = gpiod_chip_open(chipPath.c_str());
     if (!_chip) {
       errs.chip_open_err = true;
@@ -118,6 +120,7 @@ struct GPIO::GPIOImpl {
 
   bool write(GpioLevel level) {
     if (!_isOutput) {
+      std::cerr << "attempt to write to input GPIO\n";
       return false;
     }
 
@@ -145,6 +148,7 @@ struct GPIO::GPIOImpl {
   bool checkStatus() {
     return errs.checkError();
   }
+  
 };
 
 GPIO::GPIO(const std::string& chipName, unsigned lineOffset, bool output)
@@ -161,7 +165,7 @@ bool GPIO::gpio_read(GpioLevel& out) {
 }
 
 bool GPIO::checkError() {
-  return _impl->checkError();
+  return _impl->checkStatus();
 }
 
 } // namespace dash::platform

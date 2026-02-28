@@ -1,6 +1,7 @@
 #ifndef __LIGHTS_HPP__
 #define __LIGHTS_HPP__
 
+#include <nfr_can/CAN_interface.hpp>
 #include <platform/platform.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>

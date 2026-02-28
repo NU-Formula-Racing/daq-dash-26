@@ -86,11 +86,6 @@ int main() {
     return 0;
 }
 
-static void __updateLights() {
-    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
-    display->updateDisplay();
-}
-
 static void __flushScreen() {
     // Collect all signal strings
     std::vector<std::pair<std::string, bool>> lines;
@@ -231,7 +226,6 @@ static void __gameShutdown() {
 static void __gameUpdate() {
     g_timerGroup.Tick(g_canClock.monotonicMs());
     dbc::driveBus.tick_bus();
-    __updateLights();
 }
 
 static void __exitSignal(int sig) {

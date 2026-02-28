@@ -41,12 +41,24 @@ struct VirtualizedNeobar {
         _dirty = true;
     }
 
-    uint8_t numPixels() const { return _numPixels; }
-    const std::vector<glm::vec4>& currentColors() const { return _currentColors; }
-    uint8_t toHardwareIndex(uint8_t virtIdx) const { return _mapping[virtIdx]; }
-    platform::NeopixelStrip* strip() const { return _strip; }
-    bool isDirty() const { return _dirty; }
-    void clearDirty() { _dirty = false; }
+    uint8_t numPixels() const {
+        return _numPixels;
+    }
+    const std::vector<glm::vec4>& currentColors() const {
+        return _currentColors;
+    }
+    uint8_t toHardwareIndex(uint8_t virtIdx) const {
+        return _mapping[virtIdx];
+    }
+    platform::NeopixelStrip* strip() const {
+        return _strip;
+    }
+    bool isDirty() const {
+        return _dirty;
+    }
+    void clearDirty() {
+        _dirty = false;
+    }
 
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
@@ -81,8 +93,12 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
         updateDisplay();
     }
 
-    VirtualizedNeobar& getBar(uint8_t barNum) {
-        return _bars[barNum];
+    void tick() {
+        if (_animationFunction != nullptr) {
+            _animationFunction();
+        }
+
+        updateDisplay();
     }
 
     void shutdown() {
@@ -107,37 +123,51 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
             // grab the relevant bars, and set the color on the strip
             _strips[i].show();
             for (int j = 0; j < 5; j++) {
-                if (!_bars[j].isDirty()) continue;
+                if (!_bars[j].isDirty())
+                    continue;
 
-                if (i != getHWIndexForBar(j)) continue;
+                if (i != getHWIndexForBar(j))
+                    continue;
 
                 for (int k = 0; k < _bars[j].numPixels(); k++) {
-                    _strips[i].setColor(
-                        _bars[j].toHardwareIndex(k), 
-                        _bars[j].currentColors()[k]);
+                    _strips[i].setColor(_bars[j].toHardwareIndex(k), _bars[j].currentColors()[k]);
                 }
 
                 _bars[j].clearDirty();
             }
 
-            if (i == 1) continue;
+            if (i == 1)
+                continue;
 
             _strips[i].show();
         }
     }
 
+    VirtualizedNeobar& getBar(uint8_t barNum) {
+        return _bars[barNum];
+    }
+
     void onECUDriveStatus() {
         uint8_t state = dbc::ecuDriveStatus::driveState->get();
 
+        if (state == currentState)
+            return;
+
+        currentState = state;
+
         switch (state) {
-            case 0: // idle
-                // do something idle
+            case 0:  // idle
+                startAnimation([this]() { idle(); });
                 break;
-            case 1: // precharge
-                // do something
+            case 1:  // precharge
+                startAnimation([this]() { precharge(); });
                 break;
-            case 2: // drive
+            case 2:  // neutral
+                startAnimation([this]() { neutral(); });
+                break;
+            case 3:  // drive
                 // do something
+                startAnimation([this]() { drive(); });
                 break;
         }
     }
@@ -145,6 +175,14 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
    private:
     std::array<VirtualizedNeobar, 5> _bars;
     std::array<platform::NeopixelStrip, 3> _strips;
+    uint32_t _animationStartTimeMs{0};
+    std::function<void()> _animationFunction;
+    uint8_t currentState{0};
+
+    void startAnimation(std::function<void()> animationFunction) {
+        _animationStartTimeMs = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        _animationFunction = animationFunction;
+    }
 
     uint8_t numPixelsForBar(uint8_t bar) {
         if (bar == 2) {
@@ -196,57 +234,59 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
 
         return barMap;
     }
+
+    // ANIMATIONS
+
+    void idle() {
+        const float breathePeriod = 2.0;  // in seconds
+        // breathing timing; uses steady clock.
+        float nowMs = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        float time = (nowMs - _animationStartTimeMs) / 1000.0f;
+        // in seconds
+        float brightness = (std::sin(time * breathePeriod) + 1.0f) / 2.0f;  // +1 for normalize
+        // define purple
+        glm::vec4 purple(1.0f, 0.0f, 1.0f, brightness);
+        for (int i = 0; i < 5; i++) {                          // for all 5 bars
+            for (int j = 0; j < getBar(i).numPixels(); j++) {  // this indexes the leds on each bar
+                getBar(i).setColor(j, purple);
+            }
+        }
+    }
+
+    void neutral() {
+        static std::vector<glm::vec4> palette = {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
+                                                 glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
+                                                 glm::vec4(1.0f, 0.5f, 0.0f, 1.0f),
+                                                 glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
+                                                 glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),
+                                                 glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+                                                 glm::vec4(1.0f, 0.0f, 1.0f, 1.0f),
+                                                 glm::vec4(1.0f, 0.0f, 0.5f, 1.0f)};
+
+        float nowMS = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        float time = (nowMS - _animationStartTimeMs) / 1000.0f;
+        const float moveSpeed = 15.0f;
+
+        for (int i = 0; i < 5; i++) {  // for all 5 bars
+            int barOffset = i * 3;
+            for (int j = 0; j < getBar(i).numPixels(); j++) {  // this indexes the leds on each bar
+                int colorIndex = static_cast<int>(time * moveSpeed + j + barOffset);
+                glm::vec4 color = palette[colorIndex % palette.size()];
+                getBar(i).setColor(j, color);
+            }
+        }
+    }
+
+    void precharge() {
+        float nowMS = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        float time = (nowMS - _animationStartTimeMs) / 1000.0f;
+    }
+
+    void drive() {
+
+    }
 };
 
 }  // namespace dash
-
-// start light show functions here
-namespace animations {
-
-inline void idle(){
-    const float breathePeriod = 2.0; // in seconds
-    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
-    // breathing timing; uses steady clock.
-    float time = std::chrono::steady_clock::now().time_since_epoch().count() / 1000000000.0f; // in seconds
-    float brightness = (std::sin(time * breathePeriod) + 1.0f)/2.0f; // +1 for normalize
-    // define purple
-    glm::vec4 purple(1.0f, 0.0f, 1.0f, brightness);
-    for (int i = 0; i < 5; i ++){ // for all 5 bars
-        for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
-            display->getBar(i).setColor(j, purple);
-            }   
-    }
-}
-
-// let's bring the gay little lights back 
-inline void gayLittleLights()
-{
-    dash::NeopixelManager* display = okay::Engine.systems.getSystemChecked<dash::NeopixelManager>();
-
-    static std::vector<glm::vec4> palette = {
-    glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-    glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-    glm::vec4(1.0f, 0.5f, 0.0f, 1.0f),
-    glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
-    glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),
-    glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
-    glm::vec4(1.0f, 0.0f, 1.0f, 1.0f),
-    glm::vec4(1.0f, 0.0f, 0.5f, 1.0f)
-    };
-
-    float time = std::chrono::steady_clock::now().time_since_epoch().count() / 1000000000.0f; // in seconds
-    const float moveSpeed = 15.0f;
-
-    for (int i = 0; i < 5; i ++){ // for all 5 bars
-       int barOffset = i * 3;
-        for (int j = 0; j < display->getBar(i).numPixels(); j++) { // this indexes the leds on each bar
-            int colorIndex = static_cast<int>(time * moveSpeed + j + barOffset);
-            glm::vec4 color = palette[colorIndex % palette.size()];
-            display->getBar(i).setColor(j, color);    
-            }   
-    }
-}
-
-}
 
 #endif  // __LIGHTS_HPP__

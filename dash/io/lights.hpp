@@ -180,7 +180,8 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
     uint8_t currentState{0};
 
     void startAnimation(std::function<void()> animationFunction) {
-        _animationStartTimeMs = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        _animationStartTimeMs =
+            std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
         _animationFunction = animationFunction;
     }
 
@@ -291,38 +292,38 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
 
         if (time < blinkTime * 2 * numBlinks) {
             // we are still blinking
-            float brightness = floor(time / blinkTime) % 2;
+            float brightness = static_cast<int>(floor(time / blinkTime)) % 2;
             glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
             color *= brightness;
             // set the colors
-            for (int i = 0; i < 5; i++) {                         
-                for (int j = 0; j < getBar(i).numPixels(); j++) { 
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < getBar(i).numPixels(); j++) {
                     getBar(i).setColor(j, color);
+                }
             }
         } else {
             // we are now in throttle light mode
             const int16_t appsMax = 4000;
-            float throttlePercentage = dbc::ECU_Throttle::APPS1_Throttle->get() / appsMax;
+            float throttlePercentage = dbc::ecuThrottle::apps1Throttle->get() / appsMax;
 
-            float partialBrightness = throttlePercentage * 8 % 1.0;
+            float partialBrightness = fmodf(throttlePercentage * 8.0f, 1.0f);
             glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
             glm::vec4 orange = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-            
-            for (int i = 0; i < 5; i ++){
 
-                if (bar == 2) continue;
-                
-                for (int j = 0; j < floor(throttlePercentage * 8); j++){
+            for (int i = 0; i < 5; i++) {
+                if (i == 2)
+                    continue;
+
+                for (int j = 0; j < floor(throttlePercentage * 8.0f); j++) {
                     glm::vec4 color = glm::mix(blue, orange, static_cast<float>(i / 8));
                     getBar(i).setColor(j, color);
                 }
-                getbar(i).setColor(floor(throttlePercentage * 8) + 1, color * partialBrightness);
+                // getBar(i).setColor(floor(throttlePercentage * 8) + 1, color * partialBrightness);
             }
-
         }
     }
 };
 
-}  // namespace dash
+} // namespace dash
 
 #endif  // __LIGHTS_HPP__

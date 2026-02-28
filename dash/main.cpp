@@ -10,7 +10,6 @@
 
 #include "can/mock/can_imgui.hpp"
 #include "drivers/can/include/nfr_can/CAN_interface.hpp"
-#include "drivers/can/include/nfr_can/MCP2515.hpp"
 #include <nfr_can/virtual_timer.hpp>
 #include "platform/platform.hpp"
 #include <io/lights.hpp>
@@ -86,7 +85,6 @@ int main() {
         .addSystems(std::move(levelManager),
                     std::move(renderer),
                     std::make_unique<dash::NeopixelManager>(),
-                    std::make_unique<okay::OkayAssetManager>(),
                     std::make_unique<okay::OkayAssetManager>(),
                     std::make_unique<okay::OkayTweenEngine>(),
                     std::make_unique<okay::OkayIMGUI>())
@@ -243,15 +241,8 @@ static void __gameInitialize() {
     std::cout << "Game initialized." << std::endl;
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
     g_timerGroup.AddTimer(20, []() { __flushScreen(); });
-    // dbc::driveBus.set_driver(std::make_unique<MCP2515>(g_canSpi, g_canGPIO, g_canClock));
-    auto canImgui = std::make_unique<CAN_IMGUI>();
-    g_canImgui = canImgui.get();
-    dbc::driveBus.set_driver(std::move(canImgui));
-
-    // check for errors
-    if (g_canGPIO.checkError()) {
-        okay::Engine.logger.error("Failed to initialize GPIO");
-    }
+    
+    dash::platform::configureCANDrivers(g_canSpi, g_canGPIO, g_canClock);
 
     // Additional game initialization logic
     BaudRate baud500k = BaudRate::kBaud500K;
@@ -297,7 +288,6 @@ static void __gameUpdate() {
 
     // Collect all signal strings
     std::vector<std::string> lines;
-    auto messageIdToSignalsInfo { g_canImgui->getMessageIdToSignalsInfo() };
     for (ICAN_Message* msg : g_toPrint) {
         for (std::uint8_t sigNum {}; sigNum < msg->get_num_signals(); sigNum++) {
             auto sigId { std::pair{msg->get_id().id, sigNum} };
@@ -308,7 +298,7 @@ static void __gameUpdate() {
                 name = it->second;
 
             // lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
-            auto sigInfo { (*messageIdToSignalsInfo)[msg->get_id().id][sigNum] };
+            auto sigInfo { (g_canImgui->getMessageIdToSignalsInfo())[msg->get_id().id][sigNum] };
             switch (sigInfo.type) {
                 case SignalType::INT8:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s8));   break;
                 case SignalType::INT16:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo.value.s16));  break;

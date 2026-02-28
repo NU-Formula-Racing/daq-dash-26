@@ -1,6 +1,8 @@
 // mock platform
 
 #include <platform/platform.hpp>
+#include <can/mock/can_imgui.hpp>
+#include <can/can_dbc.hpp>
 
 #include <cstring>
 
@@ -65,6 +67,12 @@ void NeopixelStrip::show() {
 void NeopixelStrip::cleanup() {
   // noop
 }
+
+void configureCANDrivers(dash::platform::SPI &spi, dash::platform::GPIO &gpio, dash::platform::Clock &clock) {
+    auto canImgui = std::make_unique<CAN_IMGUI>();
+    dbc::driveBus.set_driver(std::move(canImgui));
+}
+
 void tick() {}
 
 } // namespace dash::platform

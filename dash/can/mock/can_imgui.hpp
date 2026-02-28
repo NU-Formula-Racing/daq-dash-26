@@ -42,7 +42,7 @@ public:
     bool recv(CAN_Frame& msg) override;
     okay::Option<struct MessageChangeInfo> drawUI();
     uint32_t time_ms() override;
-    std::unordered_map<uint32_t, std::vector<CAN_IMGUI::SignalInfo>>* getMessageIdToSignalsInfo();
+    SignalInfo* getSignalInfo(uint32_t msgId, uint8_t sigNum);
 };
 
 #endif

@@ -2,7 +2,6 @@
 #include "can/can_dbc.hpp"
 #include "imgui.h"
 #include "nfr_can/CAN_interface.hpp"
-#include "okay/core/okay.hpp"
 #include "okay/core/util/option.hpp"
 #include <cstdint>
 #include <unordered_map>
@@ -23,9 +22,6 @@ bool CAN_IMGUI::init(const BaudRate baud) {
 
             struct SignalInfo sigInfo;
             sigInfo.name = name;
-
-            messageIdToSignalsInfo[messageId].push_back(sigInfo);
-            
             sigInfo.type = signal->getSignalType();
 
             switch (sigInfo.type) {
@@ -40,6 +36,8 @@ bool CAN_IMGUI::init(const BaudRate baud) {
                 case SignalType::FLOAT:   sigInfo.value.f = 0;      break;
                 case SignalType::BOOL:    sigInfo.value.b = false;  break;
             }
+
+            messageIdToSignalsInfo[messageId].push_back(sigInfo);
         }
     }
     return true;
@@ -123,6 +121,6 @@ uint32_t CAN_IMGUI::time_ms() {
     return 0;
 } // do nothing
 
-std::unordered_map<uint32_t, std::vector<CAN_IMGUI::SignalInfo>>* CAN_IMGUI::getMessageIdToSignalsInfo() {
-    return &messageIdToSignalsInfo;
+CAN_IMGUI::SignalInfo* CAN_IMGUI::getSignalInfo(uint32_t msgId, uint8_t sigNum) {
+    return &messageIdToSignalsInfo[msgId][sigNum];
 }

@@ -12,7 +12,6 @@
 #include <memory>
 #include <string>
 #include <thread>
-#include <iostream>
 #include <functional>
 
 namespace dash::platform {
@@ -83,7 +82,9 @@ class NeopixelStrip {
     struct NeopixelImpl;
     std::unique_ptr<NeopixelImpl> _impl;
 };
-  
+
+inline void configureCANDrivers(dash::platform::SPI &spi, dash::platform::GPIO &gpio, dash::platform::Clock &clock);
+
 void tick();
 
 } // namespace dash::platform

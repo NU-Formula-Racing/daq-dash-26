@@ -5,8 +5,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <okay/core/okay.hpp>
-#include <can/can_dbc.hpp>
-
 #include <stdint.h>
 #include <cstdint>
 #include <vector>

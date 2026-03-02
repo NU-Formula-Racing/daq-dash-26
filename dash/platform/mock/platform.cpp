@@ -69,11 +69,9 @@ void NeopixelStrip::cleanup() {
   // noop
 }
 
-okay::Option<CAN_IMGUI*> configureCANDrivers(dash::platform::SPI &spi, dash::platform::GPIO &gpio, dash::platform::Clock &clock) {
+void configureCANDriver() {
     auto canImgui = std::make_unique<CAN_IMGUI>();
-    CAN_IMGUI* ptr = canImgui.get();
     dbc::driveBus.set_driver(std::move(canImgui));
-    return okay::Option<CAN_IMGUI*>::some(ptr);
 }
 
 void tick() {}

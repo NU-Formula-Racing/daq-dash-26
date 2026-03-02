@@ -52,6 +52,7 @@ static std::vector<ICAN_Message*> g_toPrint = {
 // heartbeat message
 inline uint64_t g_heartbeatCount = 0;
 inline VirtualTimerGroup g_timerGroup;
+inline dash::platform::Clock g_canClock;
 inline CAN_IMGUI* g_canIMGUI = nullptr;
 
 TX_can_msg_config g_heartbeat_conf = {.bus = dbc::driveBus,
@@ -64,9 +65,6 @@ TX_can_msg_config g_heartbeat_conf = {.bus = dbc::driveBus,
 inline CAN_Signal_UINT64 g_heartbeatSignal = MakeSignalExp(uint64_t, 0, 64, 1.0, 0.0);
 inline TX_CAN_Message(1) g_heartbeatMessage{g_heartbeat_conf, g_heartbeatSignal};
 
-inline dash::platform::SPI g_canSpi;
-inline dash::platform::GPIO g_canGPIO{0, true};
-inline dash::platform::Clock g_canClock;
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
@@ -242,7 +240,7 @@ static void __gameInitialize() {
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
     g_timerGroup.AddTimer(20, []() { __flushScreen(); });
     
-    g_canIMGUI = dash::platform::configureCANDrivers(g_canSpi, g_canGPIO, g_canClock).value();
+    dash::platform::configureCANDriver();
 
     // Additional game initialization logic
     BaudRate baud500k = BaudRate::kBaud500K;

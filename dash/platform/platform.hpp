@@ -85,7 +85,7 @@ class NeopixelStrip {
     std::unique_ptr<NeopixelImpl> _impl;
 };
 
-okay::Option<CAN_IMGUI*> configureCANDrivers(dash::platform::SPI &spi, dash::platform::GPIO &gpio, dash::platform::Clock &clock);
+void configureCANDriver();
 
 void tick();
 

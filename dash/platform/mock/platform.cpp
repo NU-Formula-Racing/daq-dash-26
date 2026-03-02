@@ -1,9 +1,7 @@
 // mock platform
 
-#include <memory>
 #include <platform/platform.hpp>
 #include <can/mock/can_imgui.hpp>
-#include <can/can_dbc.hpp>
 
 #include <cstring>
 #include "imgui.h"
@@ -72,9 +70,9 @@ void NeopixelStrip::cleanup() {
   // noop
 }
 
-void configureCANDriver() {
+void configureCANDriver(CAN_Bus& bus) {
     auto canImgui = std::make_unique<CAN_IMGUI>();
-    dbc::driveBus.set_driver(std::move(canImgui));
+    bus.set_driver(std::move(canImgui));
 }
 
 void preUpdate() {

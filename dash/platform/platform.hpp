@@ -4,8 +4,7 @@
 #include <nfr_can/IClock.hpp>
 #include <nfr_can/IGpio.hpp>
 #include <nfr_can/ISpi.hpp>
-
-#include <can/mock/can_imgui.hpp>
+#include <nfr_can/CAN_interface.hpp>
 
 #include <glm/glm.hpp>
 
@@ -85,7 +84,7 @@ class NeopixelStrip {
     std::unique_ptr<NeopixelImpl> _impl;
 };
 
-void configureCANDriver();
+void configureCANDriver(CAN_Bus& bus);
 
 void preUpdate();
 void postUpdate();

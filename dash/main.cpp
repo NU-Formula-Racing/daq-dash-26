@@ -234,7 +234,7 @@ static void __gameInitialize() {
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
     g_timerGroup.AddTimer(20, []() { __flushScreen(); });
     
-    dash::platform::configureCANDriver();
+    dash::platform::configureCANDriver(dbc::driveBus);
 
     // Additional game initialization logic
     BaudRate baud500k = BaudRate::kBaud500K;

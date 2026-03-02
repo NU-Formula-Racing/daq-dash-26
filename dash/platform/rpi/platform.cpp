@@ -7,7 +7,9 @@
 
 namespace dash::platform {
 
-void tick(){
+void preUpdate() {}
+
+void postUpdate() {
     GPIOManager::instance().tick();
 }
 

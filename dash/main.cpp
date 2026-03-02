@@ -8,7 +8,6 @@
 #include <okay/core/renderer/imgui/okay_imgui.hpp>
 #include <okay/core/tween/okay_tween.hpp>
 
-#include "can/mock/can_imgui.hpp"
 #include "drivers/can/include/nfr_can/CAN_interface.hpp"
 #include <nfr_can/virtual_timer.hpp>
 #include "platform/platform.hpp"
@@ -18,12 +17,8 @@
 #include <csignal>
 #include <string>
 #include <sstream>
-#include <iomanip>
 #include <math.h>
 #include "glm/ext/vector_float4.hpp"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 
 static void __gameInitialize();
 static void __gameUpdate();
@@ -53,7 +48,6 @@ static std::vector<ICAN_Message*> g_toPrint = {
 inline uint64_t g_heartbeatCount = 0;
 inline VirtualTimerGroup g_timerGroup;
 inline dash::platform::Clock g_canClock;
-inline CAN_IMGUI* g_canIMGUI = nullptr;
 
 TX_can_msg_config g_heartbeat_conf = {.bus = dbc::driveBus,
                                       .id = 0x510,
@@ -267,74 +261,13 @@ static void __gameShutdown() {
 }
 
 static void __gameUpdate() {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-    
+    dash::platform::preUpdate();
+
     g_timerGroup.Tick(g_canClock.monotonicMs());
     dbc::driveBus.tick_bus();
     __updateLights();
 
-    dash::platform::tick();
-    
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    std::cout << "\x1b[H\x1b[J";
-
-    std::cout << "NFR26 Development Dashboard\n";
-
-    // Collect all signal strings
-    std::vector<std::string> lines;
-    for (ICAN_Message* msg : g_toPrint) {
-        for (std::uint8_t sigNum {}; sigNum < msg->get_num_signals(); sigNum++) {
-            auto sigId { std::pair{msg->get_id().id, sigNum} };
-
-            const char* name = "(unknown)";
-            auto it = dbc::meta::signalIdToName.find(sigId);
-            if (it != dbc::meta::signalIdToName.end())
-                name = it->second;
-
-            if (g_canIMGUI == nullptr){
-                lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
-            } else {
-                auto sigInfo { g_canIMGUI->getSignalInfo(msg->get_id().id, sigNum) };
-                switch (sigInfo->type) {
-                    case SignalType::INT8:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.s8));   break;
-                    case SignalType::INT16:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.s16));  break;
-                    case SignalType::INT32:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.s32));  break;
-                    case SignalType::INT64:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.s64));  break;
-                    case SignalType::UINT8:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.u8));   break;
-                    case SignalType::UINT16:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.u16));  break;
-                    case SignalType::UINT32:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.u32));  break;
-                    case SignalType::UINT64:  lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.u64));  break;
-                    case SignalType::FLOAT:   lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.f));    break;
-                    case SignalType::BOOL:    lines.emplace_back(std::string{name} + ": " + std::to_string(sigInfo->value.b));    break;
-                }
-            }
-        }
-    }
-
-    constexpr int COLS = 3;
-    constexpr int COL_WIDTH = 32;
-
-    size_t rows = (lines.size() + COLS - 1) / COLS;
-
-    std::ostringstream frame;
-
-    // Print row-wise across columns
-    for (size_t r = 0; r < rows; r++) {
-        for (size_t c = 0; c < COLS; c++) {
-            size_t idx = r + c * rows;
-            if (idx < lines.size()) {
-                frame << std::left << std::setw(COL_WIDTH) << lines[idx];
-            }
-        }
-        frame << '\n';
-    }
-
-    std::cout << frame.str();
-    std::cout.flush();
+    dash::platform::postUpdate();
 }
 
 static void __exitSignal(int sig) {

@@ -87,7 +87,8 @@ class NeopixelStrip {
 
 void configureCANDriver();
 
-void tick();
+void preUpdate();
+void postUpdate();
 
 } // namespace dash::platform
 

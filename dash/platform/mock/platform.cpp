@@ -6,6 +6,9 @@
 #include <can/can_dbc.hpp>
 
 #include <cstring>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 namespace dash::platform {
 
@@ -74,6 +77,15 @@ void configureCANDriver() {
     dbc::driveBus.set_driver(std::move(canImgui));
 }
 
-void tick() {}
+void preUpdate() {
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+}
+
+void postUpdate() {
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
 
 } // namespace dash::platform

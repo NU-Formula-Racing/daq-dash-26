@@ -1,6 +1,5 @@
 #include <platform/platform.hpp>
 #include <platform/rpi/gpio_manager.hpp>
-#include "drivers/can/include/nfr_can/MCP2515.hpp"
 #include <okay/core/okay.hpp>
 
 namespace dash::platform {

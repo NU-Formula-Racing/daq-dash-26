@@ -1,12 +1,11 @@
 // mock platform
-
 #include <platform/platform.hpp>
 #include <can/mock/can_imgui.hpp>
 
 #include <cstring>
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 namespace dash::platform {
 

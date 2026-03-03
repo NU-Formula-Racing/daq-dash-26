@@ -28,6 +28,13 @@ class CAN_IMGUI : public ICAN {
         uint8_t signalNum;
         SignalInfo changedSignal;
     };
+
+    struct GroupedMessage {
+        std::string_view boardName;
+        ICAN_Message* message;
+    };
+    
+    std::vector<GroupedMessage> sortedMessages;
     
 public:
     CAN_IMGUI() {}

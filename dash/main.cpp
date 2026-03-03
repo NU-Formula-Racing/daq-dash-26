@@ -65,7 +65,11 @@ inline TX_CAN_Message(1) g_heartbeatMessage{g_heartbeat_conf, g_heartbeatSignal}
 inline dash::platform::SPI g_canSpi;
 inline dash::platform::MockGPIO g_canGPIO;
 inline dash::platform::Clock g_canClock;
-inline dash::platform::GPIO g_in_bt_u{21, false};
+inline dash::platform::GPIO g_in_bt_re{24, false};
+inline dash::platform::GPIO g_in_bt_up{21, false};
+inline dash::platform::GPIO g_in_bt_dn{20, false};
+inline dash::platform::GPIO g_in_bt_rt{12, false};
+inline dash::platform::GPIO g_in_bt_lt{16, false};
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
@@ -241,7 +245,11 @@ static void __flushScreen() {
 }
 
 static void __interruptInitialize(){
-    g_in_bt_u.attachInterrupt(in_bt_up_callback, dash::platform::GPIO::EdgeType::RISING);
+    g_in_bt_up.attachInterrupt(in_bt_up_callback, dash::platform::GPIO::EdgeType::RISING);
+    g_in_bt_dn.attachInterrupt(in_bt_up_callback, dash::platform::GPIO::EdgeType::RISING);
+    g_in_bt_rt.attachInterrupt(in_bt_up_callback, dash::platform::GPIO::EdgeType::RISING);
+    g_in_bt_lt.attachInterrupt(in_bt_up_callback, dash::platform::GPIO::EdgeType::RISING);
+    g_in_bt_re.attachInterrupt(in_bt_up_callback, dash::platform::GPIO::EdgeType::RISING);
 }
 
 static void __gameInitialize() {

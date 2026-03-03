@@ -66,9 +66,12 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
 
     ImGui::Begin("CAN");
 
+    bool filterChanged {};
+
     ImGui::SetNextItemWidth(-1.0f);
     if (ImGui::InputTextWithHint("##SearchFilter", "Search Signals...", filter.InputBuf, IM_ARRAYSIZE(filter.InputBuf))) {
         filter.Build();
+        filterChanged = true;
     }
 
     ImGui::Separator();
@@ -79,7 +82,7 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
         std::string_view currentBoard {};
         bool tabOpen {};
 
-        bool expandAll {};
+        bool expandAll { filterChanged };
         bool collapseAll {};
 
         for (const GroupedMessage& item : sortedMessages) {
@@ -130,12 +133,6 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                     ImGui::SetNextItemOpen(true, ImGuiCond_Always);
                 } else if (collapseAll) {
                     ImGui::SetNextItemOpen(false, ImGuiCond_Always);
-                } else if (filter.IsActive()) {
-                    ImGui::SetNextItemOpen(true, ImGuiCond_Always);
-                }
-
-                if (filter.IsActive()) {
-                    ImGui::SetNextItemOpen(true, ImGuiCond_Always);
                 }
 
                 if (ImGui::CollapsingHeader(msgName, ImGuiTreeNodeFlags_DefaultOpen)) {

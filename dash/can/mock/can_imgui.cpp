@@ -104,6 +104,8 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
 
                         ImGui::PushID(sigNum);
 
+                        ImGui::PushItemWidth(-(ImGui::CalcTextSize(name).x + ImGui::GetStyle().ItemInnerSpacing.x));
+
                         switch (signal->getSignalType()) {
                             case SignalType::INT8:   { auto s = static_cast<CAN_Signal<int8_t>*>(signal);   sigInfo.value.s8  = s->get(); if (ImGui::InputScalar(name, ImGuiDataType_S8,  &sigInfo.value.s8))  changed = true; break; }
                             case SignalType::INT16:  { auto s = static_cast<CAN_Signal<int16_t>*>(signal);  sigInfo.value.s16 = s->get(); if (ImGui::InputScalar(name, ImGuiDataType_S16, &sigInfo.value.s16)) changed = true; break; }
@@ -117,6 +119,8 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                             case SignalType::BOOL:   { auto s = static_cast<CAN_Signal<bool>*>(signal);     sigInfo.value.b   = s->get(); if (ImGui::Checkbox(name,                       &sigInfo.value.b))   changed = true; break; }
                         }
 
+                        ImGui::PopItemWidth();
+                        
                         ImGui::PopID();
 
                         if (changed) {

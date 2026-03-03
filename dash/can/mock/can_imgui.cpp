@@ -62,13 +62,25 @@ bool CAN_IMGUI::recv(CAN_Frame& msg) {
 }
 
 okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
+    static ImGuiTextFilter filter;
+
     ImGui::Begin("CAN");
+
+    ImGui::SetNextItemWidth(-1.0f);
+    if (ImGui::InputTextWithHint("##SearchFilter", "Search Signals...", filter.InputBuf, IM_ARRAYSIZE(filter.InputBuf))) {
+        filter.Build();
+    }
+
+    ImGui::Separator();
 
     auto result { okay::Option<CAN_IMGUI::MessageChangeInfo>::none() };
 
     if (ImGui::BeginTabBar("CAN_Boards")) {
         std::string_view currentBoard {};
         bool tabOpen {};
+
+        bool expandAll {};
+        bool collapseAll {};
 
         for (const GroupedMessage& item : sortedMessages) {
             if (item.boardName != currentBoard) {
@@ -80,13 +92,53 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                 std::string tabName { currentBoard };
 
                 tabOpen = ImGui::BeginTabItem(tabName.c_str());
+
+                if (tabOpen) {
+                    expandAll = ImGui::Button("Expand All");
+                    ImGui::SameLine();
+                    collapseAll = ImGui::Button("Collapse All");
+                }
             }
 
             if (tabOpen) {
                 ICAN_Message* message { item.message };
                 uint32_t messageId { message->get_id().id };
+                const char* msgName { dbc::meta::messageIdToName.at(messageId) };
 
-                if (ImGui::CollapsingHeader(dbc::meta::messageIdToName.at(messageId), ImGuiTreeNodeFlags_DefaultOpen)) {
+                bool showHeader {};
+
+                if (filter.PassFilter(msgName)) {
+                    showHeader = true; 
+                } else {
+                    for (uint8_t sigNum {}; sigNum < message->get_num_signals(); ++sigNum) {
+                        auto sigId { std::pair{messageId, sigNum} };
+                        auto it { dbc::meta::signalIdToName.find(sigId) };
+                        const char* peekName { (it != dbc::meta::signalIdToName.end())
+                                                ? it->second
+                                                : "(unknown)" };
+                        
+                        if (filter.PassFilter(peekName)) {
+                            showHeader = true;
+                            break; 
+                        }
+                    }
+                }
+
+                if (!showHeader) continue;
+
+                if (expandAll) {
+                    ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+                } else if (collapseAll) {
+                    ImGui::SetNextItemOpen(false, ImGuiCond_Always);
+                } else if (filter.IsActive()) {
+                    ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+                }
+
+                if (filter.IsActive()) {
+                    ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+                }
+
+                if (ImGui::CollapsingHeader(msgName, ImGuiTreeNodeFlags_DefaultOpen)) {
                     ImGui::PushID(messageId);
 
                     for (uint8_t sigNum {}; sigNum < message->get_num_signals(); sigNum++) {
@@ -96,6 +148,10 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                         const char* name { "(unknown)" };
                         auto it { dbc::meta::signalIdToName.find(sigId) };
                         if (it != dbc::meta::signalIdToName.end()) name = it->second;
+
+                        if (!filter.PassFilter(name) && !filter.PassFilter(msgName)) {
+                            continue;
+                        }
 
                         struct SignalInfo sigInfo;
                         sigInfo.name = const_cast<char*>(name);
@@ -120,7 +176,7 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                         }
 
                         ImGui::PopItemWidth();
-                        
+
                         ImGui::PopID();
 
                         if (changed) {

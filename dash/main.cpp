@@ -64,9 +64,6 @@ int main() {
     okay::SurfaceConfig surfaceConfig;
     okay::Surface surface(surfaceConfig);
 
-    okay::OkayRendererSettings rendererSettings{surfaceConfig};
-    auto renderer = okay::OkayRenderer::create(rendererSettings);
-
     okay::OkayLevelManagerSettings levelManagerSettings;
     auto levelManager = okay::OkayLevelManager::create(levelManagerSettings);
 
@@ -75,7 +72,6 @@ int main() {
 
     okay::OkayGame::create()
         .addSystems(std::move(levelManager),
-                    std::move(renderer),
                     std::make_unique<dash::NeopixelManager>(),
                     std::make_unique<okay::OkayAssetManager>(),
                     std::make_unique<okay::OkayTweenEngine>(),

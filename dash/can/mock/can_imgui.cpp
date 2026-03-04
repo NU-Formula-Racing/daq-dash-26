@@ -61,7 +61,7 @@ bool CAN_IMGUI::recv(CAN_Frame& msg) {
 
     message->encode_to_frame(msg);
 
-    timeSinceStartup += okay::Engine.time->deltaTime();
+    timeSinceStartup += okay::Engine.time->deltaTimeMs();
     
     return false;
 }

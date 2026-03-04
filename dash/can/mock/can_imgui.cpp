@@ -1,8 +1,8 @@
 #include "can_imgui.hpp"
-#include <string.h>
 #include "can/can_dbc.hpp"
-#include "imgui.h"
-#include "nfr_can/CAN_interface.hpp"
+#include <string.h>
+#include <imgui.h>
+#include <nfr_can/CAN_interface.hpp>
 #include <okay/core/okay.hpp>
 #include <algorithm>
 #include <cstdint>

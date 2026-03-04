@@ -1,5 +1,5 @@
 // mock platform
-#include <platform/platform.hpp>
+#include "platform/platform.hpp"
 #include <can/mock/can_imgui.hpp>
 
 #include <cstring>

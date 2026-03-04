@@ -8,7 +8,7 @@
 #include <okay/core/renderer/imgui/okay_imgui.hpp>
 #include <okay/core/tween/okay_tween.hpp>
 
-#include "drivers/can/include/nfr_can/CAN_interface.hpp"
+#include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/virtual_timer.hpp>
 #include "platform/platform.hpp"
 #include <io/lights.hpp>

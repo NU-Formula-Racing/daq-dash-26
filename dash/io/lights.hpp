@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <cstdint>
 #include <vector>
+#include "glm/ext/vector_float4.hpp"
 #include "okay/core/system/okay_system.hpp"
 
 namespace dash {
@@ -89,6 +90,7 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
             }
         }
 
+        startAnimation([this]() { idle(); });
         updateDisplay();
     }
 
@@ -179,7 +181,8 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
     uint8_t currentState{0};
 
     void startAnimation(std::function<void()> animationFunction) {
-        _animationStartTimeMs = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        _animationStartTimeMs =
+            std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
         _animationFunction = animationFunction;
     }
 
@@ -277,15 +280,71 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
     }
 
     void precharge() {
-        float nowMS = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        float nowMS = std::chrono::steady_clock::now().time_since_epoch().count() / 1000000.0f;
         float time = (nowMS - _animationStartTimeMs) / 1000.0f;
+        glm::vec4 yellow = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+
+        glm::vec4 black = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+        float prechargePercentage = static_cast<float>(dbc::rearInverterMotorStatus::dcVoltage->get())/static_cast<float>(dbc::bmsSoe::batteryVoltage->get());
+        for(int i = 0; i < 5; i++){
+            //probably something here
+            float t = 0.9f/getBar(i).numPixels();
+            for(int j = 0; j < getBar(i).numPixels(); j++){
+
+                if(prechargePercentage >= t*j){
+                    getBar(i).setColor(j, yellow);
+                }
+                else{
+                    getBar(i).setColor(j, black);
+                }
+
+            }
+        }
+
     }
 
     void drive() {
+        float nowMS = std::chrono::steady_clock::now().time_since_epoch().count() / 1000.0f;
+        float time = (nowMS - _animationStartTimeMs) / 1000.0f;
 
+        const float blinkTime = 1000;
+        const int numBlinks = 3;
+
+        if (time < blinkTime * 2 * numBlinks) {
+            // we are still blinking
+            float brightness = static_cast<int>(floor(time / blinkTime)) % 2;
+            glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+            color *= brightness;
+            // set the colors
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < getBar(i).numPixels(); j++) {
+                    getBar(i).setColor(j, color);
+                }
+            }
+        } else {
+            // we are now in throttle light mode
+            const int16_t appsMax = 4000;
+            float throttlePercentage = dbc::ecuThrottle::apps1Throttle->get() / appsMax;
+
+            float partialBrightness = fmodf(throttlePercentage * 8.0f, 1.0f);
+            glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+            glm::vec4 orange = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+            for (int i = 0; i < 5; i++) {
+                if (i == 2)
+                    continue;
+
+                for (int j = 0; j < floor(throttlePercentage * 8.0f); j++) {
+                    glm::vec4 color = glm::mix(blue, orange, static_cast<float>(i / 8));
+                    getBar(i).setColor(j, color);
+                }
+                // getBar(i).setColor(floor(throttlePercentage * 8) + 1, color * partialBrightness);
+            }
+        }
     }
 };
 
-}  // namespace dash
+} // namespace dash
 
 #endif  // __LIGHTS_HPP__

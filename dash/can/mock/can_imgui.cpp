@@ -20,7 +20,7 @@ bool CAN_IMGUI::init(const BaudRate baud) {
                                     ? nameView.substr(0, firstUnderscore) 
                                     : nameView };
 
-        sortedMessages.push_back({board, message});
+        sortedMessages.push_back({board, messageId});
     }
 
     std::sort(sortedMessages.begin(), sortedMessages.end(), 
@@ -104,9 +104,9 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
             }
 
             if (tabOpen) {
-                ICAN_Message* message { item.message };
-                uint32_t messageId { message->get_id().id };
-                const char* msgName { dbc::meta::messageIdToName.at(messageId) };
+                uint32_t messageID { item.messageID };
+                ICAN_Message* message { dbc::driveBus.get_message_from_id(messageID) };
+                const char* msgName { dbc::meta::messageIdToName.at(messageID) };
 
                 bool showHeader {};
 
@@ -114,8 +114,8 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                     showHeader = true; 
                 } else {
                     for (uint8_t sigNum {}; sigNum < message->get_num_signals(); ++sigNum) {
-                        auto sigId { std::pair{messageId, sigNum} };
-                        auto it { dbc::meta::signalIdToName.find(sigId) };
+                        auto sigID { std::pair{messageID, sigNum} };
+                        auto it { dbc::meta::signalIdToName.find(sigID) };
                         const char* peekName { (it != dbc::meta::signalIdToName.end())
                                                 ? it->second
                                                 : "(unknown)" };
@@ -136,12 +136,12 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                 }
 
                 if (ImGui::CollapsingHeader(msgName, ImGuiTreeNodeFlags_DefaultOpen)) {
-                    ImGui::PushID(messageId);
+                    ImGui::PushID(messageID);
 
                     for (uint8_t sigNum {}; sigNum < message->get_num_signals(); sigNum++) {
                         ICAN_Signal* signal { message->get_signal(sigNum) };
 
-                        auto sigId { std::pair{messageId, sigNum} };
+                        auto sigId { std::pair{messageID, sigNum} };
                         const char* name { "(unknown)" };
                         auto it { dbc::meta::signalIdToName.find(sigId) };
                         if (it != dbc::meta::signalIdToName.end()) name = it->second;
@@ -177,7 +177,7 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                         ImGui::PopID();
 
                         if (changed) {
-                            result = okay::Option<CAN_IMGUI::MessageChangeInfo>::some({ messageId, sigNum, sigInfo });
+                            result = okay::Option<CAN_IMGUI::MessageChangeInfo>::some({ messageID, sigNum, sigInfo });
                         }
                     }
 

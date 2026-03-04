@@ -31,7 +31,7 @@ class CAN_IMGUI : public ICAN {
 
     struct GroupedMessage {
         std::string_view boardName;
-        ICAN_Message* message;
+        uint32_t messageID;
     };
     
     std::vector<GroupedMessage> sortedMessages;

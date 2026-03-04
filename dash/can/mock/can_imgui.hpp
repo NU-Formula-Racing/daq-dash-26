@@ -35,6 +35,7 @@ class CAN_IMGUI : public ICAN {
     };
     
     std::vector<GroupedMessage> sortedMessages;
+    uint32_t timeSinceStartup;
     
 public:
     CAN_IMGUI() {}

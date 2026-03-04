@@ -3,10 +3,12 @@
 #include "can/can_dbc.hpp"
 #include "imgui.h"
 #include "nfr_can/CAN_interface.hpp"
+#include <okay/core/okay.hpp>
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include <string_view>
+
 
 bool CAN_IMGUI::init(const BaudRate baud) {
     for (ICAN_Message* message : dbc::driveBus.get_messages()) {
@@ -58,6 +60,9 @@ bool CAN_IMGUI::recv(CAN_Frame& msg) {
     }
 
     message->encode_to_frame(msg);
+
+    timeSinceStartup += okay::Engine.time->deltaTime();
+    
     return false;
 }
 
@@ -197,5 +202,5 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
 }
 
 uint32_t CAN_IMGUI::time_ms() {
-    return 0;
+    return timeSinceStartup;
 } // do nothing

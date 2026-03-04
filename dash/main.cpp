@@ -7,11 +7,13 @@
 #include <okay/core/logging/okay_logger.hpp>
 #include <okay/core/renderer/imgui/okay_imgui.hpp>
 #include <okay/core/tween/okay_tween.hpp>
+#include <okay/core/renderer/passes/scene_pass.hpp>
 
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/virtual_timer.hpp>
 #include "platform/platform.hpp"
 #include <io/lights.hpp>
+
 #include "can/can_dbc.hpp"
 
 #include <csignal>
@@ -67,11 +69,20 @@ int main() {
     okay::OkayLevelManagerSettings levelManagerSettings;
     auto levelManager = okay::OkayLevelManager::create(levelManagerSettings);
 
+    okay::OkayRendererSettings rendererSettings{
+        .surfaceConfig = surfaceConfig,
+        .pipeline = okay::OkayRenderPipeline::create(
+            std::make_unique<okay::ScenePass>()
+        )
+    };
+     
+
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);
 
     okay::OkayGame::create()
         .addSystems(std::move(levelManager),
+                    std::make_unique<okay::OkayRenderer>(std::move(rendererSettings)),
                     std::make_unique<dash::NeopixelManager>(),
                     std::make_unique<okay::OkayAssetManager>(),
                     std::make_unique<okay::OkayTweenEngine>(),

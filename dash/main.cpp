@@ -65,9 +65,6 @@ int main() {
     okay::SurfaceConfig surfaceConfig;
     okay::Surface surface(surfaceConfig);
 
-    okay::OkayRendererSettings rendererSettings{surfaceConfig};
-    auto renderer = okay::OkayRenderer::create(rendererSettings);
-
     okay::OkayLevelManagerSettings levelManagerSettings;
     auto levelManager = okay::OkayLevelManager::create(levelManagerSettings);
 
@@ -191,7 +188,6 @@ static void __gameInitialize() {
     if (g_canGPIO.checkError()) {
         okay::Engine.logger.error("Failed to initialize GPIO");
     }
-
     // Additional game initialization logic
     BaudRate baud500k = BaudRate::kBaud500K;
     if (!dbc::driveBus.init(baud500k)) {

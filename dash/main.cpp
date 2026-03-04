@@ -1,21 +1,24 @@
 #include <memory>
-#include <okay/core/asset/okay_asset.hpp>
-#include <okay/core/level/okay_level_manager.hpp>
 #include <okay/core/okay.hpp>
 #include <okay/core/renderer/okay_renderer.hpp>
 #include <okay/core/renderer/okay_surface.hpp>
+#include <okay/core/level/okay_level_manager.hpp>
+#include <okay/core/asset/okay_asset.hpp>
+#include <okay/core/logging/okay_logger.hpp>
+#include <okay/core/renderer/imgui/okay_imgui.hpp>
+#include <okay/core/tween/okay_tween.hpp>
+#include <okay/core/renderer/passes/scene_pass.hpp>
 
 #include <nfr_can/CAN_interface.hpp>
-#include <nfr_can/MCP2515.hpp>
 #include <nfr_can/virtual_timer.hpp>
-#include <platform/platform.hpp>
+#include "platform/platform.hpp"
 #include <io/lights.hpp>
-#include <can/can_dbc.hpp>
+
+#include "can/can_dbc.hpp"
 
 #include <csignal>
 #include <string>
 #include <sstream>
-#include <iomanip>
 #include <math.h>
 #include "glm/ext/vector_float4.hpp"
 
@@ -46,6 +49,7 @@ static std::vector<ICAN_Message*> g_toPrint = {
 // heartbeat message
 inline uint64_t g_heartbeatCount = 0;
 inline VirtualTimerGroup g_timerGroup;
+inline dash::platform::Clock g_canClock;
 
 TX_can_msg_config g_heartbeat_conf = {.bus = dbc::driveBus,
                                       .id = 0x510,
@@ -57,27 +61,32 @@ TX_can_msg_config g_heartbeat_conf = {.bus = dbc::driveBus,
 inline CAN_Signal_UINT64 g_heartbeatSignal = MakeSignalExp(uint64_t, 0, 64, 1.0, 0.0);
 inline TX_CAN_Message(1) g_heartbeatMessage{g_heartbeat_conf, g_heartbeatSignal};
 
-inline dash::platform::SPI g_canSpi;
-inline dash::platform::GPIO g_canGPIO{0, true};
-inline dash::platform::Clock g_canClock;
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
     okay::Surface surface(surfaceConfig);
 
-    okay::OkayRendererSettings rendererSettings{surfaceConfig};
-    auto renderer = okay::OkayRenderer::create(rendererSettings);
-
     okay::OkayLevelManagerSettings levelManagerSettings;
     auto levelManager = okay::OkayLevelManager::create(levelManagerSettings);
+
+    okay::OkayRendererSettings rendererSettings{
+        .surfaceConfig = surfaceConfig,
+        .pipeline = okay::OkayRenderPipeline::create(
+            std::make_unique<okay::ScenePass>()
+        )
+    };
+     
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);
 
     okay::OkayGame::create()
         .addSystems(std::move(levelManager),
+                    std::make_unique<okay::OkayRenderer>(std::move(rendererSettings)),
                     std::make_unique<dash::NeopixelManager>(),
-                    std::make_unique<okay::OkayAssetManager>())
+                    std::make_unique<okay::OkayAssetManager>(),
+                    std::make_unique<okay::OkayTweenEngine>(),
+                    std::make_unique<okay::OkayIMGUI>())
         .onInitialize(__gameInitialize)
         .onUpdate(__gameUpdate)
         .onShutdown(__gameShutdown)
@@ -231,12 +240,8 @@ static void __gameInitialize() {
     std::cout << "Game initialized." << std::endl;
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
     g_timerGroup.AddTimer(20, []() { __flushScreen(); });
-    dbc::driveBus.set_driver(std::make_unique<MCP2515>(g_canSpi, g_canGPIO, g_canClock));
-
-    // check for errors
-    if (g_canGPIO.checkError()) {
-        okay::Engine.logger.error("Failed to initialize GPIO");
-    }
+    
+    dash::platform::configureCANDriver(dbc::driveBus);
 
     // Additional game initialization logic
     BaudRate baud500k = BaudRate::kBaud500K;
@@ -250,7 +255,7 @@ static void __gameInitialize() {
 
     std::ios::sync_with_stdio(false);
     std::cout.tie(nullptr);
-    std::cout << "\x1b[?25l";  // hide cursor
+    std::cout << "\x1b[?25l"; // hide cursor
     std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
     std::cout.flush();
 }
@@ -263,51 +268,13 @@ static void __gameShutdown() {
 }
 
 static void __gameUpdate() {
+    dash::platform::preUpdate();
+
     g_timerGroup.Tick(g_canClock.monotonicMs());
     dbc::driveBus.tick_bus();
     __updateLights();
 
-    dash::platform::tick();
-
-    std::cout << "\x1b[H\x1b[J";
-
-    std::cout << "NFR26 Development Dashboard\n";
-
-    // Collect all signal strings
-    std::vector<std::string> lines;
-    for (ICAN_Message* msg : g_toPrint) {
-        for (std::uint8_t sigNum = 0; sigNum < msg->get_num_signals(); sigNum++) {
-            auto sigId = std::pair{msg->get_id().id, sigNum};
-
-            const char* name = "(unknown)";
-            auto it = dbc::meta::signalIdToName.find(sigId);
-            if (it != dbc::meta::signalIdToName.end())
-                name = it->second;
-
-            lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
-        }
-    }
-
-    constexpr int COLS = 3;
-    constexpr int COL_WIDTH = 32;
-
-    size_t rows = (lines.size() + COLS - 1) / COLS;
-
-    std::ostringstream frame;
-
-    // Print row-wise across columns
-    for (size_t r = 0; r < rows; r++) {
-        for (size_t c = 0; c < COLS; c++) {
-            size_t idx = r + c * rows;
-            if (idx < lines.size()) {
-                frame << std::left << std::setw(COL_WIDTH) << lines[idx];
-            }
-        }
-        frame << '\n';
-    }
-
-    std::cout << frame.str();
-    std::cout.flush();
+    dash::platform::postUpdate();
 }
 
 static void __exitSignal(int sig) {

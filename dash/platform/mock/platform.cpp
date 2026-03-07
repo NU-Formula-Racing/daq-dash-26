@@ -6,7 +6,7 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-
+#include <okay/core/okay.hpp>
 namespace dash::platform {
 
 struct GPIO::GPIOImpl {
@@ -47,7 +47,8 @@ bool SPI::ISpi_transfer(const uint8_t *tx, uint8_t *rx, size_t len) {
 }
 
 struct NeopixelStrip::NeopixelImpl {
-
+  int pin;
+  int numLeds;
 };
 
 NeopixelStrip::NeopixelStrip() : _impl(std::make_unique<NeopixelStrip::NeopixelImpl>()) {}
@@ -55,14 +56,63 @@ NeopixelStrip::~NeopixelStrip() {}
 
 void NeopixelStrip::init(const int& pin, const int &numLeds) {
   // noop
+  /*
+    Initialize boxes for each strip
+    Somehow choose orientation
+    Initial color is black
+
+  */
+  _impl->pin = pin;
+  _impl->numLeds = numLeds;
 }
 
 void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4 &color) {
   // noop
+  /*
+    Update specific color of UI
+  */
 }
 
 void NeopixelStrip::show() {
   // noop
+  // okay::Engine.logger.debug("testing");
+  // ImGui::Begin("Neopixel");
+  // ImGui::Text("Testing");
+  // ImGui::End();
+  /*
+    Draw UI
+  */
+  // ImGui::ShowDemoWindow();
+  // ImGui::NewFrame();
+  // ImGui::BeginChild("testing");
+  // ImGui::Text("Neopixel");
+  // ImGui::EndChild();
+  // ImGuiIO& io = ImGui::GetIO();
+  // io.DisplaySize = ImVec2((float)500, (float)500);
+  // // ImGui::NewFrame();
+  ImGui::Begin("Neopixel");
+  
+  
+  auto ledBoxes = ImGui::GetWindowDrawList();
+  uint8_t cols = _impl->numLeds / 8;
+  
+  if (ImGui::BeginTable("Neopixel Strip", 8)) {
+    for(int i = 0; i < cols; i++) {
+      for(int j = 0; j < _impl->numLeds / cols; j+=2) {
+        ImGui::Text("testing");
+        ImGui::TableNextRow();
+      }
+      ImGui::TableNextColumn();
+    }
+    
+   }
+  ImGui::EndTable();
+  
+  ImGui::End();
+  // ImGui::EndFrame();
+  // ImGui::Render();
+  // ledBoxes->AddQuadFilled({})
+  
 }
 
 void NeopixelStrip::cleanup() {
@@ -81,7 +131,9 @@ void preUpdate() {
 }
 
 void postUpdate() {
+  ImGui::EndFrame();
   ImGui::Render();
+           
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 

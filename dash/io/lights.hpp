@@ -76,7 +76,7 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
             }
         }
 
-        updateDisplay();
+       
     }
 
     VirtualizedNeobar& getBar(uint8_t barNum) {

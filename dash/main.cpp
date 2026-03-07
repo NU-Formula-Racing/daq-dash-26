@@ -11,6 +11,7 @@
 
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/virtual_timer.hpp>
+#include "imgui.h"
 #include "platform/platform.hpp"
 #include <io/lights.hpp>
 
@@ -137,8 +138,9 @@ static void __updateLights() {
             display->getBar(i).setColor(j, color);
         }
     }
-
+    
     display->updateDisplay();
+    
 }
 
 static void __flushScreen() {
@@ -242,7 +244,7 @@ static void __gameInitialize() {
     g_timerGroup.AddTimer(20, []() { __flushScreen(); });
     
     dash::platform::configureCANDriver(dbc::driveBus);
-
+   
     // Additional game initialization logic
     BaudRate baud500k = BaudRate::kBaud500K;
     if (!dbc::driveBus.init(baud500k)) {
@@ -265,15 +267,16 @@ static void __gameShutdown() {
     std::cout << "\x1b[?25h\x1b[?1049l";
     std::cout.flush();
     okay::Engine.shutdown();
+    
 }
 
 static void __gameUpdate() {
     dash::platform::preUpdate();
-
+    
     g_timerGroup.Tick(g_canClock.monotonicMs());
     dbc::driveBus.tick_bus();
     __updateLights();
-
+    
     dash::platform::postUpdate();
 }
 

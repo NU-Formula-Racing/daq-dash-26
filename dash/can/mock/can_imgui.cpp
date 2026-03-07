@@ -68,7 +68,7 @@ bool CAN_IMGUI::recv(CAN_Frame& msg) {
 
 okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
     static ImGuiTextFilter filter;
-
+    
     ImGui::Begin("CAN");
 
     bool filterChanged {};
@@ -198,6 +198,9 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
         ImGui::EndTabBar();
     }
     ImGui::End();
+    
+    
+    
     return result;
 }
 

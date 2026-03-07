@@ -26,7 +26,72 @@ bool GPIO::gpio_read(GpioLevel& out){
 
 void GPIO::attachInterrupt(std::function<void()> callback, EdgeType edge) {}
 
-bool checkError(){ return true; }
+bool GPIO::checkError(){ return true; }
+
+Button::Button(uint8_t gpioPin) : _buttonID(gpioPin), _gpio(std::make_unique<GPIO>(gpioPin, false)) {}
+Button::~Button() = default;
+
+void Button::onDown(std::function<void()> callback) {}
+void Button::onUp(std::function<void()> callback) {}
+
+bool Button::isDownThisFrame() { return false; }
+bool Button::isUpThisFrame() { return false; }
+bool Button::isDown() { return false; }
+
+constexpr uint16_t Encoder::generateID(uint8_t left, uint8_t right) {
+  return static_cast<uint16_t>((static_cast<uint16_t>(left) << 8U) | right);
+}
+
+Encoder::Encoder(uint8_t leftPin, uint8_t rightPin)
+    : _encoderID(generateID(leftPin, rightPin)),
+      _leftGPIO(std::make_unique<GPIO>(leftPin, false)),
+      _rightGPIO(std::make_unique<GPIO>(rightPin, false)) {}
+
+Encoder::~Encoder() = default;
+
+void Encoder::onRight(std::function<void()> callback) {}
+void Encoder::onLeft(std::function<void()> callback) {}
+
+bool Encoder::isIdle() { return true; }
+bool Encoder::isRightThisFrame() { return false; }
+bool Encoder::isLeftThisFrame() { return false; }
+
+InputManager::InputManager() = default;
+
+InputManager& InputManager::instance() {
+  static InputManager instance;
+  return instance;
+}
+
+void InputManager::registerButton(uint8_t buttonID) {}
+void InputManager::unregisterButton(uint8_t buttonID) {}
+
+void InputManager::attachDownCallback(uint8_t buttonID, std::function<void()> callback) {}
+void InputManager::attachUpCallback(uint8_t buttonID, std::function<void()> callback) {}
+
+void InputManager::executeDownCallbacks(uint8_t buttonID) {}
+void InputManager::executeUpCallbacks(uint8_t buttonID) {}
+
+void InputManager::registerEncoder(uint16_t encoderID, uint8_t leftPin, uint8_t rightPin) {}
+void InputManager::unregisterEncoder(uint16_t encoderID) {}
+
+void InputManager::attachLeftCallback(uint16_t encoderID, std::function<void()> callback) {}
+void InputManager::attachRightCallback(uint16_t encoderID, std::function<void()> callback) {}
+
+void InputManager::executeLeftCallbacks(uint16_t encoderID) {}
+void InputManager::executeRightCallbacks(uint16_t encoderID) {}
+
+void InputManager::onEncoderEdge(uint16_t encoderID) {}
+
+bool InputManager::isDownThisFrame(uint8_t buttonID) { return false; }
+bool InputManager::isUpThisFrame(uint8_t buttonID) { return false; }
+bool InputManager::isDown(uint8_t buttonID) { return false; }
+
+bool InputManager::isRightThisFrame(uint16_t encoderID) { return false; }
+bool InputManager::isLeftThisFrame(uint16_t encoderID) { return false; }
+bool InputManager::isIdle(uint16_t encoderID) { return true; }
+
+void InputManager::tick() {}
 
 struct SPI::SPIImpl {
   // noop

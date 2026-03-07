@@ -29,6 +29,10 @@ struct GPIO::GPIOImpl {
     _settings.set_direction(output ? gpiod::line::direction::OUTPUT 
                                       : gpiod::line::direction::INPUT);
     
+    if (!output) {
+      _settings.set_edge_detection(gpiod::line::edge::BOTH);
+    }
+    
     err = GPIOManager::instance().registerPin(_pin, _settings);
   }
 
@@ -51,15 +55,7 @@ struct GPIO::GPIOImpl {
   void attachInterrupt(std::function<void()> callback, EdgeType edge){
     if(_isOutput) return;
 
-    if (edge == EdgeType::RISING) {
-      _settings.set_edge_detection(gpiod::line::edge::RISING);
-    } else if (edge == EdgeType::FALLING) {
-      _settings.set_edge_detection(gpiod::line::edge::FALLING);
-    } else {
-      _settings.set_edge_detection(gpiod::line::edge::BOTH);
-    }
-    
-    GPIOManager::instance().registerInterrupt(_pin, _settings, callback);
+    GPIOManager::instance().registerInterrupt(_pin, _settings, callback, edge);
   }
 
   bool checkError() { return err; }

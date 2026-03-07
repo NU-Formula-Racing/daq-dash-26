@@ -35,14 +35,14 @@ void GPIOManager::releasePin(uint8_t offset){
     }
 }
 
-void GPIOManager::registerInterrupt(uint8_t offset, gpiod::line_settings settings, std::function<void()> callback, EdgeType edge){
+void GPIOManager::registerInterrupt(uint8_t offset, gpiod::line_settings settings, std::function<void()> callback, GPIO::EdgeType edge){
     _settings[offset] = settings;
 
-    if (edge == EdgeType::FALLING || edge == EdgeType::BOTH){
+    if (edge == GPIO::EdgeType::FALLING || edge == GPIO::EdgeType::BOTH){
         _fallingCallbacks[offset] = callback;
     } 
 
-    if (edge == EdgeType::RISING || edge == EdgeType::BOTH){
+    if (edge == GPIO::EdgeType::RISING || edge == GPIO::EdgeType::BOTH){
         _risingCallbacks[offset] = callback;
     }
     

@@ -173,7 +173,7 @@ public:
 
   bool isRightThisFrame(uint16_t encoderID) const;
   bool isLeftThisFrame(uint16_t encoderID) const;
-  bool isIdle(uint16_t encoderID);
+  bool isIdle(uint16_t encoderID) const;
 
   void tick();
 

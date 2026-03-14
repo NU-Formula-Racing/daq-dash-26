@@ -53,7 +53,7 @@ struct NeopixelStrip::NeopixelImpl {
   int numLeds;
   std::vector<ImColor> colors;
   
-  void drawLedStrips(ImVec2 pos, int row, int col) {
+  void drawLedStrips(ImVec2 pos, int row, int col, bool rightToLeft) {
       if(row * col > numLeds) {
         okay::Engine.logger.error("Provided too many rows or columns.");
       }
@@ -65,13 +65,23 @@ struct NeopixelStrip::NeopixelImpl {
       int offsetX = 30;
       int offsetY = 50;
 
+
       int squareSize = 30;
+      
       for(int j = 0; j < row; j++) {
         int rowY = windowPos.y + j * squareSize + j * offsetY;
-        for(int i = 0; i < col; i++) {
-          ImColor ledColor = colors[i + j];
-          ImVec2 relativeLedPos1 = ImVec2(offsetX * i + windowPos.x + i * squareSize + offsetX * 4, rowY);
-          drawList->AddRectFilled(relativeLedPos1, ImVec2(relativeLedPos1.x + squareSize, relativeLedPos1.y + squareSize), ledColor);
+        if(rightToLeft) {
+          for(int i = col - 1; i >= 0; i--) {
+            ImColor ledColor = colors[j * col + i];  // 
+            ImVec2 relativeLedPos1 = ImVec2(offsetX * i + windowPos.x + i * squareSize + offsetX * 4, rowY);
+            drawList->AddRectFilled(relativeLedPos1, ImVec2(relativeLedPos1.x + squareSize, relativeLedPos1.y + squareSize), ledColor);
+          }
+        } else {
+          for(int i = 0; i < col; i++) {
+            ImColor ledColor = colors[j * col + i];  // 
+            ImVec2 relativeLedPos1 = ImVec2(offsetX * i + windowPos.x + i * squareSize + offsetX * 4, rowY);
+            drawList->AddRectFilled(relativeLedPos1, ImVec2(relativeLedPos1.x + squareSize, relativeLedPos1.y + squareSize), ledColor);
+          }
         }
     }
 }
@@ -108,8 +118,6 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4 &color) {
 }
 
 
-
-
 void NeopixelStrip::show() {
   ImGui::Begin("Neopixel");
   
@@ -124,14 +132,14 @@ void NeopixelStrip::show() {
   switch(_impl->pin) {
     case 19:
       // left
-      _impl->drawLedStrips(ImVec2(0, 80), 8, 2);
+      _impl->drawLedStrips(ImVec2(0, 80), 8, 2, true);
     case 13:
         // top
-        _impl->drawLedStrips(ImVec2(135, 30), 1, 7);
+        _impl->drawLedStrips(ImVec2(135, 30), 1, 6, false);
       break;
      default:
       // right
-      _impl->drawLedStrips(ImVec2(550, 80), 8, 2);
+      _impl->drawLedStrips(ImVec2(550, 80), 8, 2, true);
       break;
   }
 

@@ -28,6 +28,46 @@ static void __gameShutdown();
 static void __motorStatusRecv();
 static void __exitSignal(int sig);
 
+bool re_pressed = false;
+void re_button_callback(){
+    re_pressed = true;
+}
+void re_up_cb(){
+    re_pressed = false;
+}
+
+int16_t encoder_counter = 0;
+void re_right_cb(){
+    encoder_counter++;;
+}
+void re_left_cb(){
+    encoder_counter--;
+}
+
+bool down_pressed = false;
+void down_down_cb(){
+    down_pressed = true;
+}
+void down_up_cb(){
+    down_pressed = false;
+}
+
+bool right_pressed = false;
+void right_down_cb(){
+    right_pressed = true;
+}
+void right_up_cb(){
+    right_pressed = false;
+}
+
+bool left_pressed = false;
+void left_down_cb(){
+    left_pressed = true;
+}
+void left_up_cb(){
+    left_pressed = false;
+}
+
 // clang-format off
 static std::vector<ICAN_Message*> g_toPrint = {
     &dbc::bmsStatus::message,
@@ -141,99 +181,20 @@ static void __updateLights() {
     display->updateDisplay();
 }
 
-static void __flushScreen() {
-    // Collect all signal strings
-    std::vector<std::pair<std::string, bool>> lines;
-    lines.reserve(256);
+static void __interruptInitialize(){
+    reButton.onDown(re_button_callback);
+    reButton.onUp(re_up_cb);
+    rotaryEncoder.onLeft(re_left_cb);
+    rotaryEncoder.onRight(re_right_cb);
 
-    constexpr int COLS = 4;
-    constexpr int COL_WIDTH = 25;
-    constexpr int MAX_NAME_LENGTH = 20;
-    constexpr int MAX_PREFERED_VALUE_LENGTH = 10;
+    downButton.onDown(down_down_cb);
+    downButton.onUp(down_up_cb);
 
-    for (ICAN_Message* msg : g_toPrint) {
-        lines.emplace_back(std::string(dbc::meta::messageIdToName.at(msg->get_id().id)), true);
+    rightButton.onDown(right_down_cb);
+    rightButton.onUp(right_up_cb);
 
-        for (std::uint8_t sigNum = 0; sigNum < msg->get_num_signals(); sigNum++) {
-            auto sigId = std::pair{msg->get_id().id, sigNum};
-
-            std::string name = "(unknown)";
-            auto it = dbc::meta::signalIdToName.find(sigId);
-            if (it != dbc::meta::signalIdToName.end())
-                name = it->second;
-
-            std::string msgValue = msg->get_signal(sigNum)->to_string();
-
-            if (msgValue.length() > MAX_PREFERED_VALUE_LENGTH) {
-                msgValue = msgValue.substr(0, MAX_PREFERED_VALUE_LENGTH);
-            }
-
-            size_t total = name.length() + msgValue.length() + 2; // ": " = 2
-            if (total > COL_WIDTH) {
-                size_t maxName = COL_WIDTH - (msgValue.length() + 2);
-                if (maxName > name.length()) maxName = name.length(); // safety
-                name = name.substr(0, maxName);
-            }
-
-            if (name.length() > MAX_NAME_LENGTH) {
-                name = name.substr(0, MAX_NAME_LENGTH);
-            }
-
-            lines.emplace_back(name + ": " + msgValue, false);
-        }
-    }
-
-
-
-    // Build one complete frame
-    std::string out;
-    out.reserve(8192);
-
-    // Home cursor
-    out += "\x1b[H";
-    // out += "NFR26 Development Dashboard\n";
-
-    // Format into columns
-    std::ostringstream grid;
-    int currentGridCol = 0;
-    for (int i = 0; i < lines.size(); i++) {
-        bool isHeader = lines[i].second;
-
-        if (isHeader) {
-            if (currentGridCol != 0) {
-                grid << "\n";
-            }
-
-            currentGridCol = 0;
-            grid << "*** " <<lines[i].first << " ***\n";
-        } else {
-            // insert text from
-            // currentGridCol * COL_WIDTH... (currentGridCol + 1) * COL_WIDTH
-            // shorten the string if it's too long, just cut it off
-            // or pad it with spaces if it's too short
-            if (lines[i].first.size() > COL_WIDTH - 1) {
-                grid << lines[i].first.substr(0, COL_WIDTH - 1);
-                grid << " "; // space between columns
-            } else {
-                int padding = COL_WIDTH - lines[i].first.size();
-                grid << lines[i].first << std::string(padding, ' ');
-            }
-
-            if (++currentGridCol == COLS) {
-                currentGridCol = 0;
-                grid << "\n";
-            }
-        }
-    }
-
-    out += grid.str();
-
-    // Now clear the rest of the screen
-    out += "\x1b[J";
-
-    // print to stdout, and flush
-    std::cout << out;
-    std::cout.flush();
+    leftButton.onDown(left_down_cb);
+    leftButton.onUp(left_up_cb);
 }
 
 static void __gameInitialize() {
@@ -252,6 +213,8 @@ static void __gameInitialize() {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
+
+    __interruptInitialize();
 
     std::ios::sync_with_stdio(false);
     std::cout.tie(nullptr);
@@ -274,6 +237,58 @@ static void __gameUpdate() {
     dbc::driveBus.tick_bus();
     __updateLights();
 
+    dash::platform::tick();
+
+    std::cout << "\x1b[H\x1b[J";
+
+    std::cout << "NFR26 Development Dashboard\n";
+
+    // Collect all signal strings
+    std::vector<std::string> lines;
+    for (ICAN_Message* msg : g_toPrint) {
+        for (std::uint8_t sigNum = 0; sigNum < msg->get_num_signals(); sigNum++) {
+            auto sigId = std::pair{msg->get_id().id, sigNum};
+
+            const char* name = "(unknown)";
+            auto it = dbc::meta::signalIdToName.find(sigId);
+            if (it != dbc::meta::signalIdToName.end())
+                name = it->second;
+
+            lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
+        }
+    }
+
+    constexpr int COLS = 3;
+    constexpr int COL_WIDTH = 32;
+
+    size_t rows = (lines.size() + COLS - 1) / COLS;
+
+    std::ostringstream frame;
+
+    // Print row-wise across columns
+    for (size_t r = 0; r < rows; r++) {
+        for (size_t c = 0; c < COLS; c++) {
+            size_t idx = r + c * rows;
+            if (idx < lines.size()) {
+                frame << std::left << std::setw(COL_WIDTH) << lines[idx];
+            }
+        }
+        frame << '\n';
+    }
+
+    std::cout << frame.str();
+
+    std::string out = "\nINPUT DEMO:\n";
+    out += "Down Button: " + std::string(downButton.isDown() ? "held" : "not held") + "\n";
+    out += "Right Button: " + std::string(rightButton.isDown() ? "held" : "not held") + "\n";
+    out += "Left Button: " + std::string(leftButton.isDown() ? "held" : "not held") + "\n";
+    out += "RE Button: " + std::string(reButton.isDown() ? "held" : "not held") + "\n";
+    out += "RE Count Val: " + std::to_string(encoder_counter);
+
+    // print to stdout, and flush
+    std::cout << out;
+    std::cout.flush();
+    std::cout.flush();
     dash::platform::postUpdate();
 }
 

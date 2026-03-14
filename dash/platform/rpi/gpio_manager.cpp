@@ -26,14 +26,26 @@ void GPIOManager::releasePin(uint8_t offset){
         _settings.erase(offset);
     }
 
-    if (_callbacks.find(offset) != _callbacks.end()){
-        _callbacks.erase(offset);
+    if (_risingCallbacks.find(offset) != _risingCallbacks.end()){
+        _risingCallbacks.erase(offset);
+    }
+
+    if (_fallingCallbacks.find(offset) != _fallingCallbacks.end()){
+        _fallingCallbacks.erase(offset);
     }
 }
 
-void GPIOManager::registerInterrupt(uint8_t offset, gpiod::line_settings settings, std::function<void()> callback){
+void GPIOManager::registerInterrupt(uint8_t offset, gpiod::line_settings settings, std::function<void()> callback, GPIO::EdgeType edge){
     _settings[offset] = settings;
-    _callbacks[offset] = callback;
+
+    if (edge == GPIO::EdgeType::FALLING || edge == GPIO::EdgeType::BOTH){
+        _fallingCallbacks[offset] = callback;
+    } 
+
+    if (edge == GPIO::EdgeType::RISING || edge == GPIO::EdgeType::BOTH){
+        _risingCallbacks[offset] = callback;
+    }
+    
 }
 
 void GPIOManager::start(){
@@ -66,15 +78,31 @@ void GPIOManager::tick(){
         start();
     }
 
+    if (!_request) {
+        return;
+    }
+
+    if (!_request->wait_edge_events(std::chrono::nanoseconds(0))) {
+        return;
+    }
+
     gpiod::edge_event_buffer buffer(64);
+    std::size_t num_events = _request->read_edge_events(buffer);
 
-    _request->read_edge_events(buffer);
+    for (std::size_t i = 0; i < num_events; i++) {
+        const auto& event = buffer.get_event(i);
+        uint8_t offset = static_cast<uint8_t>(event.line_offset());
 
-    for (const auto& event : buffer) {
-        unsigned int offset = event.line_offset();
-
-        if (_callbacks.find(offset) != _callbacks.end()) {
-            _callbacks[offset]();
+        if (event.type() == gpiod::edge_event::event_type::RISING_EDGE) {
+            auto it = _risingCallbacks.find(offset);
+            if (it != _risingCallbacks.end()) {
+                it->second();
+            }
+        } else if (event.type() == gpiod::edge_event::event_type::FALLING_EDGE) {
+            auto it = _fallingCallbacks.find(offset);
+            if (it != _fallingCallbacks.end()) {
+                it->second();
+            }
         }
     }
 }

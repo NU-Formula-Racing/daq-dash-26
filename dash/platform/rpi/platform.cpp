@@ -8,6 +8,7 @@ void preUpdate() {}
 
 void postUpdate() {
     GPIOManager::instance().tick();
+    InputManager::instance().tick();
 }
 
 static SPI s_canSpi;

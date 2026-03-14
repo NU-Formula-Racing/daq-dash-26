@@ -241,7 +241,7 @@ static void __flushScreen() {
 static void __gameInitialize() {
     std::cout << "Game initialized." << std::endl;
     g_timerGroup.AddTimer(1000, []() { g_heartbeatCount++; });
-    g_timerGroup.AddTimer(20, []() { __flushScreen(); });
+    // g_timerGroup.AddTimer(20, []() { __flushScreen(); });
     
     dash::platform::configureCANDriver(dbc::driveBus);
    

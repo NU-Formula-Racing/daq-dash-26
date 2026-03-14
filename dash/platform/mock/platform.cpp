@@ -2,11 +2,13 @@
 #include "platform/platform.hpp"
 #include <can/mock/can_imgui.hpp>
 
+#include <cstdarg>
 #include <cstring>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <okay/core/okay.hpp>
+#include <string>
 namespace dash::platform {
 
 struct GPIO::GPIOImpl {
@@ -49,6 +51,27 @@ bool SPI::ISpi_transfer(const uint8_t *tx, uint8_t *rx, size_t len) {
 struct NeopixelStrip::NeopixelImpl {
   int pin;
   int numLeds;
+  std::vector<ImColor> colors;
+  
+  
+  void drawLedStrips(ImVec2 pos, int row, int col) {
+      
+      auto* drawList = ImGui::GetWindowDrawList();
+      ImVec2 windowPos = ImGui::GetWindowPos();
+      
+      int offsetX = pos.x;
+      int offsetY = pos.y;
+
+      int squareSize = 30;
+      for(int j = 0; j < row; j++) {
+        int rowY = windowPos.y + j * (squareSize + 100) + offsetY;
+        for(int i = 0; i < col; i++) {
+          ImColor ledColor = colors[i + j];
+          ImVec2 relativeLedPos1 = ImVec2(offsetX * i + windowPos.x + i * squareSize + offsetX * 4, rowY);
+          drawList->AddRectFilled(relativeLedPos1, ImVec2(relativeLedPos1.x + squareSize, relativeLedPos1.y + squareSize), ledColor);
+        }
+    }
+}
 };
 
 NeopixelStrip::NeopixelStrip() : _impl(std::make_unique<NeopixelStrip::NeopixelImpl>()) {}
@@ -64,54 +87,65 @@ void NeopixelStrip::init(const int& pin, const int &numLeds) {
   */
   _impl->pin = pin;
   _impl->numLeds = numLeds;
+  
+  for(int i = 0; i  < numLeds; i++) {
+    _impl->colors.push_back(ImColor(0, 0, 0, 255));
+  }
 }
+
+
 
 void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4 &color) {
   // noop
   /*
     Update specific color of UI
   */
+   _impl->colors[ledIndex] = ImColor(color.x, color.y, color.z, color.w);
+
 }
 
+
+
+
 void NeopixelStrip::show() {
-  // noop
-  // okay::Engine.logger.debug("testing");
-  // ImGui::Begin("Neopixel");
-  // ImGui::Text("Testing");
-  // ImGui::End();
-  /*
-    Draw UI
-  */
-  // ImGui::ShowDemoWindow();
-  // ImGui::NewFrame();
-  // ImGui::BeginChild("testing");
-  // ImGui::Text("Neopixel");
-  // ImGui::EndChild();
-  // ImGuiIO& io = ImGui::GetIO();
-  // io.DisplaySize = ImVec2((float)500, (float)500);
-  // // ImGui::NewFrame();
   ImGui::Begin("Neopixel");
   
+  auto* drawList = ImGui::GetWindowDrawList();
+  int cols = _impl->numLeds / 7;
   
-  auto ledBoxes = ImGui::GetWindowDrawList();
-  uint8_t cols = _impl->numLeds / 8;
+  int rows = _impl->numLeds / cols;
+  ImVec2 windowPos = ImGui::GetWindowPos();
   
-  if (ImGui::BeginTable("Neopixel Strip", 8)) {
-    for(int i = 0; i < cols; i++) {
-      for(int j = 0; j < _impl->numLeds / cols; j+=2) {
-        ImGui::Text("testing");
-        ImGui::TableNextRow();
-      }
-      ImGui::TableNextColumn();
-    }
+  int squareSize = 25;
+  // decide on left orientation, top orientation, or right orientation
+  switch(_impl->pin) {
+    case 19:
+      // left
+      _impl->drawLedStrips(ImVec2(50, 30), 8, 2);
+    case 13:
+        // top
+        _impl->drawLedStrips(ImVec2(30, 10), 1, 6);
+      break;
+     default:
+      // right
+      _impl->drawLedStrips(ImVec2(100, 30), 8, 2);
+      break;
+  }
+
+
+  // std::cout << "number of leds" << _impl->numLeds << std::endl;
+  // coordinate system is y increases as you go down
+  // AddRectFilled(p_min, p_max, color)
+  
     
-   }
-  ImGui::EndTable();
+    
+    
+  //  static ImVec4 color;
+  //  ImGui::ColorPicker4("LED Color", (float *) &color);
+ 
   
   ImGui::End();
-  // ImGui::EndFrame();
-  // ImGui::Render();
-  // ledBoxes->AddQuadFilled({})
+  
   
 }
 

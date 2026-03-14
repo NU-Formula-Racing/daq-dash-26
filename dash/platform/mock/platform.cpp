@@ -65,20 +65,19 @@ struct NeopixelStrip::NeopixelImpl {
       int offsetX = 30;
       int offsetY = 50;
 
-
       int squareSize = 30;
       
       for(int j = 0; j < row; j++) {
         int rowY = windowPos.y + j * squareSize + j * offsetY;
         if(rightToLeft) {
           for(int i = col - 1; i >= 0; i--) {
-            ImColor ledColor = colors[j * col + i];  // 
+            ImColor ledColor = colors[j * col + i];  
             ImVec2 relativeLedPos1 = ImVec2(offsetX * i + windowPos.x + i * squareSize + offsetX * 4, rowY);
             drawList->AddRectFilled(relativeLedPos1, ImVec2(relativeLedPos1.x + squareSize, relativeLedPos1.y + squareSize), ledColor);
           }
         } else {
           for(int i = 0; i < col; i++) {
-            ImColor ledColor = colors[j * col + i];  // 
+            ImColor ledColor = colors[j * col + i];   
             ImVec2 relativeLedPos1 = ImVec2(offsetX * i + windowPos.x + i * squareSize + offsetX * 4, rowY);
             drawList->AddRectFilled(relativeLedPos1, ImVec2(relativeLedPos1.x + squareSize, relativeLedPos1.y + squareSize), ledColor);
           }
@@ -91,12 +90,9 @@ NeopixelStrip::NeopixelStrip() : _impl(std::make_unique<NeopixelStrip::NeopixelI
 NeopixelStrip::~NeopixelStrip() {} 
 
 void NeopixelStrip::init(const int& pin, const int &numLeds) {
-  // noop
   /*
     Initialize boxes for each strip
-    Somehow choose orientation
     Initial color is black
-
   */
   _impl->pin = pin;
   _impl->numLeds = numLeds;
@@ -109,35 +105,23 @@ void NeopixelStrip::init(const int& pin, const int &numLeds) {
 
 
 void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4 &color) {
-  // noop
-  /*
-    Update specific color of UI
-  */
    _impl->colors[ledIndex] = ImColor(color.x, color.y, color.z, color.w);
-
 }
 
 
 void NeopixelStrip::show() {
   ImGui::Begin("Neopixel");
   
-  auto* drawList = ImGui::GetWindowDrawList();
-  int cols = _impl->numLeds / 7;
-  
-  int rows = _impl->numLeds / cols;
-  ImVec2 windowPos = ImGui::GetWindowPos();
-  
-  int squareSize = 25;
   // decide on left orientation, top orientation, or right orientation
   switch(_impl->pin) {
     case 19:
       // left
       _impl->drawLedStrips(ImVec2(0, 80), 8, 2, true);
     case 13:
-        // top
-        _impl->drawLedStrips(ImVec2(135, 30), 1, 6, false);
+      // top
+      _impl->drawLedStrips(ImVec2(135, 30), 1, 6, false);
       break;
-     default:
+    default:
       // right
       _impl->drawLedStrips(ImVec2(550, 80), 8, 2, true);
       break;

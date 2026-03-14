@@ -53,18 +53,21 @@ struct NeopixelStrip::NeopixelImpl {
   int numLeds;
   std::vector<ImColor> colors;
   
-  
   void drawLedStrips(ImVec2 pos, int row, int col) {
-      
+      if(row * col > numLeds) {
+        okay::Engine.logger.error("Provided too many rows or columns.");
+      }
       auto* drawList = ImGui::GetWindowDrawList();
       ImVec2 windowPos = ImGui::GetWindowPos();
-      
-      int offsetX = pos.x;
-      int offsetY = pos.y;
+      windowPos.x = windowPos.x + pos.x;
+      windowPos.y = windowPos.y + pos.y;
+
+      int offsetX = 30;
+      int offsetY = 50;
 
       int squareSize = 30;
       for(int j = 0; j < row; j++) {
-        int rowY = windowPos.y + j * (squareSize + 100) + offsetY;
+        int rowY = windowPos.y + j * squareSize + j * offsetY;
         for(int i = 0; i < col; i++) {
           ImColor ledColor = colors[i + j];
           ImVec2 relativeLedPos1 = ImVec2(offsetX * i + windowPos.x + i * squareSize + offsetX * 4, rowY);
@@ -88,7 +91,7 @@ void NeopixelStrip::init(const int& pin, const int &numLeds) {
   _impl->pin = pin;
   _impl->numLeds = numLeds;
   
-  for(int i = 0; i  < numLeds; i++) {
+  for(int i = 0; i < numLeds; i++) {
     _impl->colors.push_back(ImColor(0, 0, 0, 255));
   }
 }
@@ -121,31 +124,18 @@ void NeopixelStrip::show() {
   switch(_impl->pin) {
     case 19:
       // left
-      _impl->drawLedStrips(ImVec2(50, 30), 8, 2);
+      _impl->drawLedStrips(ImVec2(0, 80), 8, 2);
     case 13:
         // top
-        _impl->drawLedStrips(ImVec2(30, 10), 1, 6);
+        _impl->drawLedStrips(ImVec2(135, 30), 1, 7);
       break;
      default:
       // right
-      _impl->drawLedStrips(ImVec2(100, 30), 8, 2);
+      _impl->drawLedStrips(ImVec2(550, 80), 8, 2);
       break;
   }
 
-
-  // std::cout << "number of leds" << _impl->numLeds << std::endl;
-  // coordinate system is y increases as you go down
-  // AddRectFilled(p_min, p_max, color)
-  
-    
-    
-    
-  //  static ImVec4 color;
-  //  ImGui::ColorPicker4("LED Color", (float *) &color);
- 
-  
   ImGui::End();
-  
   
 }
 

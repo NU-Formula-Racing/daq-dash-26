@@ -1,8 +1,11 @@
 // mock platform
-
-#include <platform/platform.hpp>
+#include "platform/platform.hpp"
+#include <can/mock/can_imgui.hpp>
 
 #include <cstring>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 namespace dash::platform {
 
@@ -130,6 +133,21 @@ void NeopixelStrip::show() {
 void NeopixelStrip::cleanup() {
   // noop
 }
-void tick() {}
+
+void configureCANDriver(CAN_Bus& bus) {
+    auto canImgui = std::make_unique<CAN_IMGUI>();
+    bus.set_driver(std::move(canImgui));
+}
+
+void preUpdate() {
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+}
+
+void postUpdate() {
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
 
 } // namespace dash::platform

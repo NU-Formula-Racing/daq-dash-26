@@ -6,6 +6,7 @@
 #include <imgui_impl_opengl3.h>
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
+#include <okay/okay.hpp>
 #include <platform/can.hpp>
 #include <thread>
 
@@ -25,12 +26,7 @@ void CANManager::initialize() {
 }
 
 void CANManager::tick() {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
     dbc::driveBus.tick_bus();
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 }  // namespace dash

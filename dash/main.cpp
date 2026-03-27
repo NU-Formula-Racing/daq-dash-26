@@ -50,7 +50,6 @@ int main() {
                     std::make_unique<dash::NeopixelManager>(),
                     std::make_unique<okay::AssetManager>(),
                     std::make_unique<okay::TweenEngine>(),
-                    std::make_unique<okay::IMGUISystem>(),
                     std::make_unique<dash::CANManager>())
         .onInitialize(__gameInitialize)
         .onUpdate(__gameUpdate)

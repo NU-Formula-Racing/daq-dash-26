@@ -5,7 +5,7 @@
 
 namespace dash {
 
-class CANManager : public okay::System<okay::SystemScope::ENGINE> {
+class CANManager : public okay::System<okay::SystemScope::GAME> {
    public:
     virtual void initialize();
     virtual void tick();

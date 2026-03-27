@@ -1,8 +1,7 @@
 #include "can_imgui.hpp"
 
-#include "can/can_dbc.hpp"
-
 #include <algorithm>
+#include <can/can_dbc.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <imgui.h>

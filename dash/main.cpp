@@ -1,3 +1,4 @@
+#include <platform/can.hpp>
 #include <can/can_dbc.hpp>
 #include <csignal>
 #include <math.h>
@@ -6,7 +7,6 @@
 #include <okay/okay.hpp>
 #include <platform/interfaces.hpp>
 #include <platform/neopixel_manager.hpp>
-#include <platform/platform.hpp>
 #include <sstream>
 #include <string>
 
@@ -52,7 +52,7 @@ int main() {
                     std::make_unique<okay::AssetManager>(),
                     std::make_unique<okay::TweenEngine>(),
                     std::make_unique<okay::IMGUISystem>(),
-                    std::make_unique<dash::Platform>())
+                    std::make_unique<dash::CANManager>())
         .onInitialize(__gameInitialize)
         .onUpdate(__gameUpdate)
         .onShutdown(__gameShutdown)
@@ -62,17 +62,6 @@ int main() {
 }
 
 static void __gameInitialize() {
-    std::cout << "Game initialized." << std::endl;
-
-    BaudRate baud500k = BaudRate::kBaud500K;
-    if (!dbc::driveBus.init(baud500k)) {
-        okay::Engine.logger.error("Failed to initialize CAN bus");
-
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-    }
-
     std::ios::sync_with_stdio(false);
     std::cout.tie(nullptr);
     std::cout << "\x1b[?25l";  // hide cursor

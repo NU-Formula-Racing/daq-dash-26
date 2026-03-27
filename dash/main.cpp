@@ -1,15 +1,14 @@
-#include <platform/can.hpp>
 #include <can/can_dbc.hpp>
 #include <csignal>
 #include <math.h>
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/virtual_timer.hpp>
 #include <okay/okay.hpp>
+#include <platform/can.hpp>
 #include <platform/interfaces.hpp>
 #include <platform/neopixel_manager.hpp>
 #include <sstream>
 #include <string>
-
 
 static void __gameInitialize();
 static void __gameUpdate();

@@ -80,4 +80,4 @@ class NeopixelStrip {
 
 }  // namespace dash
 
-#endif // __INTERFACES_H__
+#endif  // __INTERFACES_H__

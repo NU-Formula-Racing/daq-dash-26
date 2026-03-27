@@ -13,4 +13,4 @@ class CANManager : public okay::System<okay::SystemScope::ENGINE> {
 
 };  // namespace dash
 
-#endif // __CAN_H__
+#endif  // __CAN_H__

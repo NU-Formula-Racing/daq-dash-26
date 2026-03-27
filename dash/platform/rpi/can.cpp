@@ -1,12 +1,11 @@
 #include <can/can_dbc.hpp>
+#include <chrono>
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
 #include <platform/can.hpp>
 #include <platform/input_manager.hpp>
 #include <platform/interfaces.hpp>
 #include <platform/rpi/gpio_manager.hpp>
-
-#include <chrono>
 #include <thread>
 
 namespace dash {

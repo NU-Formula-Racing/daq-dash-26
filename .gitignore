@@ -404,3 +404,5 @@ __marimo__/
 
 # macOS specific files
 .DS_Store
+
+compile_commands.json

@@ -1,16 +1,15 @@
+#include <gpiod.hpp>
 #include <platform/rpi/gpio_manager.hpp>
 
-#include <gpiod.hpp>
+namespace dash {
 
-namespace dash::platform {
-
-GPIOManager& GPIOManager::instance(){
+GPIOManager& GPIOManager::instance() {
     static GPIOManager instance;
     return instance;
 }
 
-GPIOManager::GPIOManager() :
-    _chip(std::make_unique<gpiod::chip>("/dev/gpiochip0")) {}
+GPIOManager::GPIOManager() : _chip(std::make_unique<gpiod::chip>("/dev/gpiochip0")) {
+}
 
 bool GPIOManager::registerPin(uint8_t offset, gpiod::line_settings settings) {
     if (_settings.find(offset) != _settings.end()) {
@@ -20,35 +19,36 @@ bool GPIOManager::registerPin(uint8_t offset, gpiod::line_settings settings) {
     return true;
 }
 
-void GPIOManager::releasePin(uint8_t offset){
-    
-    if (_settings.find(offset) != _settings.end()){
+void GPIOManager::releasePin(uint8_t offset) {
+    if (_settings.find(offset) != _settings.end()) {
         _settings.erase(offset);
     }
 
-    if (_risingCallbacks.find(offset) != _risingCallbacks.end()){
+    if (_risingCallbacks.find(offset) != _risingCallbacks.end()) {
         _risingCallbacks.erase(offset);
     }
 
-    if (_fallingCallbacks.find(offset) != _fallingCallbacks.end()){
+    if (_fallingCallbacks.find(offset) != _fallingCallbacks.end()) {
         _fallingCallbacks.erase(offset);
     }
 }
 
-void GPIOManager::registerInterrupt(uint8_t offset, gpiod::line_settings settings, std::function<void()> callback, GPIO::EdgeType edge){
+void GPIOManager::registerInterrupt(uint8_t offset,
+                                    gpiod::line_settings settings,
+                                    std::function<void()> callback,
+                                    GPIO::EdgeType edge) {
     _settings[offset] = settings;
 
-    if (edge == GPIO::EdgeType::FALLING || edge == GPIO::EdgeType::BOTH){
+    if (edge == GPIO::EdgeType::FALLING || edge == GPIO::EdgeType::BOTH) {
         _fallingCallbacks[offset] = callback;
-    } 
+    }
 
-    if (edge == GPIO::EdgeType::RISING || edge == GPIO::EdgeType::BOTH){
+    if (edge == GPIO::EdgeType::RISING || edge == GPIO::EdgeType::BOTH) {
         _risingCallbacks[offset] = callback;
     }
-    
 }
 
-void GPIOManager::start(){
+void GPIOManager::start() {
     gpiod::line_config line_cfg = gpiod::line_config();
 
     for (auto const& [offset, settings] : _settings) {
@@ -56,23 +56,23 @@ void GPIOManager::start(){
     }
 
     _request = std::make_unique<gpiod::line_request>(
-        _chip->prepare_request().set_line_config(line_cfg).do_request()
-    );
+        _chip->prepare_request().set_line_config(line_cfg).do_request());
 }
 
-bool GPIOManager::gpioWritePin(uint8_t offset, GpioLevel level){
-    gpiod::line::value val = (level == GpioLevel::G_LOW ? gpiod::line::value::INACTIVE : gpiod::line::value::ACTIVE);
+bool GPIOManager::gpioWritePin(uint8_t offset, GpioLevel level) {
+    gpiod::line::value val =
+        (level == GpioLevel::G_LOW ? gpiod::line::value::INACTIVE : gpiod::line::value::ACTIVE);
     _request->set_value(offset, val);
     return true;
 }
 
-bool GPIOManager::gpioReadPin(uint8_t offset, GpioLevel& out){
+bool GPIOManager::gpioReadPin(uint8_t offset, GpioLevel& out) {
     gpiod::line::value val = _request->get_value(offset);
     out = (val == gpiod::line::value::ACTIVE ? GpioLevel::G_HIGH : GpioLevel::G_LOW);
     return true;
 }
 
-void GPIOManager::tick(){
+void GPIOManager::tick() {
     if (!_started) {
         _started = true;
         start();
@@ -106,5 +106,5 @@ void GPIOManager::tick(){
         }
     }
 }
-  
-} // manespace dash::platform
+
+}  // namespace dash

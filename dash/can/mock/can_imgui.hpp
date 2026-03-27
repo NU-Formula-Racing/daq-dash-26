@@ -33,11 +33,11 @@ class CAN_IMGUI : public ICAN {
         std::string_view boardName;
         uint32_t messageID;
     };
-    
+
     std::vector<GroupedMessage> sortedMessages;
     uint32_t timeSinceStartup;
-    
-public:
+
+   public:
     CAN_IMGUI() {}
 
     bool init(const BaudRate baud) override;

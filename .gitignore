@@ -401,3 +401,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# macOS specific files
+.DS_Store
+
+compile_commands.json

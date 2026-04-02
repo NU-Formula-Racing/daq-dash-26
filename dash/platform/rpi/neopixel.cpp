@@ -1,15 +1,15 @@
 #include <cstdint>
-#include <memory>
-#include <platform/platform.hpp>
 #include <drivers/neopixel/ws2811.h>
+#include <memory>
 #include <okay/core/okay.hpp>
+#include <platform/interfaces.hpp>
 
 extern "C" {
 #include <drivers/neopixel/gpio.h>
 #include <drivers/neopixel/mailbox.h>  // mapmem(), unmapmem(), DEV_GPIOMEM
 }
 
-namespace dash::platform {
+namespace dash {
 
 // We use GPIO13, 19 (up, left)
 // and GPIO 18 (right)
@@ -158,4 +158,4 @@ void NeopixelStrip::cleanup() {
     ws2811_fini(&s_ledString);
 }
 
-}  // namespace dash::platform
+}  // namespace dash

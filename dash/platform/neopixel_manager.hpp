@@ -1,14 +1,12 @@
 #ifndef __LIGHTS_HPP__
 #define __LIGHTS_HPP__
 
-#include <platform/platform.hpp>
+#include <cstdint>
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
-#include <okay/core/okay.hpp>
+#include <okay/okay.hpp>
+#include <platform/interfaces.hpp>
 #include <stdint.h>
-#include <cstdint>
-#include <vector>
-#include "okay/core/system/okay_system.hpp"
 
 namespace dash {
 
@@ -16,9 +14,7 @@ struct VirtualizedNeobar {
    public:
     VirtualizedNeobar() = default;
 
-    VirtualizedNeobar(platform::NeopixelStrip* strip,
-                      uint8_t numPixels,
-                      std::vector<uint8_t> mapping)
+    VirtualizedNeobar(NeopixelStrip* strip, uint8_t numPixels, std::vector<uint8_t> mapping)
         : _strip(strip), _mapping(mapping), _numPixels(numPixels), _dirty(true) {
         for (int i = 0; i < numPixels; i++) {
             _currentColors.push_back(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -42,19 +38,19 @@ struct VirtualizedNeobar {
     uint8_t numPixels() const { return _numPixels; }
     const std::vector<glm::vec4>& currentColors() const { return _currentColors; }
     uint8_t toHardwareIndex(uint8_t virtIdx) const { return _mapping[virtIdx]; }
-    platform::NeopixelStrip* strip() const { return _strip; }
+    NeopixelStrip* strip() const { return _strip; }
     bool isDirty() const { return _dirty; }
     void clearDirty() { _dirty = false; }
 
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
     std::vector<glm::vec4> _currentColors;
-    platform::NeopixelStrip* _strip;
+    NeopixelStrip* _strip;
     uint8_t _numPixels;
     bool _dirty{true};
 };
 
-class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
+class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
    public:
     void initialize() {
         // create the strips
@@ -79,9 +75,7 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
        
     }
 
-    VirtualizedNeobar& getBar(uint8_t barNum) {
-        return _bars[barNum];
-    }
+    VirtualizedNeobar& getBar(uint8_t barNum) { return _bars[barNum]; }
 
     void shutdown() {
         // make all the colors black
@@ -105,14 +99,14 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
             // grab the relevant bars, and set the color on the strip
             _strips[i].show();
             for (int j = 0; j < 5; j++) {
-                if (!_bars[j].isDirty()) continue;
+                if (!_bars[j].isDirty())
+                    continue;
 
-                if (i != getHWIndexForBar(j)) continue;
+                if (i != getHWIndexForBar(j))
+                    continue;
 
                 for (int k = 0; k < _bars[j].numPixels(); k++) {
-                    _strips[i].setColor(
-                        _bars[j].toHardwareIndex(k), 
-                        _bars[j].currentColors()[k]);
+                    _strips[i].setColor(_bars[j].toHardwareIndex(k), _bars[j].currentColors()[k]);
                 }
 
                 _bars[j].clearDirty();
@@ -124,7 +118,7 @@ class NeopixelManager : public okay::OkaySystem<okay::OkaySystemScope::GAME> {
 
    private:
     std::array<VirtualizedNeobar, 5> _bars;
-    std::array<platform::NeopixelStrip, 3> _strips;
+    std::array<NeopixelStrip, 3> _strips;
 
     uint8_t numPixelsForBar(uint8_t bar) {
         if (bar == 2) {

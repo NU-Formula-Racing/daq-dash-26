@@ -12,7 +12,7 @@ Software for `NFR26` dashboard, built upon `Okay Engine` and a custom `Raspberry
 
 ### Prerequisites
 
-* `Okay-Engine`, and all of it's prerequisites
+* [okay-engine](https://github.com/Evan-Bertis-Sample/okay-engine), and all of it's prerequisites
 
 ### Steps
 
@@ -31,10 +31,6 @@ This will build and run the project locally. If you are developing any okay-proj
 okay index
 ```
 in the root of the `daq-dash-26` repository. This will generate a `.clangd` file, which provides intellisense for development.
-
-## Installation (Running in Raspbian OS Lite, QEMU)
-
-It is suggested to get setup with QEMU and an image of Raspbian OS Lite if you are developing platform-specific code. This section will be setup eventually.
 
 ## Updating Dashboard Controller Board
 

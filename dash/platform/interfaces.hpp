@@ -1,39 +1,33 @@
-#ifndef __PLATFORM_H__
-#define __PLATFORM_H__
-
-#include <nfr_can/IClock.hpp>
-#include <nfr_can/IGpio.hpp>
-#include <nfr_can/ISpi.hpp>
-#include <nfr_can/CAN_interface.hpp>
-
-#include <glm/glm.hpp>
+#ifndef __INTERFACES_H__
+#define __INTERFACES_H__
 
 #include <chrono>
 #include <cstdint>
+#include <functional>
+#include <glm/glm.hpp>
 #include <memory>
+#include <nfr_can/CAN_interface.hpp>
+#include <nfr_can/IClock.hpp>
+#include <nfr_can/IGpio.hpp>
+#include <nfr_can/ISpi.hpp>
 #include <string>
 #include <thread>
-#include <functional>
 
-namespace dash::platform {
+namespace dash {
 
 class GPIO : public IGpio {
-public:
-  enum class EdgeType {
-    RISING,
-    FALLING,
-    BOTH
-  };
+   public:
+    enum class EdgeType { RISING, FALLING, BOTH };
 
-  GPIO(uint8_t pin, bool output);
-  ~GPIO();
+    GPIO(uint8_t pin, bool output);
+    ~GPIO();
 
     bool gpio_write(GpioLevel level) override;
     bool gpio_read(GpioLevel& out) override;
 
-  void attachInterrupt(std::function<void()> callback, EdgeType edge);
+    void attachInterrupt(std::function<void()> callback, EdgeType edge);
 
-  bool checkError();
+    bool checkError();
 
    private:
     struct GPIOImpl;
@@ -84,11 +78,6 @@ class NeopixelStrip {
     std::unique_ptr<NeopixelImpl> _impl;
 };
 
-void configureCANDriver(CAN_Bus& bus);
+}  // namespace dash
 
-void preUpdate();
-void postUpdate();
-
-} // namespace dash::platform
-
-#endif  // __PLATFORM_H__
+#endif  // __INTERFACES_H__

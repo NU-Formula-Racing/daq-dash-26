@@ -1,4 +1,11 @@
 # mock platform
 
-# give a source to dash_platform
-target_sources(dash_platform PRIVATE platform.cpp)
+target_sources(dash_platform PRIVATE 
+    gpio.cpp 
+    can.cpp 
+    spi.cpp 
+    neopixel.cpp 
+    button.cpp 
+    encoder.cpp 
+    input_manager.cpp
+)

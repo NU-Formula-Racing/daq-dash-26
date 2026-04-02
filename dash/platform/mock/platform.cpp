@@ -119,7 +119,7 @@ void NeopixelStrip::show() {
       _impl->drawLedStrips(ImVec2(0, 80), 8, 2, true);
     case 13:
       // top
-      _impl->drawLedStrips(ImVec2(135, 30), 1, 6, false);
+      _impl->drawLedStrips(ImVec2(150, 30), 1, 6, false);
       break;
     default:
       // right

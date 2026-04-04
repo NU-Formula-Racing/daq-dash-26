@@ -110,6 +110,10 @@ static void __gameUpdate() {
         frame << '\n';
     }
 
+    //frame << "error: hello" << cout 
+
+    dbc::rearInverterFaultStatus::faultCode
+
     std::cout << frame.str();
 
     std::cout.flush();

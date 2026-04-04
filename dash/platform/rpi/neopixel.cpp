@@ -115,7 +115,7 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4& color) {
 void NeopixelStrip::show() {
     ws2811_wait(&s_ledString);
     ws2811_channel_t* channel = &(s_ledString.channel[_impl->channel]);
-    if (channel->gpionum != _impl->pin) {
+    if (channel->gpionum != _impl->pin) { //Be better to check if the thing is greater than
         // Capture old pin + base BEFORE fini
         const int oldPin = channel->gpionum;
         const int newPin = _impl->pin;
@@ -150,8 +150,10 @@ void NeopixelStrip::show() {
             // initial pin setup, just set the new pin high
             if (newPin == GPIO_L) {
                 GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_HIGH);
+                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_LOW);
             } else if (newPin == GPIO_U) {
                 GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
+                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
             }
         
         } else {

@@ -11,7 +11,6 @@ struct NeopixelStrip::NeopixelImpl {
   std::vector<ImColor> colors;
   
   void drawLedStrips(ImVec2 pos, int row, int col, bool rightToLeft) {
-      
       if(row * col > numLeds) {
         okay::Engine.logger.error("Provided too many rows or columns.");
       }
@@ -25,8 +24,6 @@ struct NeopixelStrip::NeopixelImpl {
 
       int squareSize = 30;
       
-      
-
       for(int j = 0; j < row; j++) {
         int rowY = windowPos.y + j * squareSize + j * offsetY;
         if(rightToLeft) {
@@ -61,7 +58,6 @@ void NeopixelStrip::init(const int& pin, const int &numLeds) {
   _impl->numLeds = numLeds;
   
   for(int i = 0; i < numLeds; i++) {
-    
     _impl->colors.push_back(ImColor(0, 255, 0, 255));
   }
 }
@@ -69,21 +65,17 @@ void NeopixelStrip::init(const int& pin, const int &numLeds) {
 
 
 void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4 &color) {
-
    _impl->colors[ledIndex] = ImColor(color.x, color.y, color.z, color.w);
-   
 }
 
 
 void NeopixelStrip::show() {
-
   ImGui::Begin("Neopixel");
   
   // decide on left orientation, top orientation, or right orientation
   switch(_impl->pin) {
     case 19:
       // left
-      
       _impl->drawLedStrips(ImVec2(0, 80), 8, 2, true);
     case 13:
       // top

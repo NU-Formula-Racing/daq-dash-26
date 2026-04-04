@@ -111,7 +111,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                     continue;
                 
                 for (int k = 0; k < _bars[j].numPixels(); k++) {
-                    
                     _strips[i].setColor(_bars[j].toHardwareIndex(k), _bars[j].currentColors()[k]);
                 }
 

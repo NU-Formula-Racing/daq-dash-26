@@ -166,19 +166,19 @@ static void __gameUpdate() {
         bool appsInv = dbc::ecuImplausibility::appssInvalidImp->get();
 
         if (implPres) { // implausibility present }
-            std::cout << "ECU Implausibility Error: Implausibility Present!\n";
+            std::cout << "ECU Implausibility Error: Implausibility Present\n";
         } 
         if (appsImpl) { // apps implausibility 
-            std::cout << "ECU Implausibility Error: APPSs Disagreement Implausibility!\n";
+            std::cout << "ECU Implausibility Error: APPSs Disagreement Implausibility\n";
         }
         if (bppcImpl) { // bppc implausibility 
-            std::cout << "ECU Implausibility Error: BPPC Implausibility!\n";
+            std::cout << "ECU Implausibility Error: BPPC Implausibility\n";
         }
         if (brakeInv) { // brake invalid implausibility
-            std::cout << "ECU Implausibility Error: Brake Invalid Implausibility!\n";
+            std::cout << "ECU Implausibility Error: Brake Invalid Implausibility\n";
         }
         if (appsInv) { // apps invalid implausibility
-            std::cout << "ECU Implausibility Error: Apps Invalid Implausibility!\n";
+            std::cout << "ECU Implausibility Error: Apps Invalid Implausibility\n";
         }
     }
         

@@ -1,5 +1,6 @@
 #include <can/can_dbc.hpp>
 #include <csignal>
+#include <iostream>
 #include <math.h>
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/virtual_timer.hpp>
@@ -110,11 +111,83 @@ static void __gameUpdate() {
         frame << '\n';
     }
 
-    //frame << "error: hello" << cout 
+    // add errors to
+    // frame << "ERROR: dlk;ajlfkaj\n";
+    // std::cout << frame.str();
 
-    dbc::rearInverterFaultStatus::faultCode
+    // handle rearInverter Error
+    void handleInverterFaults(std::stringstream&frame)  {
+        std::uint8_t rearInverterError = dbc::rearInverterFaultStatus::faultCode.get();
+        std::unordered_map<int, std::string> faultCodes = {
+                {0x00, "NONE"},
+                {0x01, "OVER_VOLTAGE"},
+                {0x02, "UNDER_VOLTAGE"},
+                {0x03, "DRV_FAULT"},
+                {0x04, "ABS_OVER_CURRENT"},
+                {0x05, "OVER_TEMP_FET"},
+                {0x06, "OVER_TEMP_MOTOR"},
+                {0x07, "GATE_DRIVER_OVER_VOLTAGE"},
+                {0x08, "GATE_DRIVER_UNDER_VOLTAGE"},
+                {0x09, "MCU_UNDER_VOLTAGE"},
+                {0x0A, "BOOTING_FROM_WATCHDOG_RESET"},
+                {0x0B, "ENCODER_SPI_FAULT"},
+                {0x0C, "ENCODER_SINCOS_BELOW_MIN_AMPLITUDE"},
+                {0x0D, "ENCODER_SINCOS_ABOVE_MAX_AMPLITUDE"},
+                {0x0E, "FLASH_CORRUPTION"},
+                {0x0F, "HIGH_OFFSET_CURRENT_SENSOR_1"},
+                {0x10, "HIGH_OFFSET_CURRENT_SENSOR_2"},
+                {0x11, "HIGH_OFFSET_CURRENT_SENSOR_3"},
+                {0x12, "UNBALANCED_CURRENTS"},
+                {0x13, "BRK_FAULT"},
+                {0x14, "RESOLVER_LOT"},
+                {0x15, "RESOLVER_DOS"},
+                {0x16, "RESOLVER_LOS"},
+                {0x17, "FLASH_CORRUPTION_APP_CFG"},
+                {0x18, "FLASH_CORRUPTION_MC_CFG"},
+                {0x19, "ENCODER_NO_MAGNET"},
+                {0x1A, "ENCODER_MAGNET_TOO_STRONG"},
+                {0x1B, "PHASE_FILTER_FAULT"}
+            }
+        if (rearInverterError > 0) {
+            std::cout << "Rear Inverter Error: " << faultCodes[rearInverterError];
+            // idk what to do if the error code is unidentified (not in the dictionary)
+        }
+    }
 
-    std::cout << frame.str();
+    // handle ECU Implausibility Errors
+    void handleECUFaults(std::stringstream&frame) {
+        // read CAN messages
+        // add errors to
+    // frame << "ERROR: dlk;ajlfkaj\n";
+        bool implPres = dbc::ecuImplausibility::implausibilityPresent->get();
+        bool appsImpl = dbc::ecuImplausibility::appssDisagreementImp->get();
+        bool bppcImpl = dbc::ecuImplausibility::appssDisagreementImp->get();
+        bool brakeInv = dbc::ecuImplausibility::brakeInvalidImp->get();
+        bool appsInv = dbc::ecuImplausibility::appssInvalidImp->get();
+
+        if (implPres) { // implausibility present }
+            std::cout << "ECU Implausibility Error: Implausibility Present\n";
+        } 
+        if (appsImpl) { // apps implausibility 
+            std::cout << "ECU Implausibility Error: APPSs Disagreement Implausibility\n";
+        }
+        if (bppcImpl) { // bppc implausibility 
+            std::cout << "ECU Implausibility Error: BPPC Implausibility\n";
+        }
+        if (brakeInv) { // brake invalid implausibility
+            std::cout << "ECU Implausibility Error: Brake Invalid Implausibility\n";
+        }
+        if (appsInv) { // apps invalid implausibility
+            std::cout << "ECU Implausibility Error: Apps Invalid Implausibility\n";
+        }
+    }
+        
+    // handle BMS faults
+    void handleBMSFaults(std::stringstream&frame){
+        bool bms = dbc::bmsFaults::
+    }
+    
+
 
     std::cout.flush();
 }

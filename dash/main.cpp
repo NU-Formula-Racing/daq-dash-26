@@ -116,7 +116,7 @@ static void __gameUpdate() {
     // std::cout << frame.str();
 
     // handle rearInverter Error
-    void handleInverterFaults(std::stringstream&frame){
+    void handleInverterFaults(std::stringstream&frame)  {
         std::uint8_t rearInverterError = dbc::rearInverterFaultStatus::faultCode.get();
         std::unordered_map<int, std::string> faultCodes = {
                 {0x00, "NONE"},
@@ -149,9 +149,8 @@ static void __gameUpdate() {
                 {0x1B, "PHASE_FILTER_FAULT"}
             }
         if (rearInverterError > 0) {
-            // print 
-            // std::string error_name = faultCodes[rearInverterError];
-            // std::cout << f""
+            std::cout << "Rear Inverter Error: " << faultCodes[rearInverterError];
+            // idk what to do if the error code is unidentified (not in the dictionary)
         }
     }
 
@@ -166,20 +165,20 @@ static void __gameUpdate() {
         bool brakeInv = dbc::ecuImplausibility::brakeInvalidImp->get();
         bool appsInv = dbc::ecuImplausibility::appssInvalidImp->get();
 
-        if (implPres) { // print implausibility present }
-            std::cout << "Implausibility Present!\n";
+        if (implPres) { // implausibility present }
+            std::cout << "ECU Implausibility Error: Implausibility Present!\n";
         } 
-        if (appsImpl) { // print apps implausibility 
-            std::cout << "APPSs Disagreement Implausibility!\n";
+        if (appsImpl) { // apps implausibility 
+            std::cout << "ECU Implausibility Error: APPSs Disagreement Implausibility!\n";
         }
-        if (bppcImpl) { // print bppc implausibility 
-            std::cout << "BPPC Implausibility!\n";
+        if (bppcImpl) { // bppc implausibility 
+            std::cout << "ECU Implausibility Error: BPPC Implausibility!\n";
         }
-        if (brakeInv) { // print brake invalid implausibility
-            std::cout << "Brake Invalid Implausibility!\n";
+        if (brakeInv) { // brake invalid implausibility
+            std::cout << "ECU Implausibility Error: Brake Invalid Implausibility!\n";
         }
-        if (appsInv) { // print apps invalid implausibility
-            std::cout << "Apps Invalid Implausibility!\n";
+        if (appsInv) { // apps invalid implausibility
+            std::cout << "ECU Implausibility Error: Apps Invalid Implausibility!\n";
         }
     }
         

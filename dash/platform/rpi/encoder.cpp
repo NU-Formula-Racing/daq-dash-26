@@ -1,6 +1,6 @@
-#include "encoder.hpp"
+#include <platform/encoder.hpp>
 
-#include "input_manager.hpp"
+#include <platform/input_manager.hpp>
 
 #include <platform/interfaces.hpp>
 

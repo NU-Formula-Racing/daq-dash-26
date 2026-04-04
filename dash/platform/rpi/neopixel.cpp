@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <drivers/neopixel/ws2811.h>
 #include <memory>
-#include <okay/core/okay.hpp>
+#include <okay/okay.hpp>
 #include <platform/interfaces.hpp>
 
 extern "C" {

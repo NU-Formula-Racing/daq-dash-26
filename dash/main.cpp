@@ -46,7 +46,8 @@ int main() {
     std::signal(SIGINT, __exitSignal);
 
     okay::Game::create()
-        .addSystems(std::make_unique<okay::Renderer>(std::move(rendererSettings)),
+        .addSystems(
+            // std::make_unique<okay::Renderer>(std::move(rendererSettings)),
                     std::make_unique<dash::NeopixelManager>(),
                     std::make_unique<okay::AssetManager>(),
                     std::make_unique<okay::TweenEngine>(),

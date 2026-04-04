@@ -54,6 +54,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
    public:
     void initialize() {
         // create the strips
+        std::cout << "Initializing" << std::endl;
         _strips[0].init(19, 16);  // left
         _strips[1].init(13, 7);   // top
         _strips[2].init(18, 16);  // right
@@ -76,6 +77,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     }
 
     VirtualizedNeobar& getBar(uint8_t barNum) { return _bars[barNum]; }
+
+    void tick() {
+        updateDisplay();
+    }
 
     void shutdown() {
         // make all the colors black
@@ -104,8 +109,9 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
                 if (i != getHWIndexForBar(j))
                     continue;
-
+                
                 for (int k = 0; k < _bars[j].numPixels(); k++) {
+                    
                     _strips[i].setColor(_bars[j].toHardwareIndex(k), _bars[j].currentColors()[k]);
                 }
 

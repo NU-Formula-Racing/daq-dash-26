@@ -16,6 +16,8 @@ static void __gameShutdown();
 static void __motorStatusRecv();
 static void __exitSignal(int sig);
 
+static std::size_t __frameCount = 0;
+
 // clang-format off
 static std::vector<ICAN_Message*> g_toPrint = {
     &dbc::ecuBrake::message,
@@ -36,10 +38,10 @@ int main() {
     okay::Game::create()
         .addSystems(
             // std::make_unique<okay::Renderer>(std::move(rendererSettings)),
-                    std::make_unique<dash::NeopixelManager>(),
-                    std::make_unique<okay::AssetManager>(),
-                    std::make_unique<okay::TweenEngine>(),
-                    std::make_unique<dash::CANManager>())
+            std::make_unique<dash::NeopixelManager>(),
+            std::make_unique<okay::AssetManager>(),
+            std::make_unique<okay::TweenEngine>(),
+            std::make_unique<dash::CANManager>())
         .onInitialize(__gameInitialize)
         .onUpdate(__gameUpdate)
         .onShutdown(__gameShutdown)
@@ -49,8 +51,8 @@ int main() {
 }
 
 static void __gameInitialize() {
-    //std::ios::sync_with_stdio(false);
-    //std::cout.tie(nullptr);
+    // std::ios::sync_with_stdio(false);
+    // std::cout.tie(nullptr);
     std::cout << "\x1b[?25l";  // hide cursor
     std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
     std::cout.flush();
@@ -64,7 +66,7 @@ static void __gameShutdown() {
 }
 
 static void __gameUpdate() {
-    std::cout << "\x1b[H\x1b[J";
+    std::cout << "\x1b[H";
     std::cout << "NFR26 Development Dashboard\n";
 
     // Collect all signal strings
@@ -81,6 +83,10 @@ static void __gameUpdate() {
         }
     }
 
+    std::cout << "Frame count: " << __frameCount++ << '\n';
+    std::cout << "Delta time: " << okay::Engine.time->deltaTimeMs() << '\n';
+
+    std::cout << "\x1b[J";
     std::cout.flush();
 }
 

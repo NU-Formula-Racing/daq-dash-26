@@ -38,6 +38,16 @@ void CANManager::tick() {
     GPIOManager::instance().tick();
     InputManager::instance().tick();
     dbc::driveBus.tick_bus();
+
+    MCP2515* driver = static_cast<MCP2515*>(dbc::driveBus.get_driver());
+    driver->updateMissCounter();
+
+    std::cout << "Miss counter:" << driver->getMissCounter() << std::endl;
+
+    std::string error;
+    if (driver->probe(error)) {
+        std::cout << "Error: " << error << std::endl;
+    }
 }
 
 }  // namespace dash

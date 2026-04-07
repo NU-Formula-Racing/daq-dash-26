@@ -20,7 +20,19 @@ static std::size_t __frameCount = 0;
 
 // clang-format off
 static std::vector<ICAN_Message*> g_toPrint = {
+    &dbc::bmsStatus::message,
+    &dbc::bmsFaults::message,
+    &dbc::bmsSoe::message,
+    // &dbc::ecuDriveStatus::message,
+    &dbc::ecuBmsCommandMessage::message,
+    &dbc::ecuImplausibility::message,
     &dbc::ecuBrake::message,
+    &dbc::ecuThrottle::message,
+    &dbc::ecuSetCurrentRearInverter::message,
+    &dbc::rearInverterFaultStatus::message,
+    &dbc::rearInverterPowerDraw::message,
+    &dbc::rearInverterMotorStatus::message,
+    &dbc::rearInverterTempStatus::message
 };
 // clang-format on
 
@@ -66,10 +78,10 @@ static void __gameShutdown() {
 }
 
 static void __gameUpdate() {
-    std::cout << "\x1b[H";
     std::cout << "NFR26 Development Dashboard\n";
 
     // Collect all signal strings
+    std::vector<std::string> lines;
     for (ICAN_Message* msg : g_toPrint) {
         for (std::uint8_t sigNum = 0; sigNum < msg->get_num_signals(); sigNum++) {
             auto sigId = std::pair{msg->get_id().id, sigNum};
@@ -79,14 +91,33 @@ static void __gameUpdate() {
             if (it != dbc::meta::signalIdToName.end())
                 name = it->second;
 
-            std::cout << std::string{name} << ": " << msg->get_signal(sigNum)->to_string() << '\n';
+            lines.emplace_back(std::string{name} + ": " + msg->get_signal(sigNum)->to_string());
         }
     }
+
+    constexpr int COLS = 3;
+    constexpr int COL_WIDTH = 32;
+
+    size_t rows = (lines.size() + COLS - 1) / COLS;
+
+    std::ostringstream frame;
+    // Print row-wise across columns
+    for (size_t r = 0; r < rows; r++) {
+        for (size_t c = 0; c < COLS; c++) {
+            size_t idx = r + c * rows;
+            if (idx < lines.size()) {
+                frame << std::left << std::setw(COL_WIDTH) << lines[idx];
+            }
+        }
+        frame << '\n';
+    }
+    std::cout << frame.str();
 
     std::cout << "Frame count: " << __frameCount++ << '\n';
     std::cout << "Delta time: " << okay::Engine.time->deltaTimeMs() << '\n';
 
     std::cout << "\x1b[J";
+    std::cout << "\x1b[H";
     std::cout.flush();
 }
 

@@ -32,7 +32,11 @@ static std::vector<ICAN_Message*> g_toPrint = {
     &dbc::rearInverterFaultStatus::message,
     &dbc::rearInverterPowerDraw::message,
     &dbc::rearInverterMotorStatus::message,
-    &dbc::rearInverterTempStatus::message
+    &dbc::rearInverterTempStatus::message,
+    &dbc::brBrokerSus::message,
+    &dbc::brBrokerCanErrorMsg::message,
+    &dbc::brBrokerTemp1::message,
+    &dbc::brBrokerTemp2::message
 };
 // clang-format on
 

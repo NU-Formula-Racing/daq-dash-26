@@ -43,11 +43,13 @@ void CANManager::tick() {
     driver->updateMissCounter();
 
     std::cout << "Miss counter:" << driver->getMissCounter() << std::endl;
-
+/*
     std::string error;
     if (driver->probe(error)) {
-        std::cout << "Error: " << error << std::endl;
+    std::cout << "Error: " << error << std::endl;
     }
+*/
+
 }
 
 }  // namespace dash

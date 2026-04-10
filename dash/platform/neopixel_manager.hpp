@@ -73,7 +73,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
         }
 
-        startAnimation([this](float time) { idle(time); });
+        // dbc::ecuDriveStatus::message.attach_rx_callback([this]() { onECUDriveStatus(); });
+        startAnimation([this](float time) { drive(time); });
         updateDisplay();
     }
 
@@ -106,9 +107,16 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     void updateDisplay() {
         for (int i = 0; i < 3; i++) {
             // grab the relevant bars, and set the color on the strip
-            _strips[i].show();
+            if (i == 1) {
+                continue;
+            }
+
             for (int j = 0; j < 5; j++) {
                 if (!_bars[j].isDirty())
+                    continue;
+
+                // this guy is broken
+                if (j == 2)
                     continue;
 
                 if (i != getHWIndexForBar(j))
@@ -120,9 +128,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
                 _bars[j].clearDirty();
             }
-
-            if (i == 1)
-                continue;
 
             _strips[i].show();
         }
@@ -220,6 +225,13 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
     // ANIMATIONS
 
+    static constexpr glm::vec4 colorFromHex(uint32_t hex) {
+        float r = ((hex >> 16) & 0xFF) / 255.0f;
+        float g = ((hex >> 8) & 0xFF) / 255.0f;
+        float b = (hex & 0xFF) / 255.0f;
+        return glm::vec4(r, g, b, 1.0f);
+    }
+
     void idle(float time) {
         const float breathePeriod = 2000.0f;
         float brightness = (std::sin(time / breathePeriod) + 1.0f) / 2.0f;  // +1 for normalize
@@ -273,7 +285,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     }
 
     void drive(float time) {
-        const float blinkTime = 1000;
+        const float blinkTime = 500;
         const int numBlinks = 3;
 
         if (time < blinkTime * 2 * numBlinks) {
@@ -289,22 +301,33 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
         } else {
             // we are now in throttle light mode
-            const int16_t appsMax = 4000;
-            float throttlePercentage = dbc::ecuThrottle::apps1Throttle->get() / appsMax;
-
-            float partialBrightness = fmodf(throttlePercentage * 8.0f, 1.0f);
+            const float appsMax = 100;
+            float throttlePercentage =
+                static_cast<float>(dbc::ecuThrottle::apps1Throttle->get()) / appsMax;
             glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-            glm::vec4 orange = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+            glm::vec4 orange = colorFromHex(0xFFA500);
 
             for (int i = 0; i < 5; i++) {
-                if (i == 2)
-                    continue;
+                int numPixels = getBar(i).numPixels();
+                int numFull = static_cast<int>(floor(throttlePercentage * numPixels));
 
-                for (int j = 0; j < floor(throttlePercentage * 8.0f); j++) {
-                    glm::vec4 color = glm::mix(blue, orange, static_cast<float>(i / 8));
+                glm::vec4 color =
+                    glm::mix(blue, orange, static_cast<float>(i) / static_cast<float>(numPixels));
+                for (int j = 0; j < numFull; j++) {
                     getBar(i).setColor(j, color);
                 }
-                // getBar(i).setColor(floor(throttlePercentage * 8) + 1, color * partialBrightness);
+
+                // turn off the rest of the pixels
+                for (int j = numFull; j < numPixels; j++) {
+                    if (j == numFull) {
+                        // set it to partial brightness to make a smoother transition
+                        glm::vec4 partialColor = color * (throttlePercentage * numPixels - numFull);
+                        getBar(i).setColor(j, partialColor);
+                        continue;
+                    }
+
+                    getBar(i).setColor(j, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+                }
             }
         }
     }

@@ -115,33 +115,34 @@ void NeopixelStrip::show() {
     ws2811_wait(&s_ledString);
     ws2811_channel_t* channel = &(s_ledString.channel[_impl->channel]);
     if (channel->gpionum != _impl->pin) {
-        // Capture old pin + base BEFORE fini
-        const int oldPin = channel->gpionum;
-        const int newPin = _impl->pin;
-        const uint32_t perBase = s_ledString.rpi_hw->periph_base;
+        return;  // don't do this
+        // // Capture old pin + base BEFORE fini
+        // const int oldPin = channel->gpionum;
+        // const int newPin = _impl->pin;
+        // const uint32_t perBase = s_ledString.rpi_hw->periph_base;
 
-        volatile gpio_t* gpio =
-            (volatile gpio_t*)mapmem(GPIO_OFFSET + perBase, sizeof(gpio_t), DEV_GPIOMEM);
-        if (gpio) {
-            gpio_output_set(gpio, oldPin, 0);
-            gpio_output_set(gpio, newPin, 0);
+        // volatile gpio_t* gpio =
+        //     (volatile gpio_t*)mapmem(GPIO_OFFSET + perBase, sizeof(gpio_t), DEV_GPIOMEM);
+        // if (gpio) {
+        //     gpio_output_set(gpio, oldPin, 0);
+        //     gpio_output_set(gpio, newPin, 0);
 
-            gpio_output_set(gpio, oldPin, 1);
-            gpio_level_set(gpio, oldPin, 0);
+        //     gpio_output_set(gpio, oldPin, 1);
+        //     gpio_level_set(gpio, oldPin, 0);
 
-            usleep(50);
-            // enable ONLY the selected pin for PWM channel 1
-            int alt = pwm_pin_alt(_impl->channel, newPin);
-            if (alt >= 0) {
-                gpio_function_set(gpio, newPin, alt);
-            }
-        } else {
-            okay::Engine.logger.error("Unable to map gpio memory");
-            // while (true) {};
-        }
+        //     usleep(50);
+        //     // enable ONLY the selected pin for PWM channel 1
+        //     int alt = pwm_pin_alt(_impl->channel, newPin);
+        //     if (alt >= 0) {
+        //         gpio_function_set(gpio, newPin, alt);
+        //     }
+        // } else {
+        //     okay::Engine.logger.error("Unable to map gpio memory");
+        //     // while (true) {};
+        // }
 
-        channel->gpionum = newPin;
-        channel->count = MAX_LEDS;
+        // channel->gpionum = newPin;
+        // channel->count = MAX_LEDS;
     }
 
     channel->count = _impl->numLeds;

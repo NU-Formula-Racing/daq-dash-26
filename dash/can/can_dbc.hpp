@@ -1944,7 +1944,7 @@ inline RX_CAN_Message(7) message{driveBus,
                                  utcSeconds,
                                  utcMilliseconds};
 
-static constexpr uint8_t utcYearMin{2000};
+static constexpr uint8_t utcYearMin{0};
 static constexpr uint8_t utcMonthMin{0};
 static constexpr uint8_t utcDayMin{0};
 static constexpr uint8_t utcHourMin{0};

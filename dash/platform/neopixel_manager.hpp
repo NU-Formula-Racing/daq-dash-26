@@ -73,8 +73,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
         }
 
-        // dbc::ecuDriveStatus::message.attach_rx_callback([this]() { onECUDriveStatus(); });
-        startAnimation([this](float time) { drive(time); });
+        dbc::ecuDriveStatus::message.attach_rx_callback([this]() { onECUDriveStatus(); });
+        startAnimation([this](float time) { idle(time); });
         updateDisplay();
     }
 
@@ -235,7 +235,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     void idle(float time) {
         const float breathePeriod = 2000.0f;
         float brightness = (std::sin(time / breathePeriod) + 1.0f) / 2.0f;  // +1 for normalize
-        glm::vec4 purple(78.0f / 255.0f, 042.0f / 255.0f, 132.0f / 255.0f, brightness);
+        glm::vec4 purple = colorFromHex(0x4E2A84);
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < getBar(i).numPixels(); j++) {
                 getBar(i).setColor(j, purple);
@@ -244,22 +244,19 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     }
 
     void neutral(float time) {
-        static std::vector<glm::vec4> palette = {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-                                                 glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
-                                                 glm::vec4(1.0f, 0.5f, 0.0f, 1.0f),
-                                                 glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
-                                                 glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),
-                                                 glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
-                                                 glm::vec4(1.0f, 0.0f, 1.0f, 1.0f),
-                                                 glm::vec4(1.0f, 0.0f, 0.5f, 1.0f)};
-        const float moveSpeed = 15.0f;
+        static std::vector<glm::vec4> palette = {colorFromHex(0x4E2A84),
+                                                 colorFromHex(0x4E2A84),
+                                                 colorFromHex(0x00000),
+                                                 colorFromHex(0x00000)};
+        const float moveSpeed = 1 / 200.0f;
 
         for (int i = 0; i < 5; i++) {  // for all 5 bars
-            int barOffset = i * 3;
+            int barOffset = i * 2;
             for (int j = 0; j < getBar(i).numPixels(); j++) {  // this indexes the leds on each bar
                 int colorIndex = static_cast<int>(time * moveSpeed + j + barOffset);
                 glm::vec4 color = palette[colorIndex % palette.size()];
-                getBar(i).setColor(j, color);
+                int invert = getBar(i).numPixels() - j - 1;
+                getBar(i).setColor(invert, color);
             }
         }
     }
@@ -304,22 +301,26 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             const float appsMax = 100;
             float throttlePercentage =
                 static_cast<float>(dbc::ecuThrottle::apps1Throttle->get()) / appsMax;
-            glm::vec4 blue = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-            glm::vec4 orange = colorFromHex(0xFFA500);
+            glm::vec4 botColor = colorFromHex(0x00FF00);
+            glm::vec4 topColor = colorFromHex(0xFFDD00);
 
             for (int i = 0; i < 5; i++) {
                 int numPixels = getBar(i).numPixels();
                 int numFull = static_cast<int>(floor(throttlePercentage * numPixels));
 
-                glm::vec4 color =
-                    glm::mix(blue, orange, static_cast<float>(i) / static_cast<float>(numPixels));
                 for (int j = 0; j < numFull; j++) {
+                    glm::vec4 color = glm::mix(
+                        botColor, topColor, static_cast<float>(j) / static_cast<float>(numPixels));
                     getBar(i).setColor(j, color);
                 }
 
                 // turn off the rest of the pixels
                 for (int j = numFull; j < numPixels; j++) {
                     if (j == numFull) {
+                        glm::vec4 color =
+                            glm::mix(botColor,
+                                     topColor,
+                                     static_cast<float>(j) / static_cast<float>(numPixels));
                         // set it to partial brightness to make a smoother transition
                         glm::vec4 partialColor = color * (throttlePercentage * numPixels - numFull);
                         getBar(i).setColor(j, partialColor);

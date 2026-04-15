@@ -1,8 +1,10 @@
 #include "platform/rpi/gpio_manager.hpp"
+
 #include <cstdint>
 #include <drivers/neopixel/ws2811.h>
+#include <gpiod.hpp>
 #include <memory>
-#include <okay/core/okay.hpp>
+#include <okay/okay.hpp>
 #include <platform/interfaces.hpp>
 
 extern "C" {
@@ -19,9 +21,29 @@ namespace dash {
 #define GPIO_R 18
 #define MAX_LEDS 16
 
+// For muxing
+#define EN_L 48
+#define EN_U 50
+
 #define TARGET_FREQ 800000
 #define DMA 10
 #define STRIP_TYPE WS2811_STRIP_GBR  // WS2812/SK6812RGB integrated chip+leds
+
+uint8_t gamma8[] = {
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   1,   1,   1,   1,   1,   1,   1,   1,   1,   1,
+    1,   1,   1,   2,   2,   2,   2,   2,   2,   2,   2,   3,   3,   3,   3,   3,   3,   3,   4,
+    4,   4,   4,   4,   5,   5,   5,   5,   6,   6,   6,   6,   7,   7,   7,   7,   8,   8,   8,
+    9,   9,   9,   10,  10,  10,  11,  11,  11,  12,  12,  13,  13,  13,  14,  14,  15,  15,  16,
+    16,  17,  17,  18,  18,  19,  19,  20,  20,  21,  21,  22,  22,  23,  24,  24,  25,  25,  26,
+    27,  27,  28,  29,  29,  30,  31,  32,  32,  33,  34,  35,  35,  36,  37,  38,  39,  39,  40,
+    41,  42,  43,  44,  45,  46,  47,  48,  49,  50,  50,  51,  52,  54,  55,  56,  57,  58,  59,
+    60,  61,  62,  63,  64,  66,  67,  68,  69,  70,  72,  73,  74,  75,  77,  78,  79,  81,  82,
+    83,  85,  86,  87,  89,  90,  92,  93,  95,  96,  98,  99,  101, 102, 104, 105, 107, 109, 110,
+    112, 114, 115, 117, 119, 120, 122, 124, 126, 127, 129, 131, 133, 135, 137, 138, 140, 142, 144,
+    146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 167, 169, 171, 173, 175, 177, 180, 182, 184,
+    186, 189, 191, 193, 196, 198, 200, 203, 205, 208, 210, 213, 215, 218, 220, 223, 225, 228, 231,
+    233, 236, 239, 241, 244, 247, 249, 252, 255};
 
 static ws2811_t s_ledString = {
     .freq = TARGET_FREQ,
@@ -35,6 +57,7 @@ static ws2811_t s_ledString = {
                     .count = MAX_LEDS,
                     .strip_type = STRIP_TYPE,
                     .brightness = 255,
+                    .gamma = gamma8,
                 },
             // the first is up/left
             [1] =
@@ -44,6 +67,8 @@ static ws2811_t s_ledString = {
                     .count = MAX_LEDS,
                     .strip_type = STRIP_TYPE,
                     .brightness = 255,
+                    .gamma = gamma8,
+
                 },
         },
 };
@@ -94,6 +119,11 @@ void NeopixelStrip::init(const int& pin, const int& numLeds) {
                                   ws2811_get_return_t_str(code));
     }
 
+    gpiod::line_settings outputSettings;
+    outputSettings.set_direction(gpiod::line::direction::OUTPUT);
+    GPIOManager::instance().registerPin(EN_L, outputSettings);
+    GPIOManager::instance().registerPin(EN_U, outputSettings);
+
     s_hasInitialized = true;
 }
 
@@ -115,33 +145,24 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4& color) {
 void NeopixelStrip::show() {
     ws2811_wait(&s_ledString);
     ws2811_channel_t* channel = &(s_ledString.channel[_impl->channel]);
-    if (channel->gpionum != _impl->pin) { //Be better to check if the thing is greater than
+    if (channel->gpionum != _impl->pin) {  // Be better to check if the thing is greater than
         // Capture old pin + base BEFORE fini
         const int oldPin = channel->gpionum;
         const int newPin = _impl->pin;
-
-        const int RGB_L = 26;
-        const int EN_L = 48;
-        const int EN_U = 50;
-
         // read the pins
-        GPIOManager::instance().gpioSetMode(RGB_L, GpioMode::G_OUTPUT);
-        GPIOManager::instance().gpioSetMode(EN_L, GpioMode::G_OUTPUT);
-        GPIOManager::instance().gpioSetMode(EN_U, GpioMode::G_OUTPUT);    
-
         // if EN_L is high -> left strip. if EN_U is high -> upper strip
         if ((oldPin == GPIO_L && newPin == GPIO_U) || (oldPin == GPIO_U && newPin == GPIO_L)) {
             // this if statement triggers if
-            // we were talking to the left strip (old pin) and now are trying to talk to the up strip (new pin)
-            if (newPin == GPIO_L) 
-            {
+            // we were talking to the left strip (old pin) and now are trying to talk to the up
+            // strip (new pin)
+            if (newPin == GPIO_L) {
                 // set EN_L high and EN_U low -> go to left side
                 GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_HIGH);
                 GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_LOW);
-            } 
-            // OR we were talking to the up strip (old pin) and now are trying to talk to the left strip (new pin)
-            else 
-            {
+            }
+            // OR we were talking to the up strip (old pin) and now are trying to talk to the left
+            // strip (new pin)
+            else {
                 // set EN_U high and EN_L low -> go to upper side
                 GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
                 GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
@@ -155,10 +176,6 @@ void NeopixelStrip::show() {
                 GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
                 GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
             }
-        
-        } else {
-            okay::Engine.logger.error("Unable to map gpio memory");
-            // while (true) {};
         }
 
         channel->gpionum = newPin;

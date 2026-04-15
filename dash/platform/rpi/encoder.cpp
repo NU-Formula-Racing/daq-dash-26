@@ -1,7 +1,5 @@
-#include "encoder.hpp"
-
-#include "input_manager.hpp"
-
+#include <platform/encoder.hpp>
+#include <platform/input_manager.hpp>
 #include <platform/interfaces.hpp>
 
 namespace dash {

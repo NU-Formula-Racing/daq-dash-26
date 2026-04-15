@@ -216,55 +216,61 @@ static constexpr uint8_t faultCodeMin{0};
 
 namespace ecuSetCurrentFrontLeftInverter {
 
-inline CAN_Signal_INT32 setCurrent = MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
-inline RX_CAN_Message(1) message{driveBus, 0x20D, false, 4, setCurrent};
+inline CAN_Signal_INT32 setCurrentFrontLeftInverter =
+    MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
+inline RX_CAN_Message(1) message{driveBus, 0x20D, false, 4, setCurrentFrontLeftInverter};
 
-static constexpr int32_t setCurrentMin{0};
+static constexpr int32_t setCurrentFrontLeftInverterMin{0};
 
 };  // namespace ecuSetCurrentFrontLeftInverter
 
 namespace ecuSetCurrentBrakeFrontLeftInverter {
 
-inline CAN_Signal_INT32 setCurrentBrake = MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
-inline RX_CAN_Message(1) message{driveBus, 0x20E, false, 4, setCurrentBrake};
+inline CAN_Signal_INT32 setCurrentBrakeFrontLeftInverter =
+    MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
+inline RX_CAN_Message(1) message{driveBus, 0x20E, false, 4, setCurrentBrakeFrontLeftInverter};
 
-static constexpr int32_t setCurrentBrakeMin{0};
+static constexpr int32_t setCurrentBrakeFrontLeftInverterMin{0};
 
 };  // namespace ecuSetCurrentBrakeFrontLeftInverter
 
 namespace ecuSetCurrentFrontRightInverter {
 
-inline CAN_Signal_INT32 setCurrent = MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
-inline RX_CAN_Message(1) message{driveBus, 0x20F, false, 4, setCurrent};
+inline CAN_Signal_INT32 setCurrentFrontRightInverter =
+    MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
+inline RX_CAN_Message(1) message{driveBus, 0x20F, false, 4, setCurrentFrontRightInverter};
 
-static constexpr int32_t setCurrentMin{0};
+static constexpr int32_t setCurrentFrontRightInverterMin{0};
 
 };  // namespace ecuSetCurrentFrontRightInverter
 
 namespace ecuSetCurrentBrakeFrontRightInverter {
 
-inline CAN_Signal_INT32 setCurrentBrake = MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
-inline RX_CAN_Message(1) message{driveBus, 0x210, false, 4, setCurrentBrake};
+inline CAN_Signal_INT32 setCurrentBrakeFrontRightInverter =
+    MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
+inline RX_CAN_Message(1) message{driveBus, 0x210, false, 4, setCurrentBrakeFrontRightInverter};
 
-static constexpr int32_t setCurrentBrakeMin{0};
+static constexpr int32_t setCurrentBrakeFrontRightInverterMin{0};
 
 };  // namespace ecuSetCurrentBrakeFrontRightInverter
 
 namespace ecuSetCurrentRearInverter {
 
-inline CAN_Signal_INT32 setCurrent = MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
-inline RX_CAN_Message(1) message{driveBus, 0x200, false, 4, setCurrent};
+inline CAN_Signal_INT32 setCurrentRearInverter =
+    MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
+inline RX_CAN_Message(1) message{driveBus, 0x200, false, 4, setCurrentRearInverter};
 
-static constexpr int32_t setCurrentMin{0};
+static constexpr int32_t setCurrentRearInverterMin{0};
 
 };  // namespace ecuSetCurrentRearInverter
 
 namespace ecuSetCurrentBrakeRearInverter {
 
-inline CAN_Signal_INT32 setCurrentBrake = MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
-inline RX_CAN_Message(1) message{driveBus, 0x201, false, 4, setCurrentBrake};
+inline CAN_Signal_INT32 setCurrentBrakeRearInverter =
+    MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
+inline RX_CAN_Message(1) message{driveBus, 0x201, false, 4, setCurrentBrakeRearInverter};
 
-static constexpr int32_t setCurrentBrakeMin{0};
+static constexpr int32_t setCurrentBrakeRearInverterMin{0};
 
 };  // namespace ecuSetCurrentBrakeRearInverter
 
@@ -1516,6 +1522,487 @@ static constexpr uint64_t controllerErrorProtocolViolationMin{0};
 
 };  // namespace can2usbControllerErrorProtocolViolation
 
+namespace dashboardHeartbeat {
+
+inline CAN_Signal_UINT64 heartbeatCount = MakeSignalExp(uint64_t, 0, 64, 1.0, 0.0);
+inline RX_CAN_Message(1) message{driveBus, 0x510, false, 8, heartbeatCount};
+
+static constexpr uint64_t heartbeatCountMin{0};
+
+};  // namespace dashboardHeartbeat
+
+namespace brBrokerTemp1 {
+
+inline CAN_Signal_FLOAT brTireTemp0 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT brTireTemp1 = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT brTireTemp2 = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT brTireTemp3 = MakeSignalSigned(float, 48, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x530, false, 8, brTireTemp0, brTireTemp1, brTireTemp2, brTireTemp3};
+
+static constexpr float brTireTemp0Min{0.0};
+static constexpr float brTireTemp1Min{0.0};
+static constexpr float brTireTemp2Min{0.0};
+static constexpr float brTireTemp3Min{0.0};
+
+};  // namespace brBrokerTemp1
+
+namespace brBrokerTemp2 {
+
+inline CAN_Signal_FLOAT brTireTemp4 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT brTireTemp5 = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT brTireTemp6 = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT brTireTemp7 = MakeSignalSigned(float, 48, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x531, false, 8, brTireTemp4, brTireTemp5, brTireTemp6, brTireTemp7};
+
+static constexpr float brTireTemp4Min{0.0};
+static constexpr float brTireTemp5Min{0.0};
+static constexpr float brTireTemp6Min{0.0};
+static constexpr float brTireTemp7Min{0.0};
+
+};  // namespace brBrokerTemp2
+
+namespace brBrokerSus {
+
+inline CAN_Signal_INT32 brStrainGauge = MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_UINT32 brSusPot = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x538, false, 8, brStrainGauge, brSusPot};
+
+static constexpr int32_t brStrainGaugeMin{-8388608};
+static constexpr uint32_t brSusPotMin{0};
+
+};  // namespace brBrokerSus
+
+namespace brBrokerCanErrorMsg {
+
+inline CAN_Signal_INT16 brStrainGaugeError = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 brSusPotError = MakeSignalSigned(int16_t, 16, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 brTireTempError = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 brHeartbeatCount = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
+inline RX_CAN_Message(4) message{driveBus,
+                                 0x540,
+                                 false,
+                                 8,
+                                 brStrainGaugeError,
+                                 brSusPotError,
+                                 brTireTempError,
+                                 brHeartbeatCount};
+
+static constexpr int16_t brStrainGaugeErrorMin{0};
+static constexpr int16_t brSusPotErrorMin{0};
+static constexpr int16_t brTireTempErrorMin{0};
+static constexpr int16_t brHeartbeatCountMin{0};
+
+};  // namespace brBrokerCanErrorMsg
+
+namespace blBrokerTemp1 {
+
+inline CAN_Signal_FLOAT blTireTemp0 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT blTireTemp1 = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT blTireTemp2 = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT blTireTemp3 = MakeSignalSigned(float, 48, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x532, false, 8, blTireTemp0, blTireTemp1, blTireTemp2, blTireTemp3};
+
+static constexpr float blTireTemp0Min{0.0};
+static constexpr float blTireTemp1Min{0.0};
+static constexpr float blTireTemp2Min{0.0};
+static constexpr float blTireTemp3Min{0.0};
+
+};  // namespace blBrokerTemp1
+
+namespace blBrokerTemp2 {
+
+inline CAN_Signal_FLOAT blTireTemp4 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT blTireTemp5 = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT blTireTemp6 = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT blTireTemp7 = MakeSignalSigned(float, 48, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x533, false, 8, blTireTemp4, blTireTemp5, blTireTemp6, blTireTemp7};
+
+static constexpr float blTireTemp4Min{0.0};
+static constexpr float blTireTemp5Min{0.0};
+static constexpr float blTireTemp6Min{0.0};
+static constexpr float blTireTemp7Min{0.0};
+
+};  // namespace blBrokerTemp2
+
+namespace blBrokerSus {
+
+inline CAN_Signal_INT32 blStrainGauge = MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_UINT32 blSusPot = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x53A, false, 8, blStrainGauge, blSusPot};
+
+static constexpr int32_t blStrainGaugeMin{-8388608};
+static constexpr uint32_t blSusPotMin{0};
+
+};  // namespace blBrokerSus
+
+namespace blBrokerCanErrorMsg {
+
+inline CAN_Signal_INT16 blStrainGaugeError = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 blSusPotError = MakeSignalSigned(int16_t, 16, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 blTireTempError = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 blHeartbeatCount = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
+inline RX_CAN_Message(4) message{driveBus,
+                                 0x541,
+                                 false,
+                                 8,
+                                 blStrainGaugeError,
+                                 blSusPotError,
+                                 blTireTempError,
+                                 blHeartbeatCount};
+
+static constexpr int16_t blStrainGaugeErrorMin{0};
+static constexpr int16_t blSusPotErrorMin{0};
+static constexpr int16_t blTireTempErrorMin{0};
+static constexpr int16_t blHeartbeatCountMin{0};
+
+};  // namespace blBrokerCanErrorMsg
+
+namespace frBrokerTemp1 {
+
+inline CAN_Signal_FLOAT frTireTemp0 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT frTireTemp1 = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT frTireTemp2 = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT frTireTemp3 = MakeSignalSigned(float, 48, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x534, false, 8, frTireTemp0, frTireTemp1, frTireTemp2, frTireTemp3};
+
+static constexpr float frTireTemp0Min{0.0};
+static constexpr float frTireTemp1Min{0.0};
+static constexpr float frTireTemp2Min{0.0};
+static constexpr float frTireTemp3Min{0.0};
+
+};  // namespace frBrokerTemp1
+
+namespace frBrokerTemp2 {
+
+inline CAN_Signal_FLOAT frTireTemp4 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT frTireTemp5 = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT frTireTemp6 = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT frTireTemp7 = MakeSignalSigned(float, 48, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x535, false, 8, frTireTemp4, frTireTemp5, frTireTemp6, frTireTemp7};
+
+static constexpr float frTireTemp4Min{0.0};
+static constexpr float frTireTemp5Min{0.0};
+static constexpr float frTireTemp6Min{0.0};
+static constexpr float frTireTemp7Min{0.0};
+
+};  // namespace frBrokerTemp2
+
+namespace frBrokerSus {
+
+inline CAN_Signal_INT32 frStrainGauge = MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_UINT32 frSusPot = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x53C, false, 8, frStrainGauge, frSusPot};
+
+static constexpr int32_t frStrainGaugeMin{-8388608};
+static constexpr uint32_t frSusPotMin{0};
+
+};  // namespace frBrokerSus
+
+namespace frBrokerCanErrorMsg {
+
+inline CAN_Signal_INT16 frStrainGaugeError = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 frSusPotError = MakeSignalSigned(int16_t, 16, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 frTireTempError = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 frHeartbeatCount = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
+inline RX_CAN_Message(4) message{driveBus,
+                                 0x542,
+                                 false,
+                                 8,
+                                 frStrainGaugeError,
+                                 frSusPotError,
+                                 frTireTempError,
+                                 frHeartbeatCount};
+
+static constexpr int16_t frStrainGaugeErrorMin{0};
+static constexpr int16_t frSusPotErrorMin{0};
+static constexpr int16_t frTireTempErrorMin{0};
+static constexpr int16_t frHeartbeatCountMin{0};
+
+};  // namespace frBrokerCanErrorMsg
+
+namespace flBrokerTemp1 {
+
+inline CAN_Signal_FLOAT flTireTemp0 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT flTireTemp1 = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT flTireTemp2 = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT flTireTemp3 = MakeSignalSigned(float, 48, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x536, false, 8, flTireTemp0, flTireTemp1, flTireTemp2, flTireTemp3};
+
+static constexpr float flTireTemp0Min{0.0};
+static constexpr float flTireTemp1Min{0.0};
+static constexpr float flTireTemp2Min{0.0};
+static constexpr float flTireTemp3Min{0.0};
+
+};  // namespace flBrokerTemp1
+
+namespace flBrokerTemp2 {
+
+inline CAN_Signal_FLOAT flTireTemp4 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT flTireTemp5 = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT flTireTemp6 = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT flTireTemp7 = MakeSignalSigned(float, 48, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x537, false, 8, flTireTemp4, flTireTemp5, flTireTemp6, flTireTemp7};
+
+static constexpr float flTireTemp4Min{0.0};
+static constexpr float flTireTemp5Min{0.0};
+static constexpr float flTireTemp6Min{0.0};
+static constexpr float flTireTemp7Min{0.0};
+
+};  // namespace flBrokerTemp2
+
+namespace flBrokerSus {
+
+inline CAN_Signal_INT32 flStrainGauge = MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_UINT32 flSusPot = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x53E, false, 8, flStrainGauge, flSusPot};
+
+static constexpr int32_t flStrainGaugeMin{-8388608};
+static constexpr uint32_t flSusPotMin{0};
+
+};  // namespace flBrokerSus
+
+namespace flBrokerCanErrorMsg {
+
+inline CAN_Signal_INT16 flStrainGaugeError = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 flSusPotError = MakeSignalSigned(int16_t, 16, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 flTireTempError = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 flHeartbeatCount = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
+inline RX_CAN_Message(4) message{driveBus,
+                                 0x543,
+                                 false,
+                                 8,
+                                 flStrainGaugeError,
+                                 flSusPotError,
+                                 flTireTempError,
+                                 flHeartbeatCount};
+
+static constexpr int16_t flStrainGaugeErrorMin{0};
+static constexpr int16_t flSusPotErrorMin{0};
+static constexpr int16_t flTireTempErrorMin{0};
+static constexpr int16_t flHeartbeatCountMin{0};
+
+};  // namespace flBrokerCanErrorMsg
+
+namespace imuAccelerationUncompensated {
+
+inline CAN_Signal_FLOAT xAxisAccelerationUncompensated =
+    MakeSignalSigned(float, 0, 21, 0.0002, 0.0, false);
+inline CAN_Signal_FLOAT yAxisAccelerationUncompensated =
+    MakeSignalSigned(float, 21, 21, 0.0002, 0.0, false);
+inline CAN_Signal_FLOAT zAxisAccelerationUncompensated =
+    MakeSignalSigned(float, 42, 21, 0.0002, 0.0, false);
+inline RX_CAN_Message(3) message{driveBus,
+                                 0x550,
+                                 false,
+                                 8,
+                                 xAxisAccelerationUncompensated,
+                                 yAxisAccelerationUncompensated,
+                                 zAxisAccelerationUncompensated};
+
+static constexpr float xAxisAccelerationUncompensatedMin{-160.0};
+static constexpr float yAxisAccelerationUncompensatedMin{-160.0};
+static constexpr float zAxisAccelerationUncompensatedMin{-160.0};
+
+};  // namespace imuAccelerationUncompensated
+
+namespace imuYawPitchRoll {
+
+inline CAN_Signal_FLOAT yaw = MakeSignalSigned(float, 0, 21, 0.0002, 0.0, false);
+inline CAN_Signal_FLOAT pitch = MakeSignalSigned(float, 21, 21, 9e-05, 0.0, false);
+inline CAN_Signal_FLOAT roll = MakeSignalSigned(float, 42, 21, 0.0002, 0.0, false);
+inline RX_CAN_Message(3) message{driveBus, 0x551, false, 8, yaw, pitch, roll};
+
+static constexpr float yawMin{-180.0};
+static constexpr float pitchMin{-90.0};
+static constexpr float rollMin{-180.0};
+
+};  // namespace imuYawPitchRoll
+
+namespace imuAngularRate {
+
+inline CAN_Signal_FLOAT xAxisAngularRate = MakeSignalSigned(float, 0, 21, 4e-05, 0.0, false);
+inline CAN_Signal_FLOAT yAxisAngularRate = MakeSignalSigned(float, 21, 21, 4e-05, 0.0, false);
+inline CAN_Signal_FLOAT zAxisAngularRate = MakeSignalSigned(float, 42, 21, 4e-05, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x552, false, 8, xAxisAngularRate, yAxisAngularRate, zAxisAngularRate};
+
+static constexpr float xAxisAngularRateMin{-35.0};
+static constexpr float yAxisAngularRateMin{-35.0};
+static constexpr float zAxisAngularRateMin{-35.0};
+
+};  // namespace imuAngularRate
+
+namespace imuPositionIns {
+
+inline CAN_Signal_DOUBLE positionLatitude = MakeSignalSigned(double, 0, 21, 9e-05, 0.0, false);
+inline CAN_Signal_DOUBLE positionLongitude = MakeSignalSigned(double, 21, 21, 9e-05, 0.0, false);
+inline CAN_Signal_DOUBLE positionAltutude = MakeSignalSigned(double, 42, 21, 0.005, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x553, false, 8, positionLatitude, positionLongitude, positionAltutude};
+
+static constexpr double positionLatitudeMin{-90.0};
+static constexpr double positionLongitudeMin{-90.0};
+static constexpr double positionAltutudeMin{-430.0};
+
+};  // namespace imuPositionIns
+
+namespace imuVelocity {
+
+inline CAN_Signal_FLOAT xAxisVelocity = MakeSignalSigned(float, 0, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT yAxisVelocity = MakeSignalSigned(float, 21, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT zAxisVelocity = MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x554, false, 8, xAxisVelocity, yAxisVelocity, zAxisVelocity};
+
+static constexpr float xAxisVelocityMin{-500.0};
+static constexpr float yAxisVelocityMin{-500.0};
+static constexpr float zAxisVelocityMin{-500.0};
+
+};  // namespace imuVelocity
+
+namespace imuMag {
+
+inline CAN_Signal_FLOAT xAxisMagnetometer = MakeSignalSigned(float, 0, 21, 0.0001, 0.0, false);
+inline CAN_Signal_FLOAT yAxisMagnetometer = MakeSignalSigned(float, 21, 21, 0.0001, 0.0, false);
+inline CAN_Signal_FLOAT zAxisMagnetometer = MakeSignalSigned(float, 42, 21, 0.0001, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x555, false, 8, xAxisMagnetometer, yAxisMagnetometer, zAxisMagnetometer};
+
+static constexpr float xAxisMagnetometerMin{-2.5};
+static constexpr float yAxisMagnetometerMin{-2.5};
+static constexpr float zAxisMagnetometerMin{-2.5};
+
+};  // namespace imuMag
+
+namespace imuPresTempDeltatime {
+
+inline CAN_Signal_FLOAT temperature = MakeSignalSigned(float, 0, 21, 7e-05, 0.0, false);
+inline CAN_Signal_FLOAT pressure = MakeSignalSigned(float, 21, 21, 6e-05, 0.0, false);
+inline CAN_Signal_FLOAT deltaTime = MakeSignalSigned(float, 42, 21, 0.0001, 0.0, false);
+inline RX_CAN_Message(3) message{driveBus, 0x556, false, 8, temperature, pressure, deltaTime};
+
+static constexpr float temperatureMin{-40.0};
+static constexpr float pressureMin{0.0};
+static constexpr float deltaTimeMin{0.0};
+
+};  // namespace imuPresTempDeltatime
+
+namespace imuDeltaTheta {
+
+inline CAN_Signal_FLOAT xAxisDeltaTheta = MakeSignalSigned(float, 0, 21, 9e-05, 0.0, false);
+inline CAN_Signal_FLOAT yAxisDeltaTheta = MakeSignalSigned(float, 21, 21, 9e-05, 0.0, false);
+inline CAN_Signal_FLOAT zAxisDeltaTheta = MakeSignalSigned(float, 42, 21, 9e-05, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x557, false, 8, xAxisDeltaTheta, yAxisDeltaTheta, zAxisDeltaTheta};
+
+static constexpr float xAxisDeltaThetaMin{-90.0};
+static constexpr float yAxisDeltaThetaMin{-90.0};
+static constexpr float zAxisDeltaThetaMin{-90.0};
+
+};  // namespace imuDeltaTheta
+
+namespace imuDeltaVel {
+
+inline CAN_Signal_FLOAT xAxisDeltaVelocity = MakeSignalSigned(float, 0, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT yAxisDeltaVelocity = MakeSignalSigned(float, 21, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT zAxisDeltaVelocity = MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x558, false, 8, xAxisDeltaVelocity, yAxisDeltaVelocity, zAxisDeltaVelocity};
+
+static constexpr float xAxisDeltaVelocityMin{-500.0};
+static constexpr float yAxisDeltaVelocityMin{-500.0};
+static constexpr float zAxisDeltaVelocityMin{-500.0};
+
+};  // namespace imuDeltaVel
+
+namespace imuUtcTime {
+
+inline CAN_Signal_UINT8 utcYear = MakeSignalExp(uint8_t, 0, 8, 1.0, 2000.0);
+inline CAN_Signal_UINT8 utcMonth = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 utcDay = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 utcHour = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 utcMinutes = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 utcSeconds = MakeSignalExp(uint8_t, 40, 8, 1.0, 0.0);
+inline CAN_Signal_UINT16 utcMilliseconds = MakeSignalExp(uint16_t, 48, 16, 1.0, 0.0);
+inline RX_CAN_Message(7) message{driveBus,
+                                 0x559,
+                                 false,
+                                 8,
+                                 utcYear,
+                                 utcMonth,
+                                 utcDay,
+                                 utcHour,
+                                 utcMinutes,
+                                 utcSeconds,
+                                 utcMilliseconds};
+
+static constexpr uint8_t utcYearMin{0};
+static constexpr uint8_t utcMonthMin{0};
+static constexpr uint8_t utcDayMin{0};
+static constexpr uint8_t utcHourMin{0};
+static constexpr uint8_t utcMinutesMin{0};
+static constexpr uint8_t utcSecondsMin{0};
+static constexpr uint16_t utcMillisecondsMin{0};
+
+};  // namespace imuUtcTime
+
+namespace imuFixNumsatsInsStatus {
+
+inline CAN_Signal_UINT8 numSats = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 fix = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
+inline CAN_Signal_UINT16 insStatus = MakeSignalExp(uint16_t, 16, 16, 1.0, 0.0);
+inline RX_CAN_Message(3) message{driveBus, 0x55A, false, 4, numSats, fix, insStatus};
+
+static constexpr uint8_t numSatsMin{0};
+static constexpr uint8_t fixMin{0};
+static constexpr uint16_t insStatusMin{0};
+
+};  // namespace imuFixNumsatsInsStatus
+
+namespace imuPositionGnss {
+
+inline CAN_Signal_DOUBLE positionLatitude = MakeSignalSigned(double, 0, 21, 9e-05, 0.0, false);
+inline CAN_Signal_DOUBLE positionLongitude = MakeSignalSigned(double, 21, 21, 9e-05, 0.0, false);
+inline CAN_Signal_DOUBLE positionAltutude = MakeSignalSigned(double, 42, 21, 0.005, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x55B, false, 8, positionLatitude, positionLongitude, positionAltutude};
+
+static constexpr double positionLatitudeMin{-90.0};
+static constexpr double positionLongitudeMin{-90.0};
+static constexpr double positionAltutudeMin{-430.0};
+
+};  // namespace imuPositionGnss
+
+namespace imuPositionU {
+
+inline CAN_Signal_FLOAT positionUncertaintyNorth =
+    MakeSignalSigned(float, 0, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT positionUncertaintyEast =
+    MakeSignalSigned(float, 21, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT positionUncertaintyDown =
+    MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
+inline RX_CAN_Message(3) message{driveBus,
+                                 0x55C,
+                                 false,
+                                 8,
+                                 positionUncertaintyNorth,
+                                 positionUncertaintyEast,
+                                 positionUncertaintyDown};
+
+static constexpr float positionUncertaintyNorthMin{0.0};
+static constexpr float positionUncertaintyEastMin{0.0};
+static constexpr float positionUncertaintyDownMin{0.0};
+
+};  // namespace imuPositionU
+
 namespace meta {
 
 static const std::map<uint32_t, const char*> messageIdToName = {
@@ -1588,6 +2075,36 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x004, "CAN2USB_Controller_Error"},
     {0x024, "CAN2USB_Controller_Error_NACK_Error"},
     {0x00C, "CAN2USB_Controller_Error_Protocol_Violation"},
+    {0x510, "Dashboard_Heartbeat"},
+    {0x530, "BR_Broker_Temp1"},
+    {0x531, "BR_Broker_Temp2"},
+    {0x538, "BR_Broker_Sus"},
+    {0x540, "BR_Broker_CAN_Error_Msg"},
+    {0x532, "BL_Broker_Temp1"},
+    {0x533, "BL_Broker_Temp2"},
+    {0x53A, "BL_Broker_Sus"},
+    {0x541, "BL_Broker_CAN_Error_Msg"},
+    {0x534, "FR_Broker_Temp1"},
+    {0x535, "FR_Broker_Temp2"},
+    {0x53C, "FR_Broker_Sus"},
+    {0x542, "FR_Broker_CAN_Error_Msg"},
+    {0x536, "FL_Broker_Temp1"},
+    {0x537, "FL_Broker_Temp2"},
+    {0x53E, "FL_Broker_Sus"},
+    {0x543, "FL_Broker_CAN_Error_Msg"},
+    {0x550, "IMU_Acceleration_Uncompensated"},
+    {0x551, "IMU_Yaw_Pitch_Roll"},
+    {0x552, "IMU_Angular_Rate"},
+    {0x553, "IMU_Position_INS"},
+    {0x554, "IMU_Velocity"},
+    {0x555, "IMU_Mag"},
+    {0x556, "IMU_Pres_Temp_DeltaTime"},
+    {0x557, "IMU_Delta_Theta"},
+    {0x558, "IMU_Delta_Vel"},
+    {0x559, "IMU_UTC_Time"},
+    {0x55A, "IMU_Fix_NumSats_INS_Status"},
+    {0x55B, "IMU_Position_GNSS"},
+    {0x55C, "IMU_Position_U"},
 };
 
 static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName = {
@@ -1632,12 +2149,12 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x284, 0}, "Wh_Drawn"},
     {{0x284, 1}, "Wh_Charged"},
     {{0x280, 0}, "Fault_Code"},
-    {{0x20D, 0}, "Set_Current"},
-    {{0x20E, 0}, "Set_Current_Brake"},
-    {{0x20F, 0}, "Set_Current"},
-    {{0x210, 0}, "Set_Current_Brake"},
-    {{0x200, 0}, "Set_Current"},
-    {{0x201, 0}, "Set_Current_Brake"},
+    {{0x20D, 0}, "Set_Current_Front_Left_Inverter"},
+    {{0x20E, 0}, "Set_Current_Brake_Front_Left_Inverter"},
+    {{0x20F, 0}, "Set_Current_Front_Right_Inverter"},
+    {{0x210, 0}, "Set_Current_Brake_Front_Right_Inverter"},
+    {{0x200, 0}, "Set_Current_Rear_Inverter"},
+    {{0x201, 0}, "Set_Current_Brake_Rear_Inverter"},
     {{0x202, 0}, "APPS1_Throttle"},
     {{0x202, 1}, "APPS2_Throttle"},
     {{0x203, 0}, "Front_Brake_Pressure"},
@@ -1927,6 +2444,106 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x004, 0}, "Controller_Error"},
     {{0x024, 0}, "Controller_Error_NACK"},
     {{0x00C, 0}, "Controller_Error_Protocol_Violation"},
+    {{0x510, 0}, "Heartbeat_Count"},
+    {{0x530, 0}, "BR_Tire_Temp_0"},
+    {{0x530, 1}, "BR_Tire_Temp_1"},
+    {{0x530, 2}, "BR_Tire_Temp_2"},
+    {{0x530, 3}, "BR_Tire_Temp_3"},
+    {{0x531, 0}, "BR_Tire_Temp_4"},
+    {{0x531, 1}, "BR_Tire_Temp_5"},
+    {{0x531, 2}, "BR_Tire_Temp_6"},
+    {{0x531, 3}, "BR_Tire_Temp_7"},
+    {{0x538, 0}, "BR_Strain_Gauge"},
+    {{0x538, 1}, "BR_Sus_Pot"},
+    {{0x540, 0}, "BR_Strain_Gauge_Error"},
+    {{0x540, 1}, "BR_Sus_Pot_Error"},
+    {{0x540, 2}, "BR_Tire_Temp_Error"},
+    {{0x540, 3}, "BR_Heartbeat_Count"},
+    {{0x532, 0}, "BL_Tire_Temp_0"},
+    {{0x532, 1}, "BL_Tire_Temp_1"},
+    {{0x532, 2}, "BL_Tire_Temp_2"},
+    {{0x532, 3}, "BL_Tire_Temp_3"},
+    {{0x533, 0}, "BL_Tire_Temp_4"},
+    {{0x533, 1}, "BL_Tire_Temp_5"},
+    {{0x533, 2}, "BL_Tire_Temp_6"},
+    {{0x533, 3}, "BL_Tire_Temp_7"},
+    {{0x53A, 0}, "BL_Strain_Gauge"},
+    {{0x53A, 1}, "BL_Sus_Pot"},
+    {{0x541, 0}, "BL_Strain_Gauge_Error"},
+    {{0x541, 1}, "BL_Sus_Pot_Error"},
+    {{0x541, 2}, "BL_Tire_Temp_Error"},
+    {{0x541, 3}, "BL_Heartbeat_Count"},
+    {{0x534, 0}, "FR_Tire_Temp_0"},
+    {{0x534, 1}, "FR_Tire_Temp_1"},
+    {{0x534, 2}, "FR_Tire_Temp_2"},
+    {{0x534, 3}, "FR_Tire_Temp_3"},
+    {{0x535, 0}, "FR_Tire_Temp_4"},
+    {{0x535, 1}, "FR_Tire_Temp_5"},
+    {{0x535, 2}, "FR_Tire_Temp_6"},
+    {{0x535, 3}, "FR_Tire_Temp_7"},
+    {{0x53C, 0}, "FR_Strain_Gauge"},
+    {{0x53C, 1}, "FR_Sus_Pot"},
+    {{0x542, 0}, "FR_Strain_Gauge_Error"},
+    {{0x542, 1}, "FR_Sus_Pot_Error"},
+    {{0x542, 2}, "FR_Tire_Temp_Error"},
+    {{0x542, 3}, "FR_Heartbeat_Count"},
+    {{0x536, 0}, "FL_Tire_Temp_0"},
+    {{0x536, 1}, "FL_Tire_Temp_1"},
+    {{0x536, 2}, "FL_Tire_Temp_2"},
+    {{0x536, 3}, "FL_Tire_Temp_3"},
+    {{0x537, 0}, "FL_Tire_Temp_4"},
+    {{0x537, 1}, "FL_Tire_Temp_5"},
+    {{0x537, 2}, "FL_Tire_Temp_6"},
+    {{0x537, 3}, "FL_Tire_Temp_7"},
+    {{0x53E, 0}, "FL_Strain_Gauge"},
+    {{0x53E, 1}, "FL_Sus_Pot"},
+    {{0x543, 0}, "FL_Strain_Gauge_Error"},
+    {{0x543, 1}, "FL_Sus_Pot_Error"},
+    {{0x543, 2}, "FL_Tire_Temp_Error"},
+    {{0x543, 3}, "FL_Heartbeat_Count"},
+    {{0x550, 0}, "X_Axis_Acceleration_Uncompensated"},
+    {{0x550, 1}, "Y_Axis_Acceleration_Uncompensated"},
+    {{0x550, 2}, "Z_Axis_Acceleration_Uncompensated"},
+    {{0x551, 0}, "Yaw"},
+    {{0x551, 1}, "Pitch"},
+    {{0x551, 2}, "Roll"},
+    {{0x552, 0}, "X_Axis_Angular_Rate"},
+    {{0x552, 1}, "Y_Axis_Angular_Rate"},
+    {{0x552, 2}, "Z_Axis_Angular_Rate"},
+    {{0x553, 0}, "Position_Latitude"},
+    {{0x553, 1}, "Position_Longitude"},
+    {{0x553, 2}, "Position_Altutude"},
+    {{0x554, 0}, "X_Axis_Velocity"},
+    {{0x554, 1}, "Y_Axis_Velocity"},
+    {{0x554, 2}, "Z_Axis_Velocity"},
+    {{0x555, 0}, "X_Axis_Magnetometer"},
+    {{0x555, 1}, "Y_Axis_Magnetometer"},
+    {{0x555, 2}, "Z_Axis_Magnetometer"},
+    {{0x556, 0}, "Temperature"},
+    {{0x556, 1}, "Pressure"},
+    {{0x556, 2}, "Delta_Time"},
+    {{0x557, 0}, "X_Axis_Delta_Theta"},
+    {{0x557, 1}, "Y_Axis_Delta_Theta"},
+    {{0x557, 2}, "Z_Axis_Delta_Theta"},
+    {{0x558, 0}, "X_Axis_Delta_Velocity"},
+    {{0x558, 1}, "Y_Axis_Delta_Velocity"},
+    {{0x558, 2}, "Z_Axis_Delta_Velocity"},
+    {{0x559, 0}, "UTC_Year"},
+    {{0x559, 1}, "UTC_Month"},
+    {{0x559, 2}, "UTC_Day"},
+    {{0x559, 3}, "UTC_Hour"},
+    {{0x559, 4}, "UTC_Minutes"},
+    {{0x559, 5}, "UTC_Seconds"},
+    {{0x559, 6}, "UTC_Milliseconds"},
+    {{0x55A, 0}, "Num_Sats"},
+    {{0x55A, 1}, "Fix"},
+    {{0x55A, 2}, "INS_Status"},
+    {{0x55B, 0}, "Position_Latitude"},
+    {{0x55B, 1}, "Position_Longitude"},
+    {{0x55B, 2}, "Position_Altutude"},
+    {{0x55C, 0}, "Position_Uncertainty_North"},
+    {{0x55C, 1}, "Position_Uncertainty_East"},
+    {{0x55C, 2}, "Position_Uncertainty_Down"},
 };
 
 };  // namespace meta

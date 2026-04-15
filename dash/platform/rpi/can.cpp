@@ -15,6 +15,8 @@ static GPIO s_canGPIO{0, true};
 static Clock s_canClock;
 
 void CANManager::initialize() {
+    GPIOManager::instance().tick();
+
     dbc::driveBus.set_driver(std::make_unique<MCP2515>(s_canSpi, s_canGPIO, s_canClock));
 
     // check for errors
@@ -36,6 +38,9 @@ void CANManager::tick() {
     GPIOManager::instance().tick();
     InputManager::instance().tick();
     dbc::driveBus.tick_bus();
+
+    MCP2515* driver = static_cast<MCP2515*>(dbc::driveBus.get_driver());
+    driver->updateMissCounter();
 }
 
 }  // namespace dash

@@ -1,3 +1,5 @@
+#include "platform/rpi/gpio_manager.hpp"
+
 #include <cstdint>
 #include <drivers/neopixel/ws2811.h>
 #include <memory>
@@ -133,35 +135,50 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4& color) {
 void NeopixelStrip::show() {
     ws2811_wait(&s_ledString);
     ws2811_channel_t* channel = &(s_ledString.channel[_impl->channel]);
-    if (channel->gpionum != _impl->pin) {
-        return;  // don't do this
-        // // Capture old pin + base BEFORE fini
-        // const int oldPin = channel->gpionum;
-        // const int newPin = _impl->pin;
-        // const uint32_t perBase = s_ledString.rpi_hw->periph_base;
+    if (channel->gpionum != _impl->pin) {  // Be better to check if the thing is greater than
+        // Capture old pin + base BEFORE fini
+        const int oldPin = channel->gpionum;
+        const int newPin = _impl->pin;
 
-        // volatile gpio_t* gpio =
-        //     (volatile gpio_t*)mapmem(GPIO_OFFSET + perBase, sizeof(gpio_t), DEV_GPIOMEM);
-        // if (gpio) {
-        //     gpio_output_set(gpio, oldPin, 0);
-        //     gpio_output_set(gpio, newPin, 0);
+        const int RGB_L = 26;
+        const int EN_L = 48;
+        const int EN_U = 50;
 
-        //     gpio_output_set(gpio, oldPin, 1);
-        //     gpio_level_set(gpio, oldPin, 0);
+        // read the pins
+        GPIOManager::instance().gpioSetMode(RGB_L, GpioMode::G_OUTPUT);
+        GPIOManager::instance().gpioSetMode(EN_L, GpioMode::G_OUTPUT);
+        GPIOManager::instance().gpioSetMode(EN_U, GpioMode::G_OUTPUT);
 
-        //     usleep(50);
-        //     // enable ONLY the selected pin for PWM channel 1
-        //     int alt = pwm_pin_alt(_impl->channel, newPin);
-        //     if (alt >= 0) {
-        //         gpio_function_set(gpio, newPin, alt);
-        //     }
-        // } else {
-        //     okay::Engine.logger.error("Unable to map gpio memory");
-        //     // while (true) {};
-        // }
+        // if EN_L is high -> left strip. if EN_U is high -> upper strip
+        if ((oldPin == GPIO_L && newPin == GPIO_U) || (oldPin == GPIO_U && newPin == GPIO_L)) {
+            // this if statement triggers if
+            // we were talking to the left strip (old pin) and now are trying to talk to the up
+            // strip (new pin)
+            if (newPin == GPIO_L) {
+                // set EN_L high and EN_U low -> go to left side
+                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_HIGH);
+                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_LOW);
+            }
+            // OR we were talking to the up strip (old pin) and now are trying to talk to the left
+            // strip (new pin)
+            else {
+                // set EN_U high and EN_L low -> go to upper side
+                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
+                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
+            }
+        } else if (oldPin == -1) {
+            // initial pin setup, just set the new pin high
+            if (newPin == GPIO_L) {
+                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_HIGH);
+                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_LOW);
+            } else if (newPin == GPIO_U) {
+                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
+                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
+            }
+        }
 
-        // channel->gpionum = newPin;
-        // channel->count = MAX_LEDS;
+        channel->gpionum = newPin;
+        channel->count = MAX_LEDS;
     }
 
     channel->count = _impl->numLeds;

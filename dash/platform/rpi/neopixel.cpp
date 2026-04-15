@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <drivers/neopixel/ws2811.h>
+#include <gpiod.hpp>
 #include <memory>
 #include <okay/okay.hpp>
 #include <platform/interfaces.hpp>
@@ -19,6 +20,10 @@ namespace dash {
 #define GPIO_U 13
 #define GPIO_R 18
 #define MAX_LEDS 16
+
+// For muxing
+#define EN_L 48
+#define EN_U 50
 
 #define TARGET_FREQ 800000
 #define DMA 10
@@ -114,6 +119,11 @@ void NeopixelStrip::init(const int& pin, const int& numLeds) {
                                   ws2811_get_return_t_str(code));
     }
 
+    gpiod::line_settings outputSettings;
+    outputSettings.set_direction(gpiod::line::direction::OUTPUT);
+    GPIOManager::instance().registerPin(EN_L, outputSettings);
+    GPIOManager::instance().registerPin(EN_U, outputSettings);
+
     s_hasInitialized = true;
 }
 
@@ -139,16 +149,7 @@ void NeopixelStrip::show() {
         // Capture old pin + base BEFORE fini
         const int oldPin = channel->gpionum;
         const int newPin = _impl->pin;
-
-        const int RGB_L = 26;
-        const int EN_L = 48;
-        const int EN_U = 50;
-
         // read the pins
-        GPIOManager::instance().gpioSetMode(RGB_L, GpioMode::G_OUTPUT);
-        GPIOManager::instance().gpioSetMode(EN_L, GpioMode::G_OUTPUT);
-        GPIOManager::instance().gpioSetMode(EN_U, GpioMode::G_OUTPUT);
-
         // if EN_L is high -> left strip. if EN_U is high -> upper strip
         if ((oldPin == GPIO_L && newPin == GPIO_U) || (oldPin == GPIO_U && newPin == GPIO_L)) {
             // this if statement triggers if

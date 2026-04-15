@@ -235,7 +235,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     void idle(float time) {
         const float breathePeriod = 2000.0f;
         float brightness = (std::sin(time / breathePeriod) + 1.0f) / 2.0f;  // +1 for normalize
-        glm::vec4 purple = colorFromHex(0x4E2A84);
+        glm::vec4 purple = colorFromHex(0x4E2A84) * abs(brightness);
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < getBar(i).numPixels(); j++) {
                 getBar(i).setColor(j, purple);

@@ -141,6 +141,7 @@ def main() -> int:
 
 
         except Exception as e:
+            checksum_generator.save_checksums_to_csv(local_checksums_csv)
             print(e, file=sys.stderr)
             return 1
 

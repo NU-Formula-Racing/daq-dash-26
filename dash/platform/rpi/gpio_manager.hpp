@@ -39,6 +39,21 @@ class GPIOManager {
     std::unique_ptr<gpiod::line_request> _request;
 
     bool _started = false;
+
+    void rebuildRequest() {
+        _request.reset();  // releases old GPIO request first
+
+        gpiod::line_config line_cfg;
+
+        for (auto const& [offset, settings] : _settings) {
+            line_cfg.add_line_settings(offset, settings);
+        }
+
+        _request = std::make_unique<gpiod::line_request>(
+            _chip->prepare_request().set_consumer("dash").set_line_config(line_cfg).do_request());
+
+        _started = true;
+    }
 };
 
 }  // namespace dash

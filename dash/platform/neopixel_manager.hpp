@@ -106,11 +106,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
     void updateDisplay() {
         for (int i = 0; i < 3; i++) {
-            // grab the relevant bars, and set the color on the strip
-            if (i == 1) {
-                continue;
-            }
-
             for (int j = 0; j < 5; j++) {
                 if (!_bars[j].isDirty())
                     continue;

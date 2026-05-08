@@ -46,6 +46,7 @@ struct SPI::SPIImpl {
             errs.config_err = true;
             return;
         }
+        std::cout << "SPIIMpl::ctor()\n finshed";
     }
 
     ~SPIImpl() {

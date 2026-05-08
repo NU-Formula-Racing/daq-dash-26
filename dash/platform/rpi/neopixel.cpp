@@ -22,8 +22,8 @@ namespace dash {
 #define MAX_LEDS 16
 
 // For muxing
-#define EN_L 48
-#define EN_U 50
+#define EN_L 27
+#define EN_U 17
 
 #define TARGET_FREQ 800000
 #define DMA 10
@@ -121,6 +121,7 @@ void NeopixelStrip::init(const int& pin, const int& numLeds) {
 
     gpiod::line_settings outputSettings;
     outputSettings.set_direction(gpiod::line::direction::OUTPUT);
+    outputSettings.set_output_value(gpiod::line::value::INACTIVE);
     GPIOManager::instance().registerPin(EN_L, outputSettings);
     GPIOManager::instance().registerPin(EN_U, outputSettings);
 
@@ -145,39 +146,22 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4& color) {
 void NeopixelStrip::show() {
     ws2811_wait(&s_ledString);
     ws2811_channel_t* channel = &(s_ledString.channel[_impl->channel]);
+
+    if (_impl->pin == GPIO_L) {
+        okay::Engine.logger.debug("Enabling Left");
+        GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_HIGH);
+        GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_LOW);
+    } else if (_impl->pin == GPIO_U) {
+        // set EN_U high and EN_L low -> go to upper side
+        okay::Engine.logger.debug("Enabling Up");
+        GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
+        GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
+    }
+
     if (channel->gpionum != _impl->pin) {  // Be better to check if the thing is greater than
         // Capture old pin + base BEFORE fini
         const int oldPin = channel->gpionum;
         const int newPin = _impl->pin;
-        // read the pins
-        // if EN_L is high -> left strip. if EN_U is high -> upper strip
-        if ((oldPin == GPIO_L && newPin == GPIO_U) || (oldPin == GPIO_U && newPin == GPIO_L)) {
-            // this if statement triggers if
-            // we were talking to the left strip (old pin) and now are trying to talk to the up
-            // strip (new pin)
-            if (newPin == GPIO_L) {
-                // set EN_L high and EN_U low -> go to left side
-                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_HIGH);
-                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_LOW);
-            }
-            // OR we were talking to the up strip (old pin) and now are trying to talk to the left
-            // strip (new pin)
-            else {
-                // set EN_U high and EN_L low -> go to upper side
-                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
-                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
-            }
-        } else if (oldPin == -1) {
-            // initial pin setup, just set the new pin high
-            if (newPin == GPIO_L) {
-                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_HIGH);
-                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_LOW);
-            } else if (newPin == GPIO_U) {
-                GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
-                GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
-            }
-        }
-
         channel->gpionum = newPin;
         channel->count = MAX_LEDS;
     }

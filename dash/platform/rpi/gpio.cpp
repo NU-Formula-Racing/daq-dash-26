@@ -29,7 +29,7 @@ struct GPIO::GPIOImpl {
             _settings.set_edge_detection(gpiod::line::edge::BOTH);
         }
 
-        err = GPIOManager::instance().registerPin(_pin, _settings);
+        err = !GPIOManager::instance().registerPin(_pin, _settings);
     }
 
     ~GPIOImpl() { GPIOManager::instance().releasePin(_pin); }

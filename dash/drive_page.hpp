@@ -17,11 +17,11 @@ class DrivePage : public IPage {
         _entities = {okay::ecs::entity()
                 .addComponent<okay::TransformComponent>()
                 .addComponent<okay::UIComponent>([]() {
-                    return ui::image(okay::load::engineTexture("uv_test.jpg"));
+                    return ui::image(okay::load::engineTexture("textures/uv_test.jpg"));
                 })};
     }
 
-    void freeEnties() {
+    void freeEntities() {
         for (okay::ECSEntity& entity : _entities) {
             entity.destroy();
         }

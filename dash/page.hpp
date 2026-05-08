@@ -64,6 +64,8 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
             okay::Engine.logger.debug("Creating page enties");
             _pages[_currentPage].page->createEntities();
         }
+
+        okay::Engine.logger.debug("Current page {}", _currentPage);
     }
 
     void tick() {
@@ -79,6 +81,8 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
         }
 
         _currentPage = nextPage;
+
+        okay::Engine.logger.debug("Current page {}", _currentPage);
 
         if (hasCurrentPage()) {
             okay::Engine.logger.debug("Creating page enties");

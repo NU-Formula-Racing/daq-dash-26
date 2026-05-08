@@ -34,7 +34,7 @@ int main() {
     };
 
     std::unique_ptr<dash::PageManager> pageManager = std::make_unique<dash::PageManager>(
-        dash::PageEntry::create(std::unique_ptr<dash::DrivePage>())
+        dash::PageEntry::create(std::make_unique<dash::DrivePage>())
             .activeWhen([]() {
                 return true;
             })

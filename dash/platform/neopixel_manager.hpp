@@ -232,6 +232,27 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         return glm::vec4(r, g, b, 1.0f);
     }
 
+    void error(float time) {
+        const float bmsPeriod = 250.0f;
+        const float imdPeriod = 1000.0f;
+
+        bool bmsError =
+            dbc::bmsFaults::internalfaultSummary->get() || dbc::bmsFaults::externalFault->get();
+        uint8_t imdError = dbc::bmsStatus::imdState->get();
+
+        const float period = (imdError == 1) ? imdPeriod : bmsPeriod;
+        float brightness = static_cast<int>(floor(time / period)) % 2;
+
+        glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        color *= brightness;
+        // set the colors
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < getBar(i).numPixels(); j++) {
+                getBar(i).setColor(j, color);
+            }
+        }
+    }
+
     void idle(float time) {
         const float breathePeriod = 2000.0f;
         float brightness = (std::sin(time / breathePeriod) + 1.0f) / 2.0f;  // +1 for normalize
@@ -285,6 +306,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float blinkTime = 500;
         const int numBlinks = 3;
 
+        bool bppc = dbc::ecuImplausibility::bppcImp.get();
+
         if (time < blinkTime * 2 * numBlinks) {
             // we are still blinking
             float brightness = static_cast<int>(floor(time / blinkTime)) % 2;
@@ -297,42 +320,56 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 }
             }
         } else {
-            // we are now in throttle light mode
-            const float appsMax = 100;
-            float throttlePercentage =
-                static_cast<float>(dbc::ecuThrottle::apps1Throttle->get()) / appsMax;
-            glm::vec4 botColor = colorFromHex(0x00FF00);
-            glm::vec4 topColor = colorFromHex(0xFFDD00);
-
-            for (int i = 0; i < 5; i++) {
-                int numPixels = getBar(i).numPixels();
-                int numFull = static_cast<int>(floor(throttlePercentage * numPixels));
-
-                for (int j = 0; j < numFull; j++) {
-                    glm::vec4 color = glm::mix(
-                        botColor, topColor, static_cast<float>(j) / static_cast<float>(numPixels));
-                    getBar(i).setColor(j, color);
+            // bppc error check
+            if (bppc) {
+                glm::vec4 yellow = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+                for (int i = 0; i < 5; i++) {
+                    for (int j = 0; j < getBar(i).numPixels(); j++) {
+                        getBar(i).setColor(j, yellow);
+                    }
                 }
+                return;
+            }
 
-                // turn off the rest of the pixels
-                for (int j = numFull; j < numPixels; j++) {
-                    if (j == numFull) {
+                // we are now in throttle light mode
+                const float appsMax = 100;
+                float throttlePercentage =
+                    static_cast<float>(dbc::ecuThrottle::apps1Throttle->get()) / appsMax;
+                glm::vec4 botColor = colorFromHex(0x00FF00);
+                glm::vec4 topColor = colorFromHex(0xFFDD00);
+
+                for (int i = 0; i < 5; i++) {
+                    int numPixels = getBar(i).numPixels();
+                    int numFull = static_cast<int>(floor(throttlePercentage * numPixels));
+
+                    for (int j = 0; j < numFull; j++) {
                         glm::vec4 color =
                             glm::mix(botColor,
                                      topColor,
                                      static_cast<float>(j) / static_cast<float>(numPixels));
-                        // set it to partial brightness to make a smoother transition
-                        glm::vec4 partialColor = color * (throttlePercentage * numPixels - numFull);
-                        getBar(i).setColor(j, partialColor);
-                        continue;
+                        getBar(i).setColor(j, color);
                     }
 
-                    getBar(i).setColor(j, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+                    // turn off the rest of the pixels
+                    for (int j = numFull; j < numPixels; j++) {
+                        if (j == numFull) {
+                            glm::vec4 color =
+                                glm::mix(botColor,
+                                         topColor,
+                                         static_cast<float>(j) / static_cast<float>(numPixels));
+                            // set it to partial brightness to make a smoother transition
+                            glm::vec4 partialColor =
+                                color * (throttlePercentage * numPixels - numFull);
+                            getBar(i).setColor(j, partialColor);
+                            continue;
+                        }
+
+                        getBar(i).setColor(j, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+                    }
                 }
             }
         }
-    }
-};
+    };
 
 }  // namespace dash
 

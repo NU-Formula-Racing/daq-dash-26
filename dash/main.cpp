@@ -1,20 +1,18 @@
+#include "drive_page.hpp"
+#include "okay/core/ecs/builtins.hpp"
+#include "page.hpp"
+
+#include <okay/okay.hpp>
+
 #include <can/can_dbc.hpp>
 #include <csignal>
-#include <iostream>
 #include <math.h>
-#include <nfr_can/CAN_interface.hpp>
-#include <nfr_can/virtual_timer.hpp>
-#include <okay/okay.hpp>
+#include <memory>
 #include <platform/can.hpp>
 #include <platform/interfaces.hpp>
 #include <platform/neopixel_manager.hpp>
 #include <sstream>
-#include <string>
 
-static void __gameInitialize();
-static void __gameUpdate();
-static void __gameShutdown();
-static void __motorStatusRecv();
 static void __exitSignal(int sig);
 
 static void handleInverterFaults(std::stringstream& frame);
@@ -25,25 +23,37 @@ static std::size_t __frameCount = 0;
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
+    surfaceConfig.width = 800;
+    surfaceConfig.height = 480;
     okay::Surface surface(surfaceConfig);
 
     okay::RendererSettings rendererSettings{
         .surfaceConfig = surfaceConfig,
-        .pipeline = okay::RenderPipeline::create(std::make_unique<okay::ScenePass>())};
+        .pipeline = okay::RenderPipeline::create(std::make_unique<okay::ScenePass>()),
+        .enableIMGUI = true,
+    };
+
+    std::unique_ptr<dash::PageManager> pageManager = std::make_unique<dash::PageManager>(
+        dash::PageEntry::create(std::unique_ptr<dash::DrivePage>())
+            .activeWhen([]() {
+                return true;
+            })
+            .withPriority(0));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);
 
-    okay::Game::create()
-        .addSystems(std::make_unique<okay::Renderer>(std::move(rendererSettings)),
-                    std::make_unique<dash::NeopixelManager>(),
-                    std::make_unique<okay::AssetManager>(),
-                    std::make_unique<okay::TweenEngine>(),
-                    std::make_unique<dash::CANManager>())
-        .onInitialize(__gameInitialize)
-        .onUpdate(__gameUpdate)
-        .onShutdown(__gameShutdown)
-        .run();
+    auto game = okay::Game::create().addSystems(
+        std::make_unique<okay::Renderer>(std::move(rendererSettings)),
+        std::make_unique<dash::NeopixelManager>(),
+        std::make_unique<okay::AssetManager>(),
+        std::make_unique<okay::TweenEngine>(),
+        std::make_unique<dash::CANManager>(),
+        std::make_unique<okay::ECS>(),
+        std::move(pageManager));
+
+    okay::registerBuiltinComponentsAndSystems();
+    game.run();
 
     return 0;
 }

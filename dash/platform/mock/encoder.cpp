@@ -9,16 +9,13 @@ constexpr uint16_t Encoder::generateID(uint8_t left, uint8_t right) {
 Encoder::Encoder(uint8_t leftPin, uint8_t rightPin)
     : _encoderID(generateID(leftPin, rightPin)),
       _leftGPIO(std::make_unique<GPIO>(leftPin, false)),
-      _rightGPIO(std::make_unique<GPIO>(rightPin, false)) {
-}
+      _rightGPIO(std::make_unique<GPIO>(rightPin, false)) {}
 
 Encoder::~Encoder() = default;
 
-void Encoder::onRight(std::function<void()> callback) {
-}
+void Encoder::onRight(std::function<void()> callback) {}
 
-void Encoder::onLeft(std::function<void()> callback) {
-}
+void Encoder::onLeft(std::function<void()> callback) {}
 
 bool Encoder::isIdle() {
     return true;

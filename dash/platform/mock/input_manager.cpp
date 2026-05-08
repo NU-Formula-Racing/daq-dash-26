@@ -10,44 +10,31 @@ InputManager& InputManager::instance() {
     return instance;
 }
 
-void InputManager::registerButton(uint8_t buttonID) {
-}
+void InputManager::registerButton(uint8_t buttonID) {}
 
-void InputManager::unregisterButton(uint8_t buttonID) {
-}
+void InputManager::unregisterButton(uint8_t buttonID) {}
 
-void InputManager::attachDownCallback(uint8_t buttonID, std::function<void()> callback) {
-}
+void InputManager::attachDownCallback(uint8_t buttonID, std::function<void()> callback) {}
 
-void InputManager::attachUpCallback(uint8_t buttonID, std::function<void()> callback) {
-}
+void InputManager::attachUpCallback(uint8_t buttonID, std::function<void()> callback) {}
 
-void InputManager::executeDownCallbacks(uint8_t buttonID) {
-}
+void InputManager::executeDownCallbacks(uint8_t buttonID) {}
 
-void InputManager::executeUpCallbacks(uint8_t buttonID) {
-}
+void InputManager::executeUpCallbacks(uint8_t buttonID) {}
 
-void InputManager::registerEncoder(uint16_t encoderID, uint8_t leftPin, uint8_t rightPin) {
-}
+void InputManager::registerEncoder(uint16_t encoderID, uint8_t leftPin, uint8_t rightPin) {}
 
-void InputManager::unregisterEncoder(uint16_t encoderID) {
-}
+void InputManager::unregisterEncoder(uint16_t encoderID) {}
 
-void InputManager::attachLeftCallback(uint16_t encoderID, std::function<void()> callback) {
-}
+void InputManager::attachLeftCallback(uint16_t encoderID, std::function<void()> callback) {}
 
-void InputManager::attachRightCallback(uint16_t encoderID, std::function<void()> callback) {
-}
+void InputManager::attachRightCallback(uint16_t encoderID, std::function<void()> callback) {}
 
-void InputManager::executeLeftCallbacks(uint16_t encoderID) {
-}
+void InputManager::executeLeftCallbacks(uint16_t encoderID) {}
 
-void InputManager::executeRightCallbacks(uint16_t encoderID) {
-}
+void InputManager::executeRightCallbacks(uint16_t encoderID) {}
 
-void InputManager::onEncoderEdge(uint16_t encoderID) {
-}
+void InputManager::onEncoderEdge(uint16_t encoderID) {}
 
 bool InputManager::isDownThisFrame(uint8_t buttonID) {
     return false;
@@ -73,7 +60,6 @@ bool InputManager::isIdle(uint16_t encoderID) const {
     return true;
 }
 
-void InputManager::tick() {
-}
+void InputManager::tick() {}
 
 };  // namespace dash

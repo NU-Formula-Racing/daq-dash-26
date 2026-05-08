@@ -22,8 +22,8 @@ struct GPIO::GPIOImpl {
     bool err;
 
     GPIOImpl(uint8_t pin, bool output) : _pin(pin), _isOutput(output) {
-        _settings.set_direction(output ? gpiod::line::direction::OUTPUT
-                                       : gpiod::line::direction::INPUT);
+        _settings.set_direction(
+            output ? gpiod::line::direction::OUTPUT : gpiod::line::direction::INPUT);
 
         if (!output) {
             _settings.set_edge_detection(gpiod::line::edge::BOTH);
@@ -32,7 +32,9 @@ struct GPIO::GPIOImpl {
         err = !GPIOManager::instance().registerPin(_pin, _settings);
     }
 
-    ~GPIOImpl() { GPIOManager::instance().releasePin(_pin); }
+    ~GPIOImpl() {
+        GPIOManager::instance().releasePin(_pin);
+    }
 
     bool write(GpioLevel level) {
         if (!_isOutput)
@@ -55,11 +57,12 @@ struct GPIO::GPIOImpl {
         GPIOManager::instance().registerInterrupt(_pin, _settings, callback, edge);
     }
 
-    bool checkError() { return err; }
+    bool checkError() {
+        return err;
+    }
 };
 
-GPIO::GPIO(uint8_t pin, bool output) : _impl(std::make_unique<GPIOImpl>(pin, output)) {
-}
+GPIO::GPIO(uint8_t pin, bool output) : _impl(std::make_unique<GPIOImpl>(pin, output)) {}
 
 GPIO::~GPIO() = default;
 

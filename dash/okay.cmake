@@ -1,9 +1,17 @@
 # okay.cmake -- links to okay engine
 
 # dash application
+file(GLOB_RECURSE UI_SOURCES CONFIGURE_DEPENDS
+    ${OKAY_PROJECT_ROOT_DIR}/ui/*.cpp
+    ${OKAY_PROJECT_ROOT_DIR}/ui/*.c
+    ${OKAY_PROJECT_ROOT_DIR}/ui/*.hpp
+    ${OKAY_PROJECT_ROOT_DIR}/ui/*.h
+)
+
 set(SOURCES
     ${OKAY_PROJECT_ROOT_DIR}/main.cpp
     ${OKAY_PROJECT_ROOT_DIR}/can/mock/can_imgui.cpp
+    ${UI_SOURCES}
 )
 
 set(INCLUDES
@@ -28,4 +36,3 @@ add_subdirectory(
 target_sources(${PROJECT} PRIVATE ${SOURCES})
 target_link_libraries(${PROJECT} PRIVATE dash_platform)
 target_include_directories(${PROJECT} PRIVATE ${INCLUDES})
-

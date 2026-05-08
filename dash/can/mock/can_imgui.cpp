@@ -1,12 +1,13 @@
 #include "can_imgui.hpp"
 
+#include <okay/okay.hpp>
+
 #include <algorithm>
 #include <can/can_dbc.hpp>
 #include <cstdint>
 #include <cstdlib>
 #include <imgui.h>
 #include <nfr_can/CAN_interface.hpp>
-#include <okay/okay.hpp>
 #include <string.h>
 #include <string_view>
 
@@ -25,10 +26,11 @@ bool CAN_IMGUI::init(const BaudRate baud) {
         sortedMessages.push_back({board, messageId});
     }
 
-    std::sort(
-        sortedMessages.begin(),
+    std::sort(sortedMessages.begin(),
         sortedMessages.end(),
-        [](const GroupedMessage& a, const GroupedMessage& b) { return a.boardName < b.boardName; });
+        [](const GroupedMessage& a, const GroupedMessage& b) {
+            return a.boardName < b.boardName;
+        });
 
     return true;
 }
@@ -96,9 +98,9 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
 
     ImGui::SetNextItemWidth(-1.0f);
     if (ImGui::InputTextWithHint("##SearchFilter",
-                                 "Search Signals...",
-                                 filter.InputBuf,
-                                 IM_ARRAYSIZE(filter.InputBuf))) {
+            "Search Signals...",
+            filter.InputBuf,
+            IM_ARRAYSIZE(filter.InputBuf))) {
         filter.Build();
         filterChanged = true;
     }
@@ -145,8 +147,8 @@ okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {
                     for (uint8_t sigNum{}; sigNum < message->get_num_signals(); ++sigNum) {
                         auto sigID{std::pair{messageID, sigNum}};
                         auto it{dbc::meta::signalIdToName.find(sigID)};
-                        const char* peekName{(it != dbc::meta::signalIdToName.end()) ? it->second
-                                                                                     : "(unknown)"};
+                        const char* peekName{
+                            (it != dbc::meta::signalIdToName.end()) ? it->second : "(unknown)"};
 
                         if (filter.PassFilter(peekName)) {
                             showHeader = true;

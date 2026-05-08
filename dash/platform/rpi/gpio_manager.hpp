@@ -15,9 +15,9 @@ class GPIOManager {
     bool registerPin(uint8_t offset, gpiod::line_settings settings);
     void releasePin(uint8_t offset);
     void registerInterrupt(uint8_t offset,
-                           gpiod::line_settings settings,
-                           std::function<void()> callback,
-                           GPIO::EdgeType edge);
+        gpiod::line_settings settings,
+        std::function<void()> callback,
+        GPIO::EdgeType edge);
 
     void start();
 

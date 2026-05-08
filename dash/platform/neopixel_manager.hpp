@@ -1,11 +1,12 @@
 #ifndef __LIGHTS_HPP__
 #define __LIGHTS_HPP__
 
+#include <okay/okay.hpp>
+
 #include <can/can_dbc.hpp>
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
-#include <okay/okay.hpp>
 #include <platform/interfaces.hpp>
 #include <stdint.h>
 
@@ -36,12 +37,24 @@ struct VirtualizedNeobar {
         _dirty = true;
     }
 
-    uint8_t numPixels() const { return _numPixels; }
-    const std::vector<glm::vec4>& currentColors() const { return _currentColors; }
-    uint8_t toHardwareIndex(uint8_t virtIdx) const { return _mapping[virtIdx]; }
-    NeopixelStrip* strip() const { return _strip; }
-    bool isDirty() const { return _dirty; }
-    void clearDirty() { _dirty = false; }
+    uint8_t numPixels() const {
+        return _numPixels;
+    }
+    const std::vector<glm::vec4>& currentColors() const {
+        return _currentColors;
+    }
+    uint8_t toHardwareIndex(uint8_t virtIdx) const {
+        return _mapping[virtIdx];
+    }
+    NeopixelStrip* strip() const {
+        return _strip;
+    }
+    bool isDirty() const {
+        return _dirty;
+    }
+    void clearDirty() {
+        _dirty = false;
+    }
 
    private:
     std::vector<uint8_t> _mapping;  // idx -> hwIdx
@@ -73,8 +86,12 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
         }
 
-        dbc::ecuDriveStatus::message.attach_rx_callback([this]() { onECUDriveStatus(); });
-        startAnimation([this](float time) { idle(time); });
+        dbc::ecuDriveStatus::message.attach_rx_callback([this]() {
+            onECUDriveStatus();
+        });
+        startAnimation([this](float time) {
+            idle(time);
+        });
         updateDisplay();
     }
 
@@ -128,7 +145,9 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         }
     }
 
-    VirtualizedNeobar& getBar(uint8_t barNum) { return _bars[barNum]; }
+    VirtualizedNeobar& getBar(uint8_t barNum) {
+        return _bars[barNum];
+    }
 
     void onECUDriveStatus() {
         uint8_t state = dbc::ecuDriveStatus::driveState->get();
@@ -140,17 +159,25 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
         switch (state) {
             case 0:  // idle
-                startAnimation([this](float time) { idle(time); });
+                startAnimation([this](float time) {
+                    idle(time);
+                });
                 break;
             case 1:  // precharge
-                startAnimation([this](float time) { precharge(time); });
+                startAnimation([this](float time) {
+                    precharge(time);
+                });
                 break;
             case 2:  // neutral
-                startAnimation([this](float time) { neutral(time); });
+                startAnimation([this](float time) {
+                    neutral(time);
+                });
                 break;
             case 3:  // drive
                 // do something
-                startAnimation([this](float time) { drive(time); });
+                startAnimation([this](float time) {
+                    drive(time);
+                });
                 break;
         }
     }
@@ -193,11 +220,45 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     // master map
     std::vector<uint8_t> mappingAtBar(uint8_t bar) {
         static const std::vector<int> MASTER_MAP = {
-            15, 14, 13, 12, 11, 10, 9, 8,  // bar 0
-            7,  6,  5,  4,  3,  2,  1, 0,  // bar 1
-            0,  1,  2,  3,  4,  5,  6,     // bar 2
-            7,  6,  5,  4,  3,  2,  1, 0,  // bar 3
-            15, 14, 13, 12, 11, 10, 9, 8,  // bar 4
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,  // bar 0
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,  // bar 1
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,  // bar 2
+            7,
+            6,
+            5,
+            4,
+            3,
+            2,
+            1,
+            0,  // bar 3
+            15,
+            14,
+            13,
+            12,
+            11,
+            10,
+            9,
+            8,  // bar 4
         };
 
         std::vector<uint8_t> barMap;
@@ -240,9 +301,9 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
     void neutral(float time) {
         static std::vector<glm::vec4> palette = {colorFromHex(0x4E2A84),
-                                                 colorFromHex(0x4E2A84),
-                                                 colorFromHex(0x00000),
-                                                 colorFromHex(0x00000)};
+            colorFromHex(0x4E2A84),
+            colorFromHex(0x00000),
+            colorFromHex(0x00000)};
         const float moveSpeed = 1 / 200.0f;
 
         for (int i = 0; i < 5; i++) {  // for all 5 bars
@@ -312,10 +373,9 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 // turn off the rest of the pixels
                 for (int j = numFull; j < numPixels; j++) {
                     if (j == numFull) {
-                        glm::vec4 color =
-                            glm::mix(botColor,
-                                     topColor,
-                                     static_cast<float>(j) / static_cast<float>(numPixels));
+                        glm::vec4 color = glm::mix(botColor,
+                            topColor,
+                            static_cast<float>(j) / static_cast<float>(numPixels));
                         // set it to partial brightness to make a smoother transition
                         glm::vec4 partialColor = color * (throttlePercentage * numPixels - numFull);
                         getBar(i).setColor(j, partialColor);

@@ -1,4 +1,5 @@
 #include <gpiod.hpp>
+#include <okay/okay.hpp>
 #include <platform/rpi/gpio_manager.hpp>
 
 namespace dash {
@@ -15,7 +16,13 @@ bool GPIOManager::registerPin(uint8_t offset, gpiod::line_settings settings) {
     if (_settings.find(offset) != _settings.end()) {
         return false;
     }
+
     _settings[offset] = settings;
+
+    if (_request) {
+        rebuildRequest();
+    }
+
     return true;
 }
 
@@ -49,24 +56,37 @@ void GPIOManager::registerInterrupt(uint8_t offset,
 }
 
 void GPIOManager::start() {
-    gpiod::line_config line_cfg = gpiod::line_config();
-
-    for (auto const& [offset, settings] : _settings) {
-        line_cfg.add_line_settings(offset, settings);
+    if (_request) {
+        return;
     }
 
-    _request = std::make_unique<gpiod::line_request>(
-        _chip->prepare_request().set_line_config(line_cfg).do_request());
+    rebuildRequest();
 }
 
 bool GPIOManager::gpioWritePin(uint8_t offset, GpioLevel level) {
+    if (!_request) {
+        start();
+        _started = true;
+    }
+
     gpiod::line::value val =
         (level == GpioLevel::G_LOW ? gpiod::line::value::INACTIVE : gpiod::line::value::ACTIVE);
-    _request->set_value(offset, val);
+
+    try {
+        _request->set_value(offset, val);
+    } catch (const std::exception& e) {
+        okay::Engine.logger.error("Failed to write GPIO {}: {}", offset, e.what());
+        return false;
+    }
     return true;
 }
 
 bool GPIOManager::gpioReadPin(uint8_t offset, GpioLevel& out) {
+    if (!_request) {
+        start();
+        _started = true;
+    }
+
     gpiod::line::value val = _request->get_value(offset);
     out = (val == gpiod::line::value::ACTIVE ? GpioLevel::G_HIGH : GpioLevel::G_LOW);
     return true;

@@ -7,6 +7,8 @@
 
 #include <okay/okay.hpp>
 
+#include <memory>
+
 namespace ui = okay::ui;
 
 namespace dash {
@@ -16,6 +18,30 @@ namespace dash {
         return this->fnName(); \
     }
 
+// TODO: Move this component + system into somewhere else
+struct CameraControllerComponent {
+    float speed{5.0f};
+    float distance{10.0f};
+
+    CameraControllerComponent() {}
+    CameraControllerComponent(float speed, float distance) : speed(speed), distance(distance) {}
+};
+
+class CameraControllerSystem
+    : public okay::ECSSystem<
+          okay::query::Get<okay::TransformComponent, CameraControllerComponent>> {
+   public:
+    void onPreTick(QueryT::Item& item) override {
+        auto& [transform, camController] = item.components;
+        float theta =
+            okay::Engine.time->timeSinceStartSec() * camController.speed * glm::pi<float>();
+        glm::vec3 pos = glm::vec3(
+            sin(theta) * camController.distance, 1.0f, cos(theta) * camController.distance);
+        transform->position = pos;
+        transform.lookAt(item.entity, glm::vec3(0.0f));
+    }
+};
+
 class DrivePage : public IPage {
    public:
     DrivePage() {}
@@ -24,23 +50,33 @@ class DrivePage : public IPage {
         okay::Engine.logger.debug("Creating entities for Drive page!");
 
         okay::ShaderHandle shader = okay::shaderHandle(okay::load::engineShader("shaders/lit"));
-
         auto materialProperties = std::make_unique<okay::LitMaterial>();
         materialProperties->color.set(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
         okay::MaterialHandle material = okay::materialHandle(shader, std::move(materialProperties));
 
+        okay::ecs::entity()
+            .addComponent<okay::TransformComponent>(glm::vec3{},
+                glm::vec3{0.1f},
+                glm::angleAxis(glm::radians(0.0f), glm::vec3{2.0f, 3.0f, 1.0f}))
+            .addComponent<okay::LightComponent>(
+                okay::LightComponent::directional(glm::vec3{1, 1, 1}, 2.5f));
+
         centerMesh = okay::mesh(*centerMeshData);
 
+        okay::ecs::registerComponent<CameraControllerComponent>();
+        okay::ecs::registerSystem(std::make_unique<CameraControllerSystem>());
+
         _entities = {
-            okay::ecs::uiEntity(BIND_TO_THIS(buildBackground), 0),
+            // okay::ecs::uiEntity(BIND_TO_THIS(buildBackground), 0),
             okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 1),
             okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 1),
             okay::ecs::sceneEntity().addComponent<okay::MeshRendererComponent>(
-                centerMesh, material, static_cast<uint8_t>(200)),
+                centerMesh, material, static_cast<uint8_t>(255)),
             okay::ecs::entity()
-                .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 5.0f})
+                .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 20.0f})
                 .addComponent<okay::CameraComponent>(
-                    okay::CameraComponent{okay::Camera::PerspectiveLens{45.0f, 0.1f, 100.0f}}),
+                    okay::CameraComponent{okay::Camera::PerspectiveLens{45.0f, 0.1f, 100.0f}})
+                .addComponent<CameraControllerComponent>(0.5f, 50.0f),
 
         };
     }

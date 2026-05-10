@@ -2,6 +2,7 @@
 #define __DRIVE_PAGE_H__
 
 #include "okay/core/asset/asset_ref.hpp"
+#include "okay/core/asset/generic/texture_loader.hpp"
 #include "page.hpp"
 
 #include <okay/okay.hpp>
@@ -27,6 +28,8 @@ class DrivePage : public IPage {
         auto materialProperties = std::make_unique<okay::LitMaterial>();
         materialProperties->color.set(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
         okay::MaterialHandle material = okay::materialHandle(shader, std::move(materialProperties));
+
+        centerMesh = okay::mesh(*centerMeshData);
 
         _entities = {
             okay::ecs::uiEntity(BIND_TO_THIS(buildBackground), 0),
@@ -64,10 +67,12 @@ class DrivePage : public IPage {
    private:
     std::vector<okay::ECSEntity> _entities;
 
-    okay::Mesh centerMesh{okay::mesh(okay::load::meshData("models/teapot.obj"))};
-    okay::GameAssetRef<okay::Texture> bgTexture{"texutres/bg_pattern.png"};
-    okay::GameAssetRef<okay::Texture> topBar{"texture/top_bar.png"};
-    okay::GameAssetRef<okay::Texture> botBar{"texture/bottom_bar.png"};
+    okay::Mesh centerMesh{okay::Mesh::none()};
+    okay::EngineAssetRef<okay::MeshData> centerMeshData{"models/teapot.obj"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> bgTexture{
+        "textures/bg_pattern.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> topBar{"textures/top_bar.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> botBar{"textures/bottom_bar.png"};
 };
 
 }  // namespace dash

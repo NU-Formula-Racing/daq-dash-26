@@ -326,6 +326,25 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 return;
             }
 
+            // we are now in throttle light mode
+            const float appsMax = 100;
+            float throttlePercentage =
+                static_cast<float>(dbc::ecuThrottle::apps1Throttle->get()) / appsMax;
+            glm::vec4 botColor = colorFromHex(0x00FF00);
+            glm::vec4 topColor = colorFromHex(0xFFDD00);
+
+            for (int i = 0; i < 5; i++) {
+                int numPixels = getBar(i).numPixels();
+                int numFull = static_cast<int>(floor(throttlePercentage * numPixels));
+
+                for (int j = 0; j < numFull; j++) {
+                    glm::vec4 color = glm::mix(
+                        botColor, topColor, static_cast<float>(j) / static_cast<float>(numPixels));
+                    getBar(i).setColor(j, color);
+                }
+                return;
+            }
+
                 // we are now in throttle light mode
                 const float appsMax = 100;
                 float throttlePercentage =

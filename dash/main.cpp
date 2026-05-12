@@ -15,12 +15,6 @@
 
 static void __exitSignal(int sig);
 
-static void handleInverterFaults(std::stringstream& frame);
-static void handleBMSFaults(std::stringstream& frame);
-static void handleECUFaults(std::stringstream& frame);
-
-static std::size_t __frameCount = 0;
-
 int main() {
     okay::SurfaceConfig surfaceConfig;
     surfaceConfig.width = 800;

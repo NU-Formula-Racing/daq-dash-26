@@ -14,8 +14,8 @@ class IPage {
    public:
     virtual ~IPage() = default;
 
-    virtual void createEntities() = 0;
-    virtual void freeEntities() = 0;
+    virtual void initializePage() = 0;
+    virtual void closePage() = 0;
 };
 
 struct PageEntry {
@@ -62,7 +62,7 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
 
         if (hasCurrentPage()) {
             okay::Engine.logger.debug("Creating page enties");
-            _pages[_currentPage].page->createEntities();
+            _pages[_currentPage].page->initializePage();
         }
 
         okay::Engine.logger.debug("Current page {}", _currentPage);
@@ -77,7 +77,7 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
 
         if (hasCurrentPage()) {
             okay::Engine.logger.debug("Freeing entites from page");
-            _pages[_currentPage].page->freeEntities();
+            _pages[_currentPage].page->closePage();
         }
 
         _currentPage = nextPage;
@@ -86,7 +86,7 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
 
         if (hasCurrentPage()) {
             okay::Engine.logger.debug("Creating page enties");
-            _pages[_currentPage].page->createEntities();
+            _pages[_currentPage].page->initializePage();
         }
     }
 

@@ -3,6 +3,7 @@
 
 #include "okay/core/asset/asset_ref.hpp"
 #include "okay/core/asset/generic/texture_loader.hpp"
+#include "okay/core/renderer/materials/unlit.hpp"
 #include "page.hpp"
 
 #include <okay/okay.hpp>
@@ -46,13 +47,23 @@ class DrivePage : public IPage {
    public:
     DrivePage() {}
 
-    void createEntities() {
+    void initializePage() {
         okay::Engine.logger.debug("Creating entities for Drive page!");
 
-        okay::ShaderHandle shader = okay::shaderHandle(okay::load::engineShader("shaders/lit"));
+        okay::ShaderHandle objectShader =
+            okay::shaderHandle(okay::load::engineShader("shaders/lit"));
         auto materialProperties = std::make_unique<okay::LitMaterial>();
         materialProperties->color.set(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-        okay::MaterialHandle material = okay::materialHandle(shader, std::move(materialProperties));
+        okay::MaterialHandle objectMaterial =
+            okay::materialHandle(objectShader, std::move(materialProperties));
+
+        okay::ShaderHandle skyboxShader =
+            okay::shaderHandle(okay::load::shader("shaders/background"));
+        auto skyboxProperties = std::make_unique<okay::UnlitMaterial>();
+        skyboxProperties->albedo = *bgTexture;
+        okay::MaterialHandle skyboxMaterial =
+            okay::materialHandle(skyboxShader, std::move(skyboxProperties));
+        okay::Engine.systems.getSystemChecked<okay::Renderer>()->setSkyboxMaterial(skyboxMaterial);
 
         okay::ecs::entity()
             .addComponent<okay::TransformComponent>(glm::vec3{},
@@ -71,7 +82,7 @@ class DrivePage : public IPage {
             okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 1),
             okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 1),
             okay::ecs::sceneEntity().addComponent<okay::MeshRendererComponent>(
-                centerMesh, material, static_cast<uint8_t>(255)),
+                centerMesh, objectMaterial, static_cast<uint8_t>(255)),
             okay::ecs::entity()
                 .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 20.0f})
                 .addComponent<okay::CameraComponent>(
@@ -81,7 +92,7 @@ class DrivePage : public IPage {
         };
     }
 
-    void freeEntities() {
+    void closePage() {
         for (okay::ECSEntity& entity : _entities) {
             entity.destroy();
         }

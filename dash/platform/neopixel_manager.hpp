@@ -84,6 +84,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             _animationFunction(time);
         }
 
+        if (errorOccured()) {
+            startAnimation([this](float time) { error(time); });
+        }
+
         updateDisplay();
     }
 
@@ -227,15 +231,38 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         return glm::vec4(r, g, b, 1.0f);
     }
 
-    void error(float time) {
-        const float bmsPeriod = 250.0f;
-        const float imdPeriod = 1000.0f;
+    bool errorOccured() {
+        const int errorCode = 0x03;
 
-        bool bmsError =
-            dbc::bmsFaults::internalfaultSummary->get() || dbc::bmsFaults::externalFault->get();
+        bool hardFaultError = 
+            dbc::bmsFaults::internalfaultSummary->get() || 
+            dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode || 
+            dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode || 
+            dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
+
         uint8_t imdError = dbc::bmsStatus::imdState->get();
 
-        const float period = (imdError == 1) ? imdPeriod : bmsPeriod;
+        if (hardFaultError || imdError) {
+            return true;
+        }
+
+        return false;
+    }
+
+    void error(float time) {
+        const float hardFaultPeriod = 250.0f;
+        const float imdPeriod = 1000.0f;
+        const int errorCode = 0x03;
+
+        bool hardFaultError = 
+            dbc::bmsFaults::internalfaultSummary->get() || 
+            dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode || 
+            dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode || 
+            dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
+                    
+        uint8_t imdError = dbc::bmsStatus::imdState->get();
+
+        const float period = (imdError == 1) ? imdPeriod : hardFaultPeriod;
         float brightness = static_cast<int>(floor(time / period)) % 2;
 
         glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -346,11 +373,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
 
                 // we are now in throttle light mode
-                const float appsMax = 100;
-                float throttlePercentage =
-                    static_cast<float>(dbc::ecuThrottle::apps1Throttle->get()) / appsMax;
-                glm::vec4 botColor = colorFromHex(0x00FF00);
-                glm::vec4 topColor = colorFromHex(0xFFDD00);
 
                 for (int i = 0; i < 5; i++) {
                     int numPixels = getBar(i).numPixels();

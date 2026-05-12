@@ -227,6 +227,27 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         return glm::vec4(r, g, b, 1.0f);
     }
 
+    void error(float time) {
+        const float bmsPeriod = 250.0f;
+        const float imdPeriod = 1000.0f;
+
+        bool bmsError =
+            dbc::bmsFaults::internalfaultSummary->get() || dbc::bmsFaults::externalFault->get();
+        uint8_t imdError = dbc::bmsStatus::imdState->get();
+
+        const float period = (imdError == 1) ? imdPeriod : bmsPeriod;
+        float brightness = static_cast<int>(floor(time / period)) % 2;
+
+        glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        color *= brightness;
+        // set the colors
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < getBar(i).numPixels(); j++) {
+                getBar(i).setColor(j, color);
+            }
+        }
+    }
+
     void idle(float time) {
         const float breathePeriod = 2000.0f;
         float brightness = (std::sin(time / breathePeriod) + 1.0f) / 2.0f;  // +1 for normalize
@@ -280,6 +301,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float blinkTime = 500;
         const int numBlinks = 3;
 
+        bool bppc = dbc::ecuImplausibility::bppcImp->get();
+
         if (time < blinkTime * 2 * numBlinks) {
             // we are still blinking
             float brightness = static_cast<int>(floor(time / blinkTime)) % 2;
@@ -292,6 +315,17 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 }
             }
         } else {
+            // bppc error check
+            if (bppc) {
+                glm::vec4 yellow = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+                for (int i = 0; i < 5; i++) {
+                    for (int j = 0; j < getBar(i).numPixels(); j++) {
+                        getBar(i).setColor(j, yellow);
+                    }
+                }
+                return;
+            }
+
             // we are now in throttle light mode
             const float appsMax = 100;
             float throttlePercentage =

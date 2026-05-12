@@ -301,7 +301,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float blinkTime = 500;
         const int numBlinks = 3;
 
-        bool bppc = dbc::ecuImplausibility::bppcImp.get();
+        bool bppc = dbc::ecuImplausibility::bppcImp->get();
 
         if (time < blinkTime * 2 * numBlinks) {
             // we are still blinking
@@ -317,7 +317,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         } else {
             // bppc error check
             if (bppc) {
-                glm::vec4 yellow = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+                glm::vec4 yellow = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
                 for (int i = 0; i < 5; i++) {
                     for (int j = 0; j < getBar(i).numPixels(); j++) {
                         getBar(i).setColor(j, yellow);

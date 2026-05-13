@@ -15,9 +15,15 @@ uniform float u_timeMs;
 
 void main()
 {
-    vec2 offset = vec2(-1.0, -1.0) * u_timeMs;
-    vec4 texture = texture(u_albedo, v_uv + offset).rgba;
-    vec3 baseColor = v_color * texture.rgb;
-    FragColor = vec4(baseColor, texture.a);
-    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    float t = u_timeMs * 0.001f;
+
+    vec2 scrollDir = normalize(vec2(-1.0, -1.0));
+    float scrollSpeed = 0.1f; // UV units per second
+
+    vec2 sampleUV = v_uv + scrollDir * t * scrollSpeed;
+    vec4 texColor = texture(u_albedo, sampleUV);
+    vec3 baseColor = v_color * texColor.rgb;
+
+    FragColor = vec4(baseColor, texColor.a);
+    // FragColor = vec4(sampleUV.x, sampleUV.y, 0.0f, 1.0f);
 }

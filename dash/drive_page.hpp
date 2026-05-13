@@ -61,6 +61,10 @@ class DrivePage : public IPage {
             okay::shaderHandle(okay::load::shader("shaders/background"));
         auto skyboxProperties = std::make_unique<okay::UnlitMaterial>();
         skyboxProperties->albedo = *bgTexture;
+        skyboxProperties->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        skyboxProperties->isTransparent = true;
+        skyboxProperties->useScreenspaceCoords = true;
+        skyboxProperties->doubleSided = true;
         okay::MaterialHandle skyboxMaterial =
             okay::materialHandle(skyboxShader, std::move(skyboxProperties));
         okay::Engine.systems.getSystemChecked<okay::Renderer>()->setSkyboxMaterial(skyboxMaterial);

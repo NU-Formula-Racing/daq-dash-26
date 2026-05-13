@@ -1,9 +1,13 @@
 #ifndef __DRIVE_PAGE_H__
 #define __DRIVE_PAGE_H__
 
+#include "glm/ext/vector_float4.hpp"
 #include "okay/core/asset/asset_ref.hpp"
 #include "okay/core/asset/generic/texture_loader.hpp"
 #include "okay/core/renderer/materials/unlit.hpp"
+#include "okay/core/ui/builder.hpp"
+#include "okay/core/ui/element.hpp"
+#include "okay/core/ui/font.hpp"
 #include "page.hpp"
 
 #include <okay/okay.hpp>
@@ -81,8 +85,9 @@ class DrivePage : public IPage {
         okay::ecs::registerComponent<CameraControllerComponent>();
         okay::ecs::registerSystem(std::make_unique<CameraControllerSystem>());
 
+        okay::UIStyle::main().setMainFont(*latoBold);
+
         _entities = {
-            // okay::ecs::uiEntity(BIND_TO_THIS(buildBackground), 0),
             okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 1),
             okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 1),
             okay::ecs::sceneEntity().addComponent<okay::MeshRendererComponent>(
@@ -91,7 +96,7 @@ class DrivePage : public IPage {
                 .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 20.0f})
                 .addComponent<okay::CameraComponent>(
                     okay::CameraComponent{okay::Camera::PerspectiveLens{45.0f, 0.1f, 100.0f}})
-                .addComponent<CameraControllerComponent>(0.5f, 50.0f),
+                .addComponent<CameraControllerComponent>(0.5f, 60.0f),
 
         };
     }
@@ -102,17 +107,46 @@ class DrivePage : public IPage {
         }
     }
 
-    okay::UIElement buildBackground() {
-        return ui::growbox().backgroundColorSet(glm::vec4{0.0f, 0.0f, 0.0f, 1.0f})(
-            ui::image(*bgTexture));
-    }
-
     okay::UIElement buildTopHud() {
         return ui::image(*topBar);
     }
 
     okay::UIElement buildBotHud() {
-        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(ui::spacer(), ui::image(*botBar));
+        const float outerPercent = 0.22f;
+        const float valuePercent = 0.11f;
+        const float labelPercent = 0.05f;
+        const float largeFontSize = 36.0f;
+        const float medFontSize = 28.0f;
+
+        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(ui::spacer(),
+            ui::image(*botBar).axisSet(okay::UIAxis::Horizontal)(
+                ui::text("log file")
+                    .widthSet(okay::size::Percent(outerPercent))
+                    .textSizeSet(largeFontSize)
+                    .alignTextLeft()
+                    .leftPaddingSet(10),
+                ui::text("12.2")
+                    .widthSet(okay::size::Percent(valuePercent))
+                    .textSizeSet(medFontSize)
+                    .alignTextCenter(),
+                ui::text("LV")
+                    .widthSet(okay::size::Percent(labelPercent))
+                    .textSizeSet(medFontSize)
+                    .alignTextCenter(),
+                ui::spacer(),
+                ui::text("HV")
+                    .widthSet(okay::size::Percent(labelPercent))
+                    .textSizeSet(medFontSize)
+                    .alignTextCenter(),
+                ui::text("480")
+                    .widthSet(okay::size::Percent(valuePercent))
+                    .textSizeSet(medFontSize)
+                    .alignTextCenter(),
+                ui::text("milage")
+                    .widthSet(okay::size::Percent(outerPercent))
+                    .textSizeSet(largeFontSize)
+                    .alignTextRight()
+                    .rightPaddingSet(10)));
     }
 
    private:
@@ -124,6 +158,10 @@ class DrivePage : public IPage {
         "textures/bg_pattern.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> topBar{"textures/top_bar.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> botBar{"textures/bottom_bar.png"};
+    okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> lato{
+        "fonts/Lato-Regular.ttf"};
+    okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{
+        "fonts/Lato-Bold.ttf"};
 };
 
 }  // namespace dash

@@ -62,7 +62,7 @@ class DrivePage : public IPage {
         auto skyboxProperties = std::make_unique<okay::UnlitMaterial>();
         skyboxProperties->albedo = *bgTexture;
         skyboxProperties->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        skyboxProperties->isTransparent = true;
+        skyboxProperties->isTransparent = false;
         skyboxProperties->useScreenspaceCoords = true;
         skyboxProperties->doubleSided = true;
         okay::MaterialHandle skyboxMaterial =

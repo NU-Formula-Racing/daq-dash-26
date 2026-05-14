@@ -116,7 +116,7 @@ class DrivePage : public IPage {
         const float valuePercent = 0.12f;
         const float labelPercent = 0.05f;
         const float largeFontSize = 36.0f;
-        const float medFontSize = 28.0f;
+        const float medFontSize = 24.0f;
 
         // clang-format off
         return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(
@@ -133,30 +133,36 @@ class DrivePage : public IPage {
                                 .textSizeSet(largeFontSize)
                                 .alignTextLeft()
                                 .leftMarginSet(10)
-                                .fontSet(*latoBlack),
+                                .fontSet(*latoBlack)
+                                .alignTextBottom(),
                             ui::text("12.2")
                                 .widthSet(okay::size::Percent(valuePercent))
                                 .textSizeSet(medFontSize)
-                                .alignTextCenter(),
+                                .alignTextCenter()
+                                .alignTextBottom(),
                             ui::text("LV")
                                 .widthSet(okay::size::Percent(labelPercent))
                                 .textSizeSet(medFontSize)
-                                .alignTextCenter(),
+                                .alignTextCenter()
+                                .alignTextBottom(),
                             ui::spacer(),
                             ui::text("HV")
                                 .widthSet(okay::size::Percent(labelPercent))
                                 .textSizeSet(medFontSize)
-                                .alignTextCenter(),
+                                .alignTextCenter()
+                                .alignTextBottom(),
                             ui::text("480")
                                 .widthSet(okay::size::Percent(valuePercent))
                                 .textSizeSet(medFontSize)
-                                .alignTextCenter(),
+                                .alignTextCenter()
+                                .alignTextBottom(),
                             ui::text("milage")
                                 .widthSet(okay::size::Percent(outerPercent))
                                 .textSizeSet(largeFontSize)
                                 .alignTextRight()
                                 .rightMarginSet(10)
                                 .fontSet(*latoBlack)
+                                .alignTextBottom()
                         )
                 )
         );

@@ -96,7 +96,7 @@ class DrivePage : public IPage {
                 .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 20.0f})
                 .addComponent<okay::CameraComponent>(
                     okay::CameraComponent{okay::Camera::PerspectiveLens{45.0f, 0.1f, 100.0f}})
-                .addComponent<CameraControllerComponent>(0.5f, 60.0f),
+                .addComponent<CameraControllerComponent>(0.25f, 60.0f),
 
         };
     }
@@ -112,41 +112,55 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildBotHud() {
-        const float outerPercent = 0.22f;
-        const float valuePercent = 0.11f;
+        const float outerPercent = 0.20f;
+        const float valuePercent = 0.12f;
         const float labelPercent = 0.05f;
         const float largeFontSize = 36.0f;
         const float medFontSize = 28.0f;
 
-        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(ui::spacer(),
-            ui::image(*botBar).axisSet(okay::UIAxis::Horizontal)(
-                ui::text("log file")
-                    .widthSet(okay::size::Percent(outerPercent))
-                    .textSizeSet(largeFontSize)
-                    .alignTextLeft()
-                    .leftPaddingSet(10),
-                ui::text("12.2")
-                    .widthSet(okay::size::Percent(valuePercent))
-                    .textSizeSet(medFontSize)
-                    .alignTextCenter(),
-                ui::text("LV")
-                    .widthSet(okay::size::Percent(labelPercent))
-                    .textSizeSet(medFontSize)
-                    .alignTextCenter(),
-                ui::spacer(),
-                ui::text("HV")
-                    .widthSet(okay::size::Percent(labelPercent))
-                    .textSizeSet(medFontSize)
-                    .alignTextCenter(),
-                ui::text("480")
-                    .widthSet(okay::size::Percent(valuePercent))
-                    .textSizeSet(medFontSize)
-                    .alignTextCenter(),
-                ui::text("milage")
-                    .widthSet(okay::size::Percent(outerPercent))
-                    .textSizeSet(largeFontSize)
-                    .alignTextRight()
-                    .rightPaddingSet(10)));
+        // clang-format off
+        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(
+            ui::spacer(),
+            ui::image(*botBar)
+                .axisSet(okay::UIAxis::Vertical) (
+                    ui::spacer(),
+                    ui::flexbox()
+                        .axisSet(okay::UIAxis::Horizontal)
+                        .bottomMarginSet(5)
+                        .widthSet(okay::size::Percent(1.0f)) (
+                            ui::text("log file")
+                                .widthSet(okay::size::Percent(outerPercent))
+                                .textSizeSet(largeFontSize)
+                                .alignTextLeft()
+                                .leftMarginSet(10)
+                                .fontSet(*latoBlack),
+                            ui::text("12.2")
+                                .widthSet(okay::size::Percent(valuePercent))
+                                .textSizeSet(medFontSize)
+                                .alignTextCenter(),
+                            ui::text("LV")
+                                .widthSet(okay::size::Percent(labelPercent))
+                                .textSizeSet(medFontSize)
+                                .alignTextCenter(),
+                            ui::spacer(),
+                            ui::text("HV")
+                                .widthSet(okay::size::Percent(labelPercent))
+                                .textSizeSet(medFontSize)
+                                .alignTextCenter(),
+                            ui::text("480")
+                                .widthSet(okay::size::Percent(valuePercent))
+                                .textSizeSet(medFontSize)
+                                .alignTextCenter(),
+                            ui::text("milage")
+                                .widthSet(okay::size::Percent(outerPercent))
+                                .textSizeSet(largeFontSize)
+                                .alignTextRight()
+                                .rightMarginSet(10)
+                                .fontSet(*latoBlack)
+                        )
+                )
+        );
+        // clang-format on
     }
 
    private:
@@ -158,8 +172,8 @@ class DrivePage : public IPage {
         "textures/bg_pattern.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> topBar{"textures/top_bar.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> botBar{"textures/bottom_bar.png"};
-    okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> lato{
-        "fonts/Lato-Regular.ttf"};
+    okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBlack{
+        "fonts/Lato-Black.ttf"};
     okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{
         "fonts/Lato-Bold.ttf"};
 };

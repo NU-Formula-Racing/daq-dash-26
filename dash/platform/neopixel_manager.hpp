@@ -84,10 +84,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             _animationFunction(time);
         }
 
-        if (errorOccured()) {
-            startAnimation([this](float time) { error(time); });
-        }
-
         updateDisplay();
     }
 
@@ -134,11 +130,61 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
     VirtualizedNeobar& getBar(uint8_t barNum) { return _bars[barNum]; }
 
+    bool errorOccured() {
+        const int errorCode = 0x03;
+
+        bool hardFaultError = 
+            dbc::bmsFaults::internalfaultSummary->get() || 
+            dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode || 
+            dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode || 
+            dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
+
+        uint8_t imdError = dbc::bmsStatus::imdState->get();
+
+        if (hardFaultError || imdError) {
+            return true;
+        }
+
+        return false;
+    }
+
+    void error(float time) {
+        const float hardFaultPeriod = 250.0f;
+        const float imdPeriod = 1000.0f;
+        const int errorCode = 0x03;
+                    
+        uint8_t imdError = dbc::bmsStatus::imdState->get();
+ 
+        const float period = (imdError == 1) ? imdPeriod : hardFaultPeriod;
+        float brightness = static_cast<int>(floor(time / period)) % 2;
+
+        glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        color *= brightness;
+        // set the colors
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < getBar(i).numPixels(); j++) {
+                getBar(i).setColor(j, color);
+            }
+        }
+    }
+
     void onECUDriveStatus() {
+        // error  check if error state is not no error & error state is the same, then return
+        bool error_val = errorOccured();
+        if (error_val) {
+            if (!currentErrorState){
+                currentErrorState = true;
+                startAnimation([this](float time) { error(time); });
+            }
+            return;
+        }
+
         uint8_t state = dbc::ecuDriveStatus::driveState->get();
 
-        if (state == currentState)
+        if (currentErrorState == false && state == currentState)
             return;
+
+        currentErrorState = false;
 
         currentState = state;
 
@@ -157,6 +203,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 startAnimation([this](float time) { drive(time); });
                 break;
         }
+        
+        
     }
 
    private:
@@ -165,6 +213,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     uint32_t _animationStartTimeMs{0};
     std::function<void(float)> _animationFunction;
     uint8_t currentState{0};
+    bool currentErrorState{false};
 
     void startAnimation(std::function<void(float)> animationFunction) {
         _animationStartTimeMs = okay::Engine.time->timeSinceStartMs();
@@ -231,49 +280,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         return glm::vec4(r, g, b, 1.0f);
     }
 
-    bool errorOccured() {
-        const int errorCode = 0x03;
-
-        bool hardFaultError = 
-            dbc::bmsFaults::internalfaultSummary->get() || 
-            dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode || 
-            dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode || 
-            dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
-
-        uint8_t imdError = dbc::bmsStatus::imdState->get();
-
-        if (hardFaultError || imdError) {
-            return true;
-        }
-
-        return false;
-    }
-
-    void error(float time) {
-        const float hardFaultPeriod = 250.0f;
-        const float imdPeriod = 1000.0f;
-        const int errorCode = 0x03;
-
-        bool hardFaultError = 
-            dbc::bmsFaults::internalfaultSummary->get() || 
-            dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode || 
-            dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode || 
-            dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
-                    
-        uint8_t imdError = dbc::bmsStatus::imdState->get();
-
-        const float period = (imdError == 1) ? imdPeriod : hardFaultPeriod;
-        float brightness = static_cast<int>(floor(time / period)) % 2;
-
-        glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        color *= brightness;
-        // set the colors
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < getBar(i).numPixels(); j++) {
-                getBar(i).setColor(j, color);
-            }
-        }
-    }
 
     void idle(float time) {
         const float breathePeriod = 2000.0f;
@@ -354,9 +360,11 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
 
             // we are now in throttle light mode
-            const float appsMax = 100;
+            const float currentMax = 360;
+            int32_t rawCurrent = dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get();
+            int32_t rawThrottle = rawCurrent > currentMax ? currentMax : rawCurrent;
             float throttlePercentage =
-                static_cast<float>(dbc::ecuThrottle::apps1Throttle->get()) / appsMax;
+                static_cast<float>(rawThrottle) / currentMax;
             glm::vec4 botColor = colorFromHex(0x00FF00);
             glm::vec4 topColor = colorFromHex(0xFFDD00);
 
@@ -369,7 +377,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                         botColor, topColor, static_cast<float>(j) / static_cast<float>(numPixels));
                     getBar(i).setColor(j, color);
                 }
-                return;
             }
 
                 // we are now in throttle light mode

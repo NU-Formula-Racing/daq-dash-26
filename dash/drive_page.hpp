@@ -2,6 +2,7 @@
 #define __DRIVE_PAGE_H__
 
 #include "page.hpp"
+#include "style.hpp"
 
 #include <okay/okay.hpp>
 
@@ -170,17 +171,48 @@ class DrivePage : public IPage {
             ui::spacer(),
             ui::row()(
                 ui::spacer(),
-                ui::image(*stateShape)(ui::text("DRIVE")
+                ui::image(*stateShape)(ui::text(getDriveStateString())
                         .widthGrow()
                         .textSizeSet(32.0f)
                         .alignTextCenter()
                         .alignTextMiddle()
                         .fontSet(*latoBlack)
-                        .topMarginSet(8)),
+                        .topMarginSet(8))
+                        .backgroundColorSet(getDriveStateColor()),
                 ui::spacer()
             )
         );
         // clang-format on
+    }
+
+    std::string getDriveStateString() {
+        switch (dbc::ecuDriveStatus::driveState->get()) {
+            case 0:
+                return "IDLE";
+            case 1:
+                return "PRECHARGE";
+            case 2:
+                return "NEUTRAL";
+            case 3:
+                return "DRIVE";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
+    glm::vec4 getDriveStateColor() {
+        switch (dbc::ecuDriveStatus::driveState->get()) {
+            case 0:
+                return colors::fromHex(0x219EEBFF);
+            case 1:
+                return colors::fromHex(0xEBCD21FF);
+            case 2:
+                return colors::northwesternPurple;
+            case 3:
+                return colors::fromHex(0x38EB21FF);
+            default:
+                return colors::fromHex(0xFF00FFFF);
+        }
     }
 
    private:

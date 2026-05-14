@@ -1,13 +1,6 @@
 #ifndef __DRIVE_PAGE_H__
 #define __DRIVE_PAGE_H__
 
-#include "glm/ext/vector_float4.hpp"
-#include "okay/core/asset/asset_ref.hpp"
-#include "okay/core/asset/generic/texture_loader.hpp"
-#include "okay/core/renderer/materials/unlit.hpp"
-#include "okay/core/ui/builder.hpp"
-#include "okay/core/ui/element.hpp"
-#include "okay/core/ui/font.hpp"
 #include "page.hpp"
 
 #include <okay/okay.hpp>
@@ -88,8 +81,9 @@ class DrivePage : public IPage {
         okay::UIStyle::main().setMainFont(*latoBold);
 
         _entities = {
-            okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 1),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 1),
+            okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 2),
+            okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 2),
+            okay::ecs::uiEntity(BIND_TO_THIS(buildDriveStatus), 1),
             okay::ecs::sceneEntity().addComponent<okay::MeshRendererComponent>(
                 centerMesh, objectMaterial, static_cast<uint8_t>(255)),
             okay::ecs::entity()
@@ -115,7 +109,7 @@ class DrivePage : public IPage {
         const float outerPercent = 0.20f;
         const float valuePercent = 0.12f;
         const float labelPercent = 0.05f;
-        const float largeFontSize = 36.0f;
+        const float largeFontSize = 32.0f;
         const float medFontSize = 24.0f;
 
         // clang-format off
@@ -169,6 +163,19 @@ class DrivePage : public IPage {
         // clang-format on
     }
 
+    okay::UIElement buildDriveStatus() {
+        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(ui::spacer(),
+            ui::row()(ui::spacer(),
+                ui::image(*stateShape)(ui::text("DRIVE")
+                        .widthGrow()
+                        .textSizeSet(32.0f)
+                        .alignTextCenter()
+                        .alignTextMiddle()
+                        .fontSet(*latoBlack)
+                        .topMarginSet(8)),
+                ui::spacer()));
+    }
+
    private:
     std::vector<okay::ECSEntity> _entities;
 
@@ -178,6 +185,8 @@ class DrivePage : public IPage {
         "textures/bg_pattern.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> topBar{"textures/top_bar.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> botBar{"textures/bottom_bar.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> stateShape{
+        "textures/state_shape.png"};
     okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBlack{
         "fonts/Lato-Black.ttf"};
     okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{

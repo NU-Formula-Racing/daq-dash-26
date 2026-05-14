@@ -5,6 +5,7 @@
 
 #include <okay/okay.hpp>
 
+#include <can/can_dbc.hpp>
 #include <memory>
 
 namespace ui = okay::ui;
@@ -122,14 +123,14 @@ class DrivePage : public IPage {
                         .axisSet(okay::UIAxis::Horizontal)
                         .bottomMarginSet(5)
                         .widthSet(okay::size::Percent(1.0f)) (
-                            ui::text("log file")
+                            ui::text(std::format("log_{:04}.nfr", dbc::telemetryStatus::logFile->get()))
                                 .widthSet(okay::size::Percent(outerPercent))
                                 .textSizeSet(largeFontSize)
                                 .alignTextLeft()
                                 .leftMarginSet(10)
                                 .fontSet(*latoBlack)
                                 .alignTextBottom(),
-                            ui::text("12.2")
+                            ui::text(std::format("{:.2f}", dbc::pdmBatVolt::batVolt->get()))
                                 .widthSet(okay::size::Percent(valuePercent))
                                 .textSizeSet(medFontSize)
                                 .alignTextCenter()
@@ -145,12 +146,12 @@ class DrivePage : public IPage {
                                 .textSizeSet(medFontSize)
                                 .alignTextCenter()
                                 .alignTextBottom(),
-                            ui::text("480")
+                            ui::text(std::format("{:.2f}", dbc::bmsSoe::batteryVoltage->get()))
                                 .widthSet(okay::size::Percent(valuePercent))
                                 .textSizeSet(medFontSize)
                                 .alignTextCenter()
                                 .alignTextBottom(),
-                            ui::text("milage")
+                            ui::text(std::format("{:.2f} mi", dbc::telemetryOdometer::milesDriven->get()))
                                 .widthSet(okay::size::Percent(outerPercent))
                                 .textSizeSet(largeFontSize)
                                 .alignTextRight()
@@ -164,8 +165,11 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildDriveStatus() {
-        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(ui::spacer(),
-            ui::row()(ui::spacer(),
+        // clang-format off
+        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(
+            ui::spacer(),
+            ui::row()(
+                ui::spacer(),
                 ui::image(*stateShape)(ui::text("DRIVE")
                         .widthGrow()
                         .textSizeSet(32.0f)
@@ -173,7 +177,10 @@ class DrivePage : public IPage {
                         .alignTextMiddle()
                         .fontSet(*latoBlack)
                         .topMarginSet(8)),
-                ui::spacer()));
+                ui::spacer()
+            )
+        );
+        // clang-format on
     }
 
    private:

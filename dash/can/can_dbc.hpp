@@ -40,6 +40,20 @@ static constexpr float batVoltMin{0.0};
 
 };  // namespace pdmBatVolt
 
+namespace pdmCoolant {
+
+inline CAN_Signal_FLOAT coolant1Volt = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT coolant2Volt = MakeSignalSigned(float, 16, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT coolant3Volt = MakeSignalSigned(float, 32, 16, 0.01, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x2A3, false, 6, coolant1Volt, coolant2Volt, coolant3Volt};
+
+static constexpr float coolant1VoltMin{0.0};
+static constexpr float coolant2VoltMin{0.0};
+static constexpr float coolant3VoltMin{0.0};
+
+};  // namespace pdmCoolant
+
 namespace frontRightInverterMotorStatus {
 
 inline CAN_Signal_INT16 rpm = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
@@ -1522,15 +1536,6 @@ static constexpr uint64_t controllerErrorProtocolViolationMin{0};
 
 };  // namespace can2usbControllerErrorProtocolViolation
 
-namespace dashboardHeartbeat {
-
-inline CAN_Signal_UINT64 heartbeatCount = MakeSignalExp(uint64_t, 0, 64, 1.0, 0.0);
-inline RX_CAN_Message(1) message{driveBus, 0x510, false, 8, heartbeatCount};
-
-static constexpr uint64_t heartbeatCountMin{0};
-
-};  // namespace dashboardHeartbeat
-
 namespace brBrokerTemp1 {
 
 inline CAN_Signal_FLOAT brTireTemp0 = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
@@ -1791,27 +1796,19 @@ static constexpr int16_t flHeartbeatCountMin{0};
 
 };  // namespace flBrokerCanErrorMsg
 
-namespace imuAccelerationUncompensated {
+namespace imuAcceleration {
 
-inline CAN_Signal_FLOAT xAxisAccelerationUncompensated =
-    MakeSignalSigned(float, 0, 21, 0.0002, 0.0, false);
-inline CAN_Signal_FLOAT yAxisAccelerationUncompensated =
-    MakeSignalSigned(float, 21, 21, 0.0002, 0.0, false);
-inline CAN_Signal_FLOAT zAxisAccelerationUncompensated =
-    MakeSignalSigned(float, 42, 21, 0.0002, 0.0, false);
-inline RX_CAN_Message(3) message{driveBus,
-    0x550,
-    false,
-    8,
-    xAxisAccelerationUncompensated,
-    yAxisAccelerationUncompensated,
-    zAxisAccelerationUncompensated};
+inline CAN_Signal_FLOAT xAxisAcceleration = MakeSignalSigned(float, 0, 21, 0.0002, 0.0, false);
+inline CAN_Signal_FLOAT yAxisAcceleration = MakeSignalSigned(float, 21, 21, 0.0002, 0.0, false);
+inline CAN_Signal_FLOAT zAxisAcceleration = MakeSignalSigned(float, 42, 21, 0.0002, 0.0, false);
+inline RX_CAN_Message(3) message{
+    driveBus, 0x550, false, 8, xAxisAcceleration, yAxisAcceleration, zAxisAcceleration};
 
-static constexpr float xAxisAccelerationUncompensatedMin{-160.0};
-static constexpr float yAxisAccelerationUncompensatedMin{-160.0};
-static constexpr float zAxisAccelerationUncompensatedMin{-160.0};
+static constexpr float xAxisAccelerationMin{-160.0};
+static constexpr float yAxisAccelerationMin{-160.0};
+static constexpr float zAxisAccelerationMin{-160.0};
 
-};  // namespace imuAccelerationUncompensated
+};  // namespace imuAcceleration
 
 namespace imuYawPitchRoll {
 
@@ -1925,7 +1922,7 @@ static constexpr float zAxisDeltaVelocityMin{-500.0};
 
 namespace imuUtcTime {
 
-inline CAN_Signal_UINT8 utcYear = MakeSignalExp(uint8_t, 0, 8, 1.0, 2000.0);
+inline CAN_Signal_UINT8 utcYear = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
 inline CAN_Signal_UINT8 utcMonth = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
 inline CAN_Signal_UINT8 utcDay = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
 inline CAN_Signal_UINT8 utcHour = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
@@ -2003,11 +2000,98 @@ static constexpr float positionUncertaintyDownMin{0.0};
 
 };  // namespace imuPositionU
 
+namespace telemetryRtcTime {
+
+inline CAN_Signal_UINT8 rtcHour = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 rtcMinute = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 rtcSecond = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
+inline CAN_Signal_UINT32 rtcSubsecond = MakeSignalExp(uint32_t, 24, 32, 1.0, 0.0);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x520, false, 7, rtcHour, rtcMinute, rtcSecond, rtcSubsecond};
+
+static constexpr uint8_t rtcHourMin{0};
+static constexpr uint8_t rtcMinuteMin{0};
+static constexpr uint8_t rtcSecondMin{0};
+static constexpr uint32_t rtcSubsecondMin{0};
+
+};  // namespace telemetryRtcTime
+
+namespace telemetryRtcDate {
+
+inline CAN_Signal_UINT8 rtcYear = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 rtcMonth = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 rtcDay = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 rtcWeekday = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
+inline RX_CAN_Message(4) message{driveBus, 0x521, false, 4, rtcYear, rtcMonth, rtcDay, rtcWeekday};
+
+static constexpr uint8_t rtcYearMin{0};
+static constexpr uint8_t rtcMonthMin{1};
+static constexpr uint8_t rtcDayMin{1};
+static constexpr uint8_t rtcWeekdayMin{1};
+
+};  // namespace telemetryRtcDate
+
+namespace telemetryOdometer {
+
+inline CAN_Signal_FLOAT milesDriven = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline RX_CAN_Message(1) message{driveBus, 0x522, false, 4, milesDriven};
+
+static constexpr float milesDrivenMin{0.0};
+
+};  // namespace telemetryOdometer
+
+namespace telemetryStatus {
+
+inline CAN_Signal_UINT16 logFile = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
+inline CAN_Signal_UINT8 loggingStatus = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 wirelessStatus = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
+inline RX_CAN_Message(3) message{driveBus, 0x523, false, 4, logFile, loggingStatus, wirelessStatus};
+
+static constexpr uint16_t logFileMin{0};
+static constexpr uint8_t loggingStatusMin{0};
+static constexpr uint8_t wirelessStatusMin{0};
+
+};  // namespace telemetryStatus
+
+namespace aeroStrainGauge1 {
+
+inline CAN_Signal_FLOAT strainGauge1 = MakeSignalSigned(float, 0, 32, 0.0001, 0.0, false);
+inline CAN_Signal_FLOAT strainGauge2 = MakeSignalSigned(float, 32, 32, 0.0001, 0.0, false);
+inline RX_CAN_Message(2) message{driveBus, 0x560, false, 8, strainGauge1, strainGauge2};
+
+static constexpr float strainGauge1Min{-100.0};
+static constexpr float strainGauge2Min{-100.0};
+
+};  // namespace aeroStrainGauge1
+
+namespace aeroStrainGauge2 {
+
+inline CAN_Signal_FLOAT strainGauge3 = MakeSignalSigned(float, 0, 32, 0.0001, 0.0, false);
+inline CAN_Signal_FLOAT strainGauge4 = MakeSignalSigned(float, 32, 32, 0.0001, 0.0, false);
+inline RX_CAN_Message(2) message{driveBus, 0x561, false, 8, strainGauge3, strainGauge4};
+
+static constexpr float strainGauge3Min{-100.0};
+static constexpr float strainGauge4Min{-100.0};
+
+};  // namespace aeroStrainGauge2
+
+namespace aeroStrainGauge3 {
+
+inline CAN_Signal_FLOAT strainGauge5 = MakeSignalSigned(float, 0, 32, 0.0001, 0.0, false);
+inline CAN_Signal_FLOAT strainGauge6 = MakeSignalSigned(float, 32, 32, 0.0001, 0.0, false);
+inline RX_CAN_Message(2) message{driveBus, 0x562, false, 8, strainGauge5, strainGauge6};
+
+static constexpr float strainGauge5Min{-100.0};
+static constexpr float strainGauge6Min{-100.0};
+
+};  // namespace aeroStrainGauge3
+
 namespace meta {
 
 static const std::map<uint32_t, const char*> messageIdToName = {
     {0x2A1, "PDM_Current"},
     {0x2A2, "PDM_Bat_Volt"},
+    {0x2A3, "PDM_Coolant"},
     {0x28B, "Front_Right_Inverter_Motor_Status"},
     {0x28C, "Front_Right_Inverter_Temp_Status"},
     {0x28D, "Front_Right_Inverter_Current_Draw"},
@@ -2075,7 +2159,6 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x004, "CAN2USB_Controller_Error"},
     {0x024, "CAN2USB_Controller_Error_NACK_Error"},
     {0x00C, "CAN2USB_Controller_Error_Protocol_Violation"},
-    {0x510, "Dashboard_Heartbeat"},
     {0x530, "BR_Broker_Temp1"},
     {0x531, "BR_Broker_Temp2"},
     {0x538, "BR_Broker_Sus"},
@@ -2092,7 +2175,7 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x537, "FL_Broker_Temp2"},
     {0x53E, "FL_Broker_Sus"},
     {0x543, "FL_Broker_CAN_Error_Msg"},
-    {0x550, "IMU_Acceleration_Uncompensated"},
+    {0x550, "IMU_Acceleration"},
     {0x551, "IMU_Yaw_Pitch_Roll"},
     {0x552, "IMU_Angular_Rate"},
     {0x553, "IMU_Position_INS"},
@@ -2105,6 +2188,13 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x55A, "IMU_Fix_NumSats_INS_Status"},
     {0x55B, "IMU_Position_GNSS"},
     {0x55C, "IMU_Position_U"},
+    {0x520, "Telemetry_RTC_Time"},
+    {0x521, "Telemetry_RTC_Date"},
+    {0x522, "Telemetry_Odometer"},
+    {0x523, "Telemetry_Status"},
+    {0x560, "Aero_Strain_Gauge1"},
+    {0x561, "Aero_Strain_Gauge2"},
+    {0x562, "Aero_Strain_Gauge3"},
 };
 
 static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName = {
@@ -2116,6 +2206,9 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x2A2, 0}, "Bat_Volt"},
     {{0x2A2, 1}, "Low_Bat_Volt_Warning"},
     {{0x2A2, 2}, "Danger_Bat_Volt_Warning"},
+    {{0x2A3, 0}, "Coolant_1_Volt"},
+    {{0x2A3, 1}, "Coolant_2_Volt"},
+    {{0x2A3, 2}, "Coolant_3_Volt"},
     {{0x28B, 0}, "RPM"},
     {{0x28B, 1}, "Motor_Current"},
     {{0x28B, 2}, "DC_Voltage"},
@@ -2444,7 +2537,6 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x004, 0}, "Controller_Error"},
     {{0x024, 0}, "Controller_Error_NACK"},
     {{0x00C, 0}, "Controller_Error_Protocol_Violation"},
-    {{0x510, 0}, "Heartbeat_Count"},
     {{0x530, 0}, "BR_Tire_Temp_0"},
     {{0x530, 1}, "BR_Tire_Temp_1"},
     {{0x530, 2}, "BR_Tire_Temp_2"},
@@ -2501,9 +2593,9 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x543, 1}, "FL_Sus_Pot_Error"},
     {{0x543, 2}, "FL_Tire_Temp_Error"},
     {{0x543, 3}, "FL_Heartbeat_Count"},
-    {{0x550, 0}, "X_Axis_Acceleration_Uncompensated"},
-    {{0x550, 1}, "Y_Axis_Acceleration_Uncompensated"},
-    {{0x550, 2}, "Z_Axis_Acceleration_Uncompensated"},
+    {{0x550, 0}, "X_Axis_Acceleration"},
+    {{0x550, 1}, "Y_Axis_Acceleration"},
+    {{0x550, 2}, "Z_Axis_Acceleration"},
     {{0x551, 0}, "Yaw"},
     {{0x551, 1}, "Pitch"},
     {{0x551, 2}, "Roll"},
@@ -2544,6 +2636,24 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x55C, 0}, "Position_Uncertainty_North"},
     {{0x55C, 1}, "Position_Uncertainty_East"},
     {{0x55C, 2}, "Position_Uncertainty_Down"},
+    {{0x520, 0}, "RTC_Hour"},
+    {{0x520, 1}, "RTC_Minute"},
+    {{0x520, 2}, "RTC_Second"},
+    {{0x520, 3}, "RTC_Subsecond"},
+    {{0x521, 0}, "RTC_Year"},
+    {{0x521, 1}, "RTC_Month"},
+    {{0x521, 2}, "RTC_Day"},
+    {{0x521, 3}, "RTC_Weekday"},
+    {{0x522, 0}, "Miles_Driven"},
+    {{0x523, 0}, "Log_File"},
+    {{0x523, 1}, "Logging_Status"},
+    {{0x523, 2}, "Wireless_Status"},
+    {{0x560, 0}, "Strain_Gauge_1"},
+    {{0x560, 1}, "Strain_Gauge_2"},
+    {{0x561, 0}, "Strain_Gauge_3"},
+    {{0x561, 1}, "Strain_Gauge_4"},
+    {{0x562, 0}, "Strain_Gauge_5"},
+    {{0x562, 1}, "Strain_Gauge_6"},
 };
 
 };  // namespace meta

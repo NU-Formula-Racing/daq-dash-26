@@ -74,6 +74,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         }
 
         dbc::ecuDriveStatus::message.attach_rx_callback([this]() { onECUDriveStatus(); });
+
         startAnimation([this](float time) { idle(time); });
         updateDisplay();
     }
@@ -83,7 +84,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             float time = okay::Engine.time->timeSinceStartMs() - _animationStartTimeMs;
             _animationFunction(time);
         }
-
+        checkErrorOccured();
         updateDisplay();
     }
 
@@ -134,12 +135,12 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const int errorCode = 0x03;
 
         bool hardFaultError = 
-            dbc::bmsFaults::internalfaultSummary->get() || 
+            dbc::bmsStatus::internalfaultSummary->get() != 0 || 
             dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode || 
             dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode || 
             dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
 
-        uint8_t imdError = dbc::bmsStatus::imdState->get();
+        bool imdError = !(dbc::bmsStatus::imdState->get());
 
         if (hardFaultError || imdError) {
             return true;
@@ -153,9 +154,9 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float imdPeriod = 1000.0f;
         const int errorCode = 0x03;
                     
-        uint8_t imdError = dbc::bmsStatus::imdState->get();
+        bool imdError = !(dbc::bmsStatus::imdState->get());
  
-        const float period = (imdError == 1) ? imdPeriod : hardFaultPeriod;
+        const float period = (imdError) ? imdPeriod : hardFaultPeriod;
         float brightness = static_cast<int>(floor(time / period)) % 2;
 
         glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -168,7 +169,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         }
     }
 
-    void onECUDriveStatus() {
+    void checkErrorOccured() {
         // error  check if error state is not no error & error state is the same, then return
         bool error_val = errorOccured();
         if (error_val) {
@@ -177,7 +178,14 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 startAnimation([this](float time) { error(time); });
             }
             return;
-        }
+        } 
+        
+        currentErrorState = false;
+        onECUDriveStatus();
+    }
+
+    void onECUDriveStatus() {
+        if (currentErrorState) { return; }
 
         uint8_t state = dbc::ecuDriveStatus::driveState->get();
 
@@ -316,7 +324,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
         float prechargePercentage =
             static_cast<float>(dbc::rearInverterMotorStatus::dcVoltage->get()) /
-            static_cast<float>(dbc::bmsSoe::batteryVoltage->get());
+            static_cast<float>(dbc::bmsDaughterboard::batteryVoltage->get());
         for (int i = 0; i < 5; i++) {
             // probably something here
             float t = 0.9f / getBar(i).numPixels();

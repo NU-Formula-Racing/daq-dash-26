@@ -26,8 +26,6 @@ static std::size_t __frameCount = 0;
 // clang-format off
 static std::vector<ICAN_Message*> g_toPrint = {
     &dbc::bmsStatus::message,
-    &dbc::bmsFaults::message,
-    &dbc::bmsSoe::message,
     &dbc::pdmBatVolt::message,
     &dbc::ecuBmsCommandMessage::message,
     &dbc::ecuImplausibility::message,

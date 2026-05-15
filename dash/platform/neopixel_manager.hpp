@@ -179,6 +179,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
             return;
         } 
+
+        if (currentErrorState) { errorReset = true; }
         
         currentErrorState = false;
         onECUDriveStatus();
@@ -189,10 +191,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
         uint8_t state = dbc::ecuDriveStatus::driveState->get();
 
-        if (currentErrorState == false && state == currentState)
+        if (errorReset == false && state == currentState)
             return;
 
-        currentErrorState = false;
+        errorReset = false;
 
         currentState = state;
 
@@ -222,6 +224,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     std::function<void(float)> _animationFunction;
     uint8_t currentState{0};
     bool currentErrorState{false};
+    bool errorReset{false};
 
     void startAnimation(std::function<void(float)> animationFunction) {
         _animationStartTimeMs = okay::Engine.time->timeSinceStartMs();

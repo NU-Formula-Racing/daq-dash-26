@@ -134,11 +134,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     bool errorOccured() {
         const int errorCode = 0x03;
 
-        bool hardFaultError = 
-            dbc::bmsStatus::internalfaultSummary->get() != 0 || 
-            dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode || 
-            dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode || 
-            dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
+        bool hardFaultError = dbc::bmsStatus::internalfaultSummary->get() != 0 ||
+                              dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode ||
+                              dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode ||
+                              dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
 
         bool imdError = !(dbc::bmsStatus::imdState->get());
 
@@ -153,9 +152,9 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float hardFaultPeriod = 250.0f;
         const float imdPeriod = 1000.0f;
         const int errorCode = 0x03;
-                    
+
         bool imdError = !(dbc::bmsStatus::imdState->get());
- 
+
         const float period = (imdError) ? imdPeriod : hardFaultPeriod;
         float brightness = static_cast<int>(floor(time / period)) % 2;
 
@@ -173,21 +172,25 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         // error  check if error state is not no error & error state is the same, then return
         bool error_val = errorOccured();
         if (error_val) {
-            if (!currentErrorState){
+            if (!currentErrorState) {
                 currentErrorState = true;
                 startAnimation([this](float time) { error(time); });
             }
             return;
-        } 
+        }
 
-        if (currentErrorState) { errorReset = true; }
-        
+        if (currentErrorState) {
+            errorReset = true;
+        }
+
         currentErrorState = false;
         onECUDriveStatus();
     }
 
     void onECUDriveStatus() {
-        if (currentErrorState) { return; }
+        if (currentErrorState) {
+            return;
+        }
 
         uint8_t state = dbc::ecuDriveStatus::driveState->get();
 
@@ -213,8 +216,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 startAnimation([this](float time) { drive(time); });
                 break;
         }
-        
-        
     }
 
    private:
@@ -290,7 +291,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         float b = (hex & 0xFF) / 255.0f;
         return glm::vec4(r, g, b, 1.0f);
     }
-
 
     void idle(float time) {
         const float breathePeriod = 2000.0f;
@@ -371,11 +371,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
 
             // we are now in throttle light mode
-            const float currentMax = 360;
+            const float currentMax = 235;
             int32_t rawCurrent = dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get();
             int32_t rawThrottle = rawCurrent > currentMax ? currentMax : rawCurrent;
-            float throttlePercentage =
-                static_cast<float>(rawThrottle) / currentMax;
+            float throttlePercentage = static_cast<float>(rawThrottle) / currentMax;
             glm::vec4 botColor = colorFromHex(0x00FF00);
             glm::vec4 topColor = colorFromHex(0xFFDD00);
 
@@ -390,40 +389,37 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 }
             }
 
-                // we are now in throttle light mode
+            // we are now in throttle light mode
 
-                for (int i = 0; i < 5; i++) {
-                    int numPixels = getBar(i).numPixels();
-                    int numFull = static_cast<int>(floor(throttlePercentage * numPixels));
+            for (int i = 0; i < 5; i++) {
+                int numPixels = getBar(i).numPixels();
+                int numFull = static_cast<int>(floor(throttlePercentage * numPixels));
 
-                    for (int j = 0; j < numFull; j++) {
+                for (int j = 0; j < numFull; j++) {
+                    glm::vec4 color = glm::mix(
+                        botColor, topColor, static_cast<float>(j) / static_cast<float>(numPixels));
+                    getBar(i).setColor(j, color);
+                }
+
+                // turn off the rest of the pixels
+                for (int j = numFull; j < numPixels; j++) {
+                    if (j == numFull) {
                         glm::vec4 color =
                             glm::mix(botColor,
                                      topColor,
                                      static_cast<float>(j) / static_cast<float>(numPixels));
-                        getBar(i).setColor(j, color);
+                        // set it to partial brightness to make a smoother transition
+                        glm::vec4 partialColor = color * (throttlePercentage * numPixels - numFull);
+                        getBar(i).setColor(j, partialColor);
+                        continue;
                     }
 
-                    // turn off the rest of the pixels
-                    for (int j = numFull; j < numPixels; j++) {
-                        if (j == numFull) {
-                            glm::vec4 color =
-                                glm::mix(botColor,
-                                         topColor,
-                                         static_cast<float>(j) / static_cast<float>(numPixels));
-                            // set it to partial brightness to make a smoother transition
-                            glm::vec4 partialColor =
-                                color * (throttlePercentage * numPixels - numFull);
-                            getBar(i).setColor(j, partialColor);
-                            continue;
-                        }
-
-                        getBar(i).setColor(j, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
-                    }
+                    getBar(i).setColor(j, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
                 }
             }
         }
-    };
+    }
+};
 
 }  // namespace dash
 

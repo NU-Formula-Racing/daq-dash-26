@@ -75,6 +75,9 @@ static void __gameInitialize() {
     std::cout << "\x1b[?25l";  // hide cursor
     std::cout << "\x1b[?1049h\x1b[2J\x1b[H\x1b[?25l";
     std::cout.flush();
+
+    // A bit of a hack, but default of IMD state should be 1
+    dbc::bmsStatus::imdState->set(1);
 }
 
 static void __gameShutdown() {

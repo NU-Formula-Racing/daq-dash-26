@@ -77,7 +77,7 @@ static bool s_hasInitialized{false};
 static bool s_hasCleanedUp{false};
 
 static uint32_t encodeToWWRRGGBB(glm::vec4 color) {
-    color = color * color.a;
+    color = color * color.a * 0.5f;
     return static_cast<uint32_t>(color.w * 255) << 24 | static_cast<uint32_t>(color.z * 255) << 16 |
            static_cast<uint32_t>(color.y * 255) << 8 | static_cast<uint32_t>(color.x * 255);
 }

@@ -212,6 +212,9 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 startAnimation([this](float time) { drive(time); });
                 break;
         }
+
+        odometerAnimation(0);
+        socChargeAnimation(0);
     }
 
    private:
@@ -304,6 +307,57 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const int topBar = 2;
         for (int j = 0; j < getBar(topBar).numPixels(); j++) {
             getBar(topBar).setColor(j, color);
+        }
+    }
+
+    void odometerAnimation(float time) {  // bar 0
+        glm::vec4 nuPurple = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+
+        float odometerPercentage =
+            static_cast<float>(dbc::telemetryOdometer::milesDriven->get()) * 1.60934 / 22;
+
+        int numFull = static_cast<int>(floor(odometerPercentage * getBar(0).numPixels()));
+
+        // full bars
+        for (int j = 0; j < numFull; j++) {
+            getBar(0).setColor((getBar(0).numPixels() - 1) - j, nuPurple);
+        }
+
+        // partial
+        for (int j = 0; j < getBar(0).numPixels(); j++) {
+            if (j == (getBar(0).numPixels() - 1) - numFull) {
+                glm::vec4 partialColor =
+                    nuPurple * (odometerPercentage * getBar(0).numPixels() - numFull);
+                getBar(0).setColor(j, partialColor);
+                continue;
+            }
+        }
+    }
+
+
+    void socChargeAnimation(float time) {                     // bar 1
+        glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);  // placeholder
+        float lowerBound = 0.1;
+        float upperBound = 0.9;
+
+        float batteryPercentage =
+            (static_cast<float>(dbc::bmsStatus::soc->get()) - lowerBound) / upperBound;
+
+        int numFull = static_cast<int>(floor(batteryPercentage * getBar(1).numPixels()));
+
+        // full bars
+        for (int j = 0; j < numFull; j++) {
+            getBar(0).setColor((getBar(1).numPixels() - 1) - j, color);
+        }
+
+        // partial
+        for (int j = 0; j < getBar(0).numPixels(); j++) {
+            if (j == (getBar(1).numPixels() - 1) - numFull) {
+                glm::vec4 partialColor =
+                    color * (batteryPercentage * getBar(1).numPixels() - numFull);
+                getBar(1).setColor(j, partialColor);
+                continue;
+            }
         }
     }
 

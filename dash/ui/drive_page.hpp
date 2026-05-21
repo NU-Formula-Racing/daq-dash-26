@@ -1,8 +1,6 @@
 #ifndef __DRIVE_PAGE_H__
 #define __DRIVE_PAGE_H__
 
-#define GLM_ENABLE_EXPERIMENTAL
-
 #include "page.hpp"
 #include "style.hpp"
 

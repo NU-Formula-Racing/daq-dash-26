@@ -1,5 +1,5 @@
-#ifndef __DRIVE_PAGE_H__
-#define __DRIVE_PAGE_H__
+#ifndef __ERROR_PAGE_H__
+#define __ERROR_PAGE_H__
 
 #include "page.hpp"
 #include "style.hpp"
@@ -44,19 +44,12 @@ class CameraControllerSystem
 };
 #endif
 
-class DrivePage : public IPage {
+class ErrorPage : public IPage {
    public:
-    DrivePage() {}
+    ErrorPage() {}
 
     void initializePage() {
-        okay::Engine.logger.debug("Creating entities for Drive page!");
-
-        okay::ShaderHandle objectShader =
-            okay::shaderHandle(okay::load::engineShader("shaders/lit"));
-        auto materialProperties = std::make_unique<okay::LitMaterial>();
-        materialProperties->color.set(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-        okay::MaterialHandle objectMaterial =
-            okay::materialHandle(objectShader, std::move(materialProperties));
+        okay::Engine.logger.debug("Creating entities for Error page!");
 
         okay::ShaderHandle skyboxShader =
             okay::shaderHandle(okay::load::shader("shaders/background"));
@@ -70,32 +63,12 @@ class DrivePage : public IPage {
             okay::materialHandle(skyboxShader, std::move(skyboxProperties));
         okay::Engine.systems.getSystemChecked<okay::Renderer>()->setSkyboxMaterial(skyboxMaterial);
 
-        okay::ecs::entity()
-            .addComponent<okay::TransformComponent>(glm::vec3{},
-                glm::vec3{0.1f},
-                glm::angleAxis(glm::radians(0.0f), glm::vec3{2.0f, 3.0f, 1.0f}))
-            .addComponent<okay::LightComponent>(
-                okay::LightComponent::directional(glm::vec3{1, 1, 1}, 2.5f));
-
-        centerMesh = okay::mesh(*centerMeshData);
-
-        okay::ecs::registerComponent<CameraControllerComponent>();
-        okay::ecs::registerSystem(std::make_unique<CameraControllerSystem>());
-
         okay::UIStyle::main().setMainFont(*latoBold);
 
         _entities = {
-            okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 2),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 2),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildDriveStatus), 1),
-            okay::ecs::sceneEntity().addComponent<okay::MeshRendererComponent>(
-                centerMesh, objectMaterial, static_cast<uint8_t>(255)),
-            okay::ecs::entity()
-                .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 20.0f})
-                .addComponent<okay::CameraComponent>(
-                    okay::CameraComponent{okay::Camera::PerspectiveLens{45.0f, 0.1f, 100.0f}})
-                .addComponent<CameraControllerComponent>(0.25f, 60.0f),
-
+            okay::ecs::uiEntity(dash::BIND_TO_THIS(buildTopHud), 2),
+            okay::ecs::uiEntity(dash::BIND_TO_THIS(buildBotHud), 2),
+            okay::ecs::uiEntity(dash::BIND_TO_THIS(buildDriveStatus), 1),
         };
     }
 
@@ -220,8 +193,6 @@ class DrivePage : public IPage {
    private:
     std::vector<okay::ECSEntity> _entities;
 
-    okay::Mesh centerMesh{okay::Mesh::none()};
-    okay::EngineAssetRef<okay::MeshData> centerMeshData{"models/teapot.obj"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> bgTexture{
         "textures/bg_pattern.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> topBar{"textures/top_bar.png"};

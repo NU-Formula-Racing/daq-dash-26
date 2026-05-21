@@ -1,6 +1,9 @@
 #ifndef __DRIVE_PAGE_H__
 #define __DRIVE_PAGE_H__
 
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/quaternion_trigonometric.hpp"
+#include "glm/fwd.hpp"
 #include "page.hpp"
 #include "style.hpp"
 
@@ -19,26 +22,22 @@ namespace dash {
     }
 
 // TODO: Move this component + system into somewhere else
-struct CameraControllerComponent {
+struct RotateComponent {
     float speed{5.0f};
-    float distance{10.0f};
 
-    CameraControllerComponent() {}
-    CameraControllerComponent(float speed, float distance) : speed(speed), distance(distance) {}
+    RotateComponent() {}
+    RotateComponent(float speed) : speed(speed) {}
 };
 
-class CameraControllerSystem
-    : public okay::ECSSystem<
-          okay::query::Get<okay::TransformComponent, CameraControllerComponent>> {
+class RotateSystem
+    : public okay::ECSSystem<okay::query::Get<okay::TransformComponent, RotateComponent>> {
    public:
     void onPreTick(QueryT::Item& item) override {
-        auto& [transform, camController] = item.components;
+        auto& [transform, rotateComponent] = item.components;
         float theta =
-            okay::Engine.time->timeSinceStartSec() * camController.speed * glm::pi<float>();
-        glm::vec3 pos = glm::vec3(
-            sin(theta) * camController.distance, 1.0f, cos(theta) * camController.distance);
-        transform->position = pos;
-        transform.lookAt(item.entity, glm::vec3(0.0f));
+            okay::Engine.time->timeSinceStartSec() * rotateComponent.speed * glm::pi<float>();
+        glm::quat rot = glm::angleAxis(theta, glm::vec3(0.0, 1.0, 0.0f));
+        transform->rotation = rot;
     }
 };
 
@@ -69,16 +68,16 @@ class DrivePage : public IPage {
         okay::Engine.systems.getSystemChecked<okay::Renderer>()->setSkyboxMaterial(skyboxMaterial);
 
         okay::ecs::entity()
-            .addComponent<okay::TransformComponent>(glm::vec3{},
-                glm::vec3{0.1f},
-                glm::angleAxis(glm::radians(0.0f), glm::vec3{2.0f, 3.0f, 1.0f}))
+            .addComponent<okay::TransformComponent>(glm::vec3(),
+                glm::vec3(0.1f),
+                glm::angleAxis(glm::radians(-25.0f), glm::vec3(2.0f, 3.0f, 1.0f)))
             .addComponent<okay::LightComponent>(
                 okay::LightComponent::directional(glm::vec3{1, 1, 1}, 2.5f));
 
         centerMesh = okay::mesh(*centerMeshData);
 
-        okay::ecs::registerComponent<CameraControllerComponent>();
-        okay::ecs::registerSystem(std::make_unique<CameraControllerSystem>());
+        okay::ecs::registerComponent<RotateComponent>();
+        okay::ecs::registerSystem(std::make_unique<RotateSystem>());
 
         okay::UIStyle::main().setMainFont(*latoBold);
 
@@ -86,14 +85,16 @@ class DrivePage : public IPage {
             okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 2),
             okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 2),
             okay::ecs::uiEntity(BIND_TO_THIS(buildDriveStatus), 1),
-            okay::ecs::sceneEntity().addComponent<okay::MeshRendererComponent>(
-                centerMesh, objectMaterial, static_cast<uint8_t>(255)),
             okay::ecs::entity()
-                .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 20.0f})
+                .addComponent<okay::TransformComponent>(
+                    glm::vec3(0.0f), glm::vec3(0.5f), glm::identity<glm::quat>())
+                .addComponent<okay::MeshRendererComponent>(
+                    centerMesh, objectMaterial, static_cast<uint8_t>(255))
+                .addComponent<RotateComponent>(0.25f),
+            okay::ecs::entity()
+                .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 30.0f})
                 .addComponent<okay::CameraComponent>(
-                    okay::CameraComponent{okay::Camera::PerspectiveLens{45.0f, 0.1f, 100.0f}})
-                .addComponent<CameraControllerComponent>(0.25f, 60.0f),
-
+                    okay::CameraComponent{okay::Camera::PerspectiveLens{45.0f, 0.1f, 100.0f}}),
         };
     }
 
@@ -183,6 +184,10 @@ class DrivePage : public IPage {
             )
         );
         // clang-format on
+    }
+
+    okay::UIElement buildSpeedometer() {
+        return ui::box();
     }
 
     std::string getDriveStateString() {

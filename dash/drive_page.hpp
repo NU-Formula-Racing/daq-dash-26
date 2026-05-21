@@ -4,12 +4,14 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/quaternion_trigonometric.hpp"
 #include "glm/fwd.hpp"
+#include "okay/core/renderer/material.hpp"
 #include "page.hpp"
 #include "style.hpp"
 
 #include <okay/okay.hpp>
 
 #include <can/can_dbc.hpp>
+#include <cstdint>
 #include <memory>
 
 namespace ui = okay::ui;
@@ -40,6 +42,9 @@ class RotateSystem
         transform->rotation = rot;
     }
 };
+
+struct SpeedometerMaterial : public okay::UIRectProperties,
+                             okay::OkayMaterialProperties<SpeedometerMaterial> {};
 
 class DrivePage : public IPage {
    public:

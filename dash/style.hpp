@@ -22,7 +22,7 @@ static inline constexpr glm::vec4 fromHex(const std::uint32_t color) {
 
 static constexpr glm::vec4 black = glm::vec4{0.0f, 0.0f, 0.0f, 1.0f};
 static constexpr glm::vec4 white = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
-static constexpr glm::vec4 northwesternPurple = fromHex(0x4E2A84);
+static constexpr glm::vec4 northwesternPurple = fromHex(0x4E2A84FF);
 
 }  // namespace colors
 

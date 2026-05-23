@@ -63,7 +63,7 @@ class DrivePage : public IPage {
         auto speedometerProperties = std::make_unique<SpeedometerMaterial>();
         speedometerProperties->isTransparent = true;
         speedometerProperties->useScreenspaceCoords = true;
-        speedometerProperties->color = colors::northwesternPurple;
+        speedometerProperties->color = colors::white;
         speedometerProperties->albedo = *speedometerTexture;
         speedometerProperties->trailColor = colors::fromHex(0xA304FFFF);
         speedometerProperties->trailRads = glm::radians(120.0f);

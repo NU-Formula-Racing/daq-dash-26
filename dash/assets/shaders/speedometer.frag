@@ -16,12 +16,13 @@ uniform vec4 u_bgColor;
 const float TAU = 6.28318530718;
 
 // Dial shape config
-const float OUTER_RADIUS = 0.5;
-const float INNER_CIRCLE_RADIUS = 0.1;
-const float BLEND_RADIUS = 0.1;
+const float OUTER_RADIUS = 0.5f;
+const float INNER_CIRCLE_RADIUS = 0.1f;
+const float BLEND_RADIUS = 0.3f;
 
 // Needle config
-const float NEEDLE_HALF_WIDTH = 0.018;
+const float NEEDLE_HALF_WIDTH = 0.009;
+const float NEEDLE_EDGE_SOFTNESS = 0.004;
 
 float wrapAngle(float a) {
     return mod(a + TAU, TAU);
@@ -34,12 +35,6 @@ float backwardAngularDistance(float fragAngle, float endAngle) {
     return mod(endAngle - fragAngle + TAU, TAU);
 }
 
-// Smallest absolute angular distance between two angles
-float angularDistance(float a, float b) {
-    float d = abs(wrapAngle(a) - wrapAngle(b));
-    return min(d, TAU - d);
-}
-
 // Alpha-over compositing assuming dst is already the element below
 vec4 alphaOver(vec4 dst, vec4 src) {
     return vec4(
@@ -48,6 +43,8 @@ vec4 alphaOver(vec4 dst, vec4 src) {
     );
 }
 
+// 0 inside the inner circle, smoothly rises to 1 outside it,
+// and 0 again outside the outer radius.
 float computeRadialAlpha(float len) {
     if (len > OUTER_RADIUS) {
         return 0.0;
@@ -73,38 +70,46 @@ float computeTrailAlpha(float len, float fragAngle, float endAngle) {
         return 0.0;
     }
 
-    // Fade alpha backward along the trail, then fade radially toward center
     float angularAlpha = 1.0 - smoothstep(0.0, u_trailRads, dist);
 
     return angularAlpha * radialAlpha;
 }
 
-float computeNeedleAlpha(float len, float fragAngle, float endAngle) {
-    float radialAlpha = computeRadialAlpha(len);
-
-    if (radialAlpha <= 0.0) {
+float computeNeedleAlpha(vec2 p, float len, float endAngle) {
+    if (len > OUTER_RADIUS) {
         return 0.0;
     }
 
-    float dist = angularDistance(fragAngle, endAngle);
+    vec2 needleDir = vec2(cos(endAngle), sin(endAngle));
 
-    float angularAlpha = 1.0 - smoothstep(
-                NEEDLE_HALF_WIDTH * 0.6,
+    // Distance along the needle axis
+    float alongNeedle = dot(p, needleDir);
+
+    // Only draw the needle from the inner circle outward
+    if (alongNeedle < INNER_CIRCLE_RADIUS || alongNeedle > OUTER_RADIUS) {
+        return 0.0;
+    }
+
+    // Perpendicular distance from the point to the needle centerline
+    float perpDist = abs(p.x * needleDir.y - p.y * needleDir.x);
+
+    // Soft edge for antialiasing
+    float alpha = 1.0 - smoothstep(
+                NEEDLE_HALF_WIDTH - NEEDLE_EDGE_SOFTNESS,
                 NEEDLE_HALF_WIDTH,
-                dist
+                perpDist
             );
 
-    return angularAlpha * radialAlpha;
+    return alpha * computeRadialAlpha(len);
 }
 
-vec4 computeNeedleColor(float len, float fragAngle, float endAngle) {
-    float needleAlpha = computeNeedleAlpha(len, fragAngle, endAngle);
-
+vec4 computeNeedleColor(vec2 p, float len, float endAngle) {
+    float needleAlpha = computeNeedleAlpha(p, len, endAngle);
     return vec4(u_needleColor.rgb, u_needleColor.a * needleAlpha);
 }
 
 void main() {
-    vec2 p = v_uv - vec2(0.5);
+    vec2 p = v_uv - vec2(0.0, 0.5);
     float len = length(p);
 
     float fragAngle = 0.0;
@@ -118,17 +123,20 @@ void main() {
 
     vec4 color = u_bgColor;
 
-    if (len > 0.5f) {
-        color = vec4(0.0f);
+    if (len > OUTER_RADIUS) {
+        color = vec4(0.0);
     }
 
+    // Trail
     float trailAlpha = computeTrailAlpha(len, fragAngle, endAngle);
     vec4 trailColor = vec4(u_trailColor.rgb, u_trailColor.a * trailAlpha);
     color = alphaOver(color, trailColor);
 
-    vec4 needleColor = computeNeedleColor(len, fragAngle, endAngle);
+    // Needle
+    vec4 needleColor = computeNeedleColor(p, len, endAngle);
     color = alphaOver(color, needleColor);
 
+    // Texture on top
     color = alphaOver(color, texColor);
 
     FragColor = color;

@@ -81,7 +81,7 @@ class DrivePage : public IPage {
         batPercentProperties->color = colors::white;
         batPercentProperties->albedo = *batPerecentBG;
         batPercentProperties->barColor = colors::fromHex(0xA304FFFF);
-        batPercentProperties->percent = 0.50f;
+        batPercentProperties->bgColor = colors::fromHex(0x565150FF);
 
         batPercentMaterial = okay::materialHandle(
             okay::shaderHandle(*batPercentShader), std::move(batPercentProperties));
@@ -111,6 +111,8 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildTopHud() {
+        auto props = dynamic_cast<BatPercentMaterial*>(batPercentMaterial->properties().get());
+        props->percent = dbc::bmsStatus::bmsSoc->get();
         // clang-format off
         return ui::image(*topBar)
             .axisSet(okay::UIAxis::Horizontal) (
@@ -125,7 +127,12 @@ class DrivePage : public IPage {
                             .backgroundMaterialOverrideSet(batPercentMaterial)
                             .axisSet(okay::UIAxis::Horizontal) (
                                 ui::spacer(),
-                                ui::image(*batPerecentOverlay),
+                                ui::image(*batPerecentOverlay)
+                                    .textSet(std::format("{:.1f}%", dbc::bmsStatus::bmsSoc->get() * 100.0f))
+                                    .alignTextCenter()
+                                    .alignTextMiddle()
+                                    .fontSet(*latoBlack)
+                                    .textSizeSet(24.0f),
                                 ui::spacer()
                             ),
                          ui::spacer()

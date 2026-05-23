@@ -13,32 +13,34 @@ struct SpeedometerMaterial : public okay::UIRectProperties,
     okay::UniformProperty<float, okay::FixedString("u_angle")> angle{0.0f};
     okay::UniformProperty<float, okay::FixedString("u_trailRads")> trailRads{glm::radians(30.0f)};
     okay::UniformProperty<glm::vec4, okay::FixedString("u_trailColor")> trailColor{glm::vec4(1.0f)};
-    okay::UniformProperty<glm::vec4, okay::FixedString("u_needColor")> needleColor{glm::vec4(1.0f)};
+    okay::UniformProperty<glm::vec4, okay::FixedString("u_needleColor")> needleColor{
+        glm::vec4(1.0f)};
+    okay::UniformProperty<glm::vec4, okay::FixedString("u_bgColor")> bgColor{glm::vec4(1.0f)};
 
     auto uniformRefs() {
         return std::tuple_cat(okay::UIRectProperties::uniformRefs(),
-            std::tie(angle, trailRads, trailColor, needleColor));
+            std::tie(angle, trailRads, trailColor, needleColor, bgColor));
     }
 
     auto uniformRefs() const {
         return std::tuple_cat(okay::UIRectProperties::uniformRefs(),
-            std::tie(angle, trailRads, trailColor, needleColor));
+            std::tie(angle, trailRads, trailColor, needleColor, bgColor));
     }
 
     auto uniformBlockRefs() const {
-        return UIRectProperties::uniformBlockRefs();
+        return okay::UIRectProperties::uniformBlockRefs();
     }
 
     auto textureRefs() {
-        return UIRectProperties::textureRefs();
+        return okay::UIRectProperties::textureRefs();
     }
 
     auto textureRefs() const {
-        return UIRectProperties::textureRefs();
+        return okay::UIRectProperties::textureRefs();
     }
 
     okay::MaterialFlagCollection flags() {
-        okay::MaterialFlagCollection flags = SceneMaterialProperties::flags();
+        okay::MaterialFlagCollection flags = okay::SceneMaterialProperties::flags();
         flags.addFlag(okay::MaterialFlags::UNLIT);
         return flags;
     }

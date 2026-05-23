@@ -11,6 +11,7 @@ uniform float u_angle;
 uniform float u_trailRads;
 uniform vec4 u_trailColor;
 uniform vec4 u_needleColor;
+uniform vec4 u_bgColor;
 
 const float TAU = 6.28318530718;
 
@@ -25,34 +26,48 @@ float backwardAngularDistance(float fragAngle, float endAngle) {
     return mod(endAngle - fragAngle + TAU, TAU);
 }
 
-float computeTrailAlpha() {
+vec4 computeTrailColor() {
     vec2 p = v_uv - vec2(0.5);
     float len = length(p);
 
-    // Hide center quarter radius and anything outside half radius.
-    if (len < 0.25 || len > 0.5) {
-        return 0.0;
+    // Outside dial radius.
+    if (len > 0.5) {
+        return vec4(0.0, 0.0, 0.0, 0.0);
     }
 
     float fragAngle = wrapAngle(atan(p.y, p.x));
     float endAngle = wrapAngle(u_angle);
-
     float dist = backwardAngularDistance(fragAngle, endAngle);
 
-    // Hard cutoff outside trail.
+    // Outside angular trail region: just background.
     if (dist > u_trailRads) {
-        return 0.0;
+        return u_bgColor;
     }
 
-    // Brightest near needle, fades backward.
-    return 1.0 - smoothstep(0.0, u_trailRads, dist);
+    // Trail is strongest near needle, fades backward.
+    float angularFade = 1.0 - smoothstep(0.0, u_trailRads, dist);
+
+    vec4 trailColor = vec4(
+            u_trailColor.rgb,
+            u_trailColor.a * angularFade
+        );
+
+    // Inner circle stays bgColor, then smoothly blends into the trail.
+    const float innerRadius = 0.25;
+    const float blendWidth = 0.08;
+
+    float radialFade = smoothstep(
+            innerRadius,
+            innerRadius + blendWidth,
+            len
+        );
+
+    return mix(u_bgColor, trailColor, radialFade);
 }
 
 void main() {
     vec4 texColor = texture(u_albedo, v_uv) * v_color;
-    float trailAlpha = computeTrailAlpha();
-
-    vec4 trailColor = vec4(u_trailColor.rgb, u_trailColor.a * trailAlpha);
+    vec4 trailColor = computeTrailColor();
 
     FragColor = mix(trailColor, texColor, texColor.a);
 }

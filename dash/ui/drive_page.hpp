@@ -3,6 +3,7 @@
 
 #include "components/rotate.hpp"
 #include "materials/speedometer.hpp"
+#include "okay/core/ui/builder.hpp"
 #include "page.hpp"
 #include "style.hpp"
 
@@ -66,6 +67,7 @@ class DrivePage : public IPage {
         speedometerProperties->color = colors::white;
         speedometerProperties->albedo = *speedometerTexture;
         speedometerProperties->trailColor = colors::fromHex(0xA304FFFF);
+        speedometerProperties->angle = glm::radians(45.0f);
         speedometerProperties->trailRads = glm::radians(120.0f);
         speedometerProperties->bgColor = colors::fromHex(0x342F2EFF);
         speedometerMaterial = okay::materialHandle(
@@ -122,28 +124,33 @@ class DrivePage : public IPage {
                                 .alignTextLeft()
                                 .leftMarginSet(10)
                                 .fontSet(*latoBlack)
-                                .alignTextBottom(),
+                                .alignTextBottom()
+                                .heightGrow(),
                             ui::text(std::format("{:.2f}", dbc::pdmBatVolt::batVolt->get()))
                                 .widthSet(okay::size::Percent(valuePercent))
                                 .textSizeSet(medFontSize)
                                 .alignTextCenter()
-                                .alignTextBottom(),
+                                .alignTextBottom()
+                                .heightGrow(),
                             ui::text("LV")
                                 .widthSet(okay::size::Percent(labelPercent))
                                 .textSizeSet(medFontSize)
                                 .alignTextCenter()
-                                .alignTextBottom(),
+                                .alignTextBottom()
+                                .heightGrow(),
                             ui::spacer(),
                             ui::text("HV")
                                 .widthSet(okay::size::Percent(labelPercent))
                                 .textSizeSet(medFontSize)
                                 .alignTextCenter()
-                                .alignTextBottom(),
+                                .alignTextBottom()
+                                .heightGrow(),
                             ui::text(std::format("{:.2f}", dbc::bmsSoe::batteryVoltage->get()))
                                 .widthSet(okay::size::Percent(valuePercent))
                                 .textSizeSet(medFontSize)
                                 .alignTextCenter()
-                                .alignTextBottom(),
+                                .alignTextBottom()
+                                .heightGrow(),
                             ui::text(std::format("{:.2f} mi", dbc::telemetryOdometer::milesDriven->get()))
                                 .widthSet(okay::size::Percent(outerPercent))
                                 .textSizeSet(largeFontSize)
@@ -151,6 +158,7 @@ class DrivePage : public IPage {
                                 .rightMarginSet(10)
                                 .fontSet(*latoBlack)
                                 .alignTextBottom()
+                                .heightGrow()
                         )
                 )
         );
@@ -165,6 +173,7 @@ class DrivePage : public IPage {
                 ui::spacer(),
                 ui::image(*stateShape)(ui::text(getDriveStateString())
                         .widthGrow()
+                        .heightGrow()
                         .textSizeSet(32.0f)
                         .alignTextCenter()
                         .alignTextMiddle()
@@ -178,12 +187,31 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildSpeedometer() {
-        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(ui::vspacer(10),
-            ui::box()
-                .backgroundColorSet(colors::white)
-                .backgroundMaterialOverrideSet(speedometerMaterial)
-                .backgroundImageSet(*speedometerTexture),
-            ui::spacer());
+        auto props = dynamic_cast<SpeedometerMaterial*>(speedometerMaterial->properties().get());
+        props->angle = glm::radians(okay::Engine.time->timeSinceStartSec() * 20.0f);
+        const int textWidth = 150;
+        // clang-format off
+        return ui::flexbox().topMarginSet(25)(
+                ui::box()
+                    .backgroundColorSet(colors::white)
+                    .backgroundMaterialOverrideSet(speedometerMaterial)
+                    .backgroundImageSet(*speedometerTexture)(
+                        ui::spacer(),
+                        ui::h1("75")
+                            .widthFixed(textWidth)
+                            .heightFit()
+                            .alignTextCenter()
+                            .textSizeSet(48.0f)
+                            .fontSet(*latoBlack),
+                        ui::h1("MPH")
+                            .widthFixed(textWidth)
+                            .heightFit()
+                            .alignTextCenter()
+                            .textSizeSet(20.0f),
+                        ui::spacer()
+                )
+        );
+        // clang-format on
     }
 
     std::string getDriveStateString() {

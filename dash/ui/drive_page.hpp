@@ -66,7 +66,7 @@ class DrivePage : public IPage {
         speedometerProperties->color = colors::northwesternPurple;
         speedometerProperties->albedo = *speedometerTexture;
         speedometerProperties->trailColor = colors::fromHex(0xA304FFFF);
-        speedometerProperties->trailRads = glm::radians(45.0f);
+        speedometerProperties->trailRads = glm::radians(120.0f);
         speedometerProperties->bgColor = colors::fromHex(0x342F2EFF);
         speedometerMaterial = okay::materialHandle(
             okay::shaderHandle(*speedometerShader), std::move(speedometerProperties));

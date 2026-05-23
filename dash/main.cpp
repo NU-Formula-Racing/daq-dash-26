@@ -1,7 +1,9 @@
+#include "page.hpp"
+#include "ui/components/rotate.hpp"
 #include "ui/drive_page.hpp"
 #include "ui/error_page.hpp"
-#include "okay/core/ecs/builtins.hpp"
-#include "page.hpp"
+#include "ui/page.hpp"
+#include "ui/shared_elements.hpp"
 
 #include <okay/okay.hpp>
 
@@ -53,6 +55,9 @@ int main() {
         std::move(pageManager));
 
     okay::registerBuiltinComponentsAndSystems();
+    okay::ecs::registerComponent<dash::RotateComponent>();
+    okay::ecs::registerSystem(std::make_unique<dash::RotateSystem>());
+
     game.run();
 
     return 0;

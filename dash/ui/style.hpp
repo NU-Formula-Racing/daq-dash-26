@@ -1,7 +1,7 @@
 #ifndef __STYLE_H__
 #define __STYLE_H__
 
-#include "glm/ext/vector_float4.hpp"
+#include <okay/okay.hpp>
 
 #include <glm/glm.hpp>
 
@@ -22,11 +22,18 @@ static inline constexpr glm::vec4 fromHex(const std::uint32_t color) {
 
 static constexpr glm::vec4 black = glm::vec4{0.0f, 0.0f, 0.0f, 1.0f};
 static constexpr glm::vec4 white = glm::vec4{1.0f, 1.0f, 1.0f, 1.0f};
-static constexpr glm::vec4 northwesternPurple = fromHex(0x4E2A84);
+static constexpr glm::vec4 northwesternPurple = fromHex(0x4E2A84FF);
 
 }  // namespace colors
 
-namespace fonts {};
+namespace fonts {
+
+okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBlack{
+    "fonts/Lato-Black.ttf"};
+okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{
+    "fonts/Lato-Bold.ttf"};
+
+};  // namespace fonts
 
 }  // namespace dash
 

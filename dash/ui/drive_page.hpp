@@ -1,10 +1,6 @@
 #ifndef __DRIVE_PAGE_H__
 #define __DRIVE_PAGE_H__
 
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/ext/quaternion_trigonometric.hpp"
-#include "glm/fwd.hpp"
-#include "okay/core/renderer/material.hpp"
 #include "page.hpp"
 #include "style.hpp"
 

@@ -1,8 +1,6 @@
 #ifndef __STYLE_H__
 #define __STYLE_H__
 
-#include "glm/ext/vector_float4.hpp"
-
 #include <glm/glm.hpp>
 
 namespace dash {

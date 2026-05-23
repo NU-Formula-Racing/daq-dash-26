@@ -4,41 +4,55 @@ precision highp float;
 out vec4 FragColor;
 
 in vec4 v_color;
-in vec3 v_normal;
-in vec3 v_position;
 in vec2 v_uv;
-in vec3 v_cameraPosition;
-in vec3 v_cameraDirection;
 
 uniform sampler2D u_albedo;
 uniform float u_angle;
 uniform float u_trailRads;
+uniform vec4 u_trailColor;
+uniform vec4 u_needleColor;
 
-uniform sampler2D u_clipMask;
+const float TAU = 6.28318530718;
 
-vec4 computeRadialColor() {
-    vec2 angleVec = vec2(
-        cos(u_angle),
-        sin(u_angle)
-    );
-    vec2 ourVec = normalize(v_uv - vec2(0.5f, 0.5f));
+float wrapAngle(float a) {
+    return mod(a + TAU, TAU);
+}
 
-    vec4 targetColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
-    vec4 clear = vec4(targetColor.rgb, 0.0f);
-    float t = dot(angleVec, ourVec);
+// Distance from fragAngle to endAngle going backwards around the dial.
+// 0 means fragment is exactly at the current needle angle.
+// u_trailRads means fragment is at the end of the trail.
+float backwardAngularDistance(float fragAngle, float endAngle) {
+    return mod(endAngle - fragAngle + TAU, TAU);
+}
 
-    return mix(targetColor, clear, t);
+float computeTrailAlpha() {
+    vec2 p = v_uv - vec2(0.5);
+    float len = length(p);
+
+    // Hide center quarter radius and anything outside half radius.
+    if (len < 0.25 || len > 0.5) {
+        return 0.0;
+    }
+
+    float fragAngle = wrapAngle(atan(p.y, p.x));
+    float endAngle = wrapAngle(u_angle);
+
+    float dist = backwardAngularDistance(fragAngle, endAngle);
+
+    // Hard cutoff outside trail.
+    if (dist > u_trailRads) {
+        return 0.0;
+    }
+
+    // Brightest near needle, fades backward.
+    return 1.0 - smoothstep(0.0, u_trailRads, dist);
 }
 
 void main() {
-    // Anti-alias width in screen space.
-    float aa = max(fwidth(dist), 0.00001f);
+    vec4 texColor = texture(u_albedo, v_uv) * v_color;
+    float trailAlpha = computeTrailAlpha();
 
-    vec4 texColor = texture(u_albedo, v_uv);
-    vec4 bgColor = computeRadialColor();
+    vec4 trailColor = vec4(u_trailColor.rgb, u_trailColor.a * trailAlpha);
 
-    vec4 color = mix(texColor, bgColor, texColor.a);
-    color.a *= texture(u_clipMask, v_uv).r;
-
-    FragColor = color;
+    FragColor = mix(trailColor, texColor, texColor.a);
 }

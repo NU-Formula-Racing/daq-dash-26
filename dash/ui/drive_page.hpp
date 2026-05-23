@@ -1,13 +1,14 @@
 #ifndef __DRIVE_PAGE_H__
 #define __DRIVE_PAGE_H__
 
+#include "components/rotate.hpp"
+#include "materials/speedometer.hpp"
 #include "page.hpp"
 #include "style.hpp"
 
 #include <okay/okay.hpp>
 
 #include <can/can_dbc.hpp>
-#include <cstdint>
 #include <memory>
 
 namespace ui = okay::ui;
@@ -18,29 +19,6 @@ namespace dash {
     [this]() {                 \
         return this->fnName(); \
     }
-
-// TODO: Move this component + system into somewhere else
-struct RotateComponent {
-    float speed{5.0f};
-
-    RotateComponent() {}
-    RotateComponent(float speed) : speed(speed) {}
-};
-
-class RotateSystem
-    : public okay::ECSSystem<okay::query::Get<okay::TransformComponent, RotateComponent>> {
-   public:
-    void onPreTick(QueryT::Item& item) override {
-        auto& [transform, rotateComponent] = item.components;
-        float theta =
-            okay::Engine.time->timeSinceStartSec() * rotateComponent.speed * glm::pi<float>();
-        glm::quat rot = glm::angleAxis(theta, glm::vec3(0.0, 1.0, 0.0f));
-        transform->rotation = rot;
-    }
-};
-
-struct SpeedometerMaterial : public okay::UIRectProperties,
-                             okay::OkayMaterialProperties<SpeedometerMaterial> {};
 
 class DrivePage : public IPage {
    public:
@@ -82,10 +60,20 @@ class DrivePage : public IPage {
 
         okay::UIStyle::main().setMainFont(*latoBold);
 
+        auto speedometerProperties = std::make_unique<SpeedometerMaterial>();
+        speedometerProperties->isTransparent = true;
+        speedometerProperties->useScreenspaceCoords = true;
+        speedometerProperties->color = colors::northwesternPurple;
+        speedometerProperties->albedo = *speedometerTexture;
+        speedometerProperties->trailColor = colors::fromHex(0xA304FFFF);
+        speedometerMaterial = okay::materialHandle(
+            okay::shaderHandle(*speedometerShader), std::move(speedometerProperties));
+
         _entities = {
             okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 2),
             okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 2),
             okay::ecs::uiEntity(BIND_TO_THIS(buildDriveStatus), 1),
+            okay::ecs::uiEntity(BIND_TO_THIS(buildSpeedometer), 1),
             okay::ecs::entity()
                 .addComponent<okay::TransformComponent>(
                     glm::vec3(0.0f), glm::vec3(0.5f), glm::identity<glm::quat>())
@@ -188,7 +176,12 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildSpeedometer() {
-        return ui::box();
+        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(ui::vspacer(10),
+            ui::box()
+                .backgroundColorSet(colors::white)
+                .backgroundMaterialOverrideSet(speedometerMaterial)
+                .backgroundImageSet(*speedometerTexture),
+            ui::spacer());
     }
 
     std::string getDriveStateString() {
@@ -236,6 +229,12 @@ class DrivePage : public IPage {
         "fonts/Lato-Black.ttf"};
     okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{
         "fonts/Lato-Bold.ttf"};
+
+    // speedometer
+    okay::MaterialHandle speedometerMaterial;
+    okay::GameAssetRef<okay::Shader> speedometerShader{"shaders/speedometer"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> speedometerTexture{
+        "textures/speedometer.png"};
 };
 
 }  // namespace dash

@@ -1,5 +1,7 @@
+#include "page.hpp"
 #include "ui/components/rotate.hpp"
 #include "ui/drive_page.hpp"
+#include "ui/error_page.hpp"
 #include "ui/page.hpp"
 #include "ui/shared_elements.hpp"
 
@@ -33,7 +35,12 @@ int main() {
             .activeWhen([]() {
                 return true;
             })
-            .withPriority(0));
+            .withPriority(0),
+        dash::PageEntry::create(std::make_unique<dash::ErrorPage>())
+            .activeWhen([]() {
+                return true;
+            })
+            .withPriority(1));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);

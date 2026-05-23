@@ -293,6 +293,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         return glm::vec4(r, g, b, 1.0f);
     }
 
+<<<<<<< HEAD
     void bmsSocAnimation(float time) {
         float bmsSoc = dbc::bmsStatus::soc->get();
 
@@ -414,6 +415,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         }
     }
 
+=======
+>>>>>>> main
     void idle(float time) {
         const float breathePeriod = 2000.0f;
         float brightness = (std::sin(time / breathePeriod) + 1.0f) / 2.0f;  // +1 for normalize
@@ -499,7 +502,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
 
             // we are now in throttle light mode
-            const float currentMax = 360;
+            const float currentMax = 235;
             int32_t rawCurrent = dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get();
             int32_t rawThrottle = rawCurrent > currentMax ? currentMax : rawCurrent;
             float throttlePercentage = static_cast<float>(rawThrottle) / currentMax;

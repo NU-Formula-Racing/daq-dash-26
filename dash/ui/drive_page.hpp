@@ -2,6 +2,7 @@
 #define __DRIVE_PAGE_H__
 
 #include "components/rotate.hpp"
+#include "materials/bat_percent.hpp"
 #include "materials/speedometer.hpp"
 #include "okay/core/ui/builder.hpp"
 #include "page.hpp"
@@ -70,8 +71,20 @@ class DrivePage : public IPage {
         speedometerProperties->angle = glm::radians(45.0f);
         speedometerProperties->trailRads = glm::radians(120.0f);
         speedometerProperties->bgColor = colors::fromHex(0x342F2EFF);
+
         speedometerMaterial = okay::materialHandle(
             okay::shaderHandle(*speedometerShader), std::move(speedometerProperties));
+
+        auto batPercentProperties = std::make_unique<BatPercentMaterial>();
+        batPercentProperties->isTransparent = true;
+        batPercentProperties->useScreenspaceCoords = true;
+        batPercentProperties->color = colors::white;
+        batPercentProperties->albedo = *batPerecentBG;
+        batPercentProperties->barColor = colors::fromHex(0xA304FFFF);
+        batPercentProperties->percent = 0.50f;
+
+        batPercentMaterial = okay::materialHandle(
+            okay::shaderHandle(*batPercentShader), std::move(batPercentProperties));
 
         _entities = {
             okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 2),
@@ -98,7 +111,28 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildTopHud() {
-        return ui::image(*topBar);
+        // clang-format off
+        return ui::image(*topBar)
+            .axisSet(okay::UIAxis::Horizontal) (
+                ui::spacer(),
+                ui::flexbox()
+                    .axisSet(okay::UIAxis::Vertical)
+                    .heightGrow()
+                    (
+                        ui::spacer(),
+                        ui::image(*batPerecentBG)
+                            .backgroundColorSet(colors::white)
+                            .backgroundMaterialOverrideSet(batPercentMaterial)
+                            .axisSet(okay::UIAxis::Horizontal) (
+                                ui::spacer(),
+                                ui::image(*batPerecentOverlay),
+                                ui::spacer()
+                            ),
+                         ui::spacer()
+                    ),
+                ui::spacer()
+            );
+        // clang-format on
     }
 
     okay::UIElement buildBotHud() {
@@ -265,6 +299,14 @@ class DrivePage : public IPage {
     okay::GameAssetRef<okay::Shader> speedometerShader{"shaders/speedometer"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> speedometerTexture{
         "textures/speedometer.png"};
+
+    // Battery Percentage
+    okay::MaterialHandle batPercentMaterial;
+    okay::GameAssetRef<okay::Shader> batPercentShader{"shaders/battery"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> batPerecentBG{
+        "textures/bat_percent_bg.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> batPerecentOverlay{
+        "textures/bat_percent_over.png"};
 };
 
 }  // namespace dash

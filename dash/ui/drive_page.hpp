@@ -2,10 +2,9 @@
 #define __DRIVE_PAGE_H__
 
 #include "components/rotate.hpp"
-#include "materials/bat_percent.hpp"
 #include "materials/speedometer.hpp"
-#include "okay/core/ui/builder.hpp"
 #include "page.hpp"
+#include "shared_elements.hpp"
 #include "style.hpp"
 
 #include <okay/okay.hpp>
@@ -22,31 +21,22 @@ namespace dash {
         return this->fnName(); \
     }
 
+#define LAMBDA_WRAP(fn) \
+    []() {              \
+        return fn();    \
+    }
+
 class DrivePage : public IPage {
    public:
     DrivePage() {}
 
     void initializePage() {
-        okay::Engine.logger.debug("Creating entities for Drive page!");
-
         okay::ShaderHandle objectShader =
             okay::shaderHandle(okay::load::engineShader("shaders/lit"));
         auto materialProperties = std::make_unique<okay::LitMaterial>();
         materialProperties->color.set(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
         okay::MaterialHandle objectMaterial =
             okay::materialHandle(objectShader, std::move(materialProperties));
-
-        okay::ShaderHandle skyboxShader =
-            okay::shaderHandle(okay::load::shader("shaders/background"));
-        auto skyboxProperties = std::make_unique<okay::UnlitMaterial>();
-        skyboxProperties->albedo = *bgTexture;
-        skyboxProperties->color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        skyboxProperties->isTransparent = false;
-        skyboxProperties->useScreenspaceCoords = true;
-        skyboxProperties->doubleSided = true;
-        okay::MaterialHandle skyboxMaterial =
-            okay::materialHandle(skyboxShader, std::move(skyboxProperties));
-        okay::Engine.systems.getSystemChecked<okay::Renderer>()->setSkyboxMaterial(skyboxMaterial);
 
         okay::ecs::entity()
             .addComponent<okay::TransformComponent>(glm::vec3(),
@@ -57,10 +47,7 @@ class DrivePage : public IPage {
 
         centerMesh = okay::mesh(*centerMeshData);
 
-        okay::ecs::registerComponent<RotateComponent>();
-        okay::ecs::registerSystem(std::make_unique<RotateSystem>());
-
-        okay::UIStyle::main().setMainFont(*latoBold);
+        okay::UIStyle::main().setMainFont(*fonts::latoBold);
 
         auto speedometerProperties = std::make_unique<SpeedometerMaterial>();
         speedometerProperties->isTransparent = true;
@@ -72,24 +59,16 @@ class DrivePage : public IPage {
         speedometerProperties->trailRads = glm::radians(120.0f);
         speedometerProperties->bgColor = colors::fromHex(0x342F2EFF);
 
+        okay::Engine.systems.getSystemChecked<okay::Renderer>()->setSkyboxMaterial(
+            dash::SharedElements::get().skyboxMaterial);
+
         speedometerMaterial = okay::materialHandle(
             okay::shaderHandle(*speedometerShader), std::move(speedometerProperties));
 
-        auto batPercentProperties = std::make_unique<BatPercentMaterial>();
-        batPercentProperties->isTransparent = true;
-        batPercentProperties->useScreenspaceCoords = true;
-        batPercentProperties->color = colors::white;
-        batPercentProperties->albedo = *batPerecentBG;
-        batPercentProperties->barColor = colors::fromHex(0xA304FFFF);
-        batPercentProperties->bgColor = colors::fromHex(0x565150FF);
-
-        batPercentMaterial = okay::materialHandle(
-            okay::shaderHandle(*batPercentShader), std::move(batPercentProperties));
-
         _entities = {
-            okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 2),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 2),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildDriveStatus), 1),
+            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
+            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
+            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
             okay::ecs::uiEntity(BIND_TO_THIS(buildSpeedometer), 1),
             okay::ecs::entity()
                 .addComponent<okay::TransformComponent>(
@@ -110,123 +89,6 @@ class DrivePage : public IPage {
         }
     }
 
-    okay::UIElement buildTopHud() {
-        auto props = dynamic_cast<BatPercentMaterial*>(batPercentMaterial->properties().get());
-        props->percent = dbc::bmsStatus::bmsSoc->get();
-        // clang-format off
-        return ui::image(*topBar)
-            .axisSet(okay::UIAxis::Horizontal) (
-                ui::spacer(),
-                ui::flexbox()
-                    .axisSet(okay::UIAxis::Vertical)
-                    .heightGrow()
-                    (
-                        ui::spacer(),
-                        ui::image(*batPerecentBG)
-                            .backgroundColorSet(colors::white)
-                            .backgroundMaterialOverrideSet(batPercentMaterial)
-                            .axisSet(okay::UIAxis::Horizontal) (
-                                ui::spacer(),
-                                ui::image(*batPerecentOverlay)
-                                    .textSet(std::format("{:.1f}%", dbc::bmsStatus::bmsSoc->get() * 100.0f))
-                                    .alignTextCenter()
-                                    .alignTextMiddle()
-                                    .fontSet(*latoBlack)
-                                    .textSizeSet(24.0f),
-                                ui::spacer()
-                            ),
-                         ui::spacer()
-                    ),
-                ui::spacer()
-            );
-        // clang-format on
-    }
-
-    okay::UIElement buildBotHud() {
-        const float outerPercent = 0.20f;
-        const float valuePercent = 0.12f;
-        const float labelPercent = 0.05f;
-        const float largeFontSize = 32.0f;
-        const float medFontSize = 24.0f;
-
-        // clang-format off
-        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(
-            ui::spacer(),
-            ui::image(*botBar)
-                .axisSet(okay::UIAxis::Vertical) (
-                    ui::spacer(),
-                    ui::flexbox()
-                        .axisSet(okay::UIAxis::Horizontal)
-                        .bottomMarginSet(5)
-                        .widthSet(okay::size::Percent(1.0f)) (
-                            ui::text(std::format("log_{:04}.nfr", dbc::telemetryStatus::logFile->get()))
-                                .widthSet(okay::size::Percent(outerPercent))
-                                .textSizeSet(largeFontSize)
-                                .alignTextLeft()
-                                .leftMarginSet(10)
-                                .fontSet(*latoBlack)
-                                .alignTextBottom()
-                                .heightGrow(),
-                            ui::text(std::format("{:.2f}", dbc::pdmBatVolt::batVolt->get()))
-                                .widthSet(okay::size::Percent(valuePercent))
-                                .textSizeSet(medFontSize)
-                                .alignTextCenter()
-                                .alignTextBottom()
-                                .heightGrow(),
-                            ui::text("LV")
-                                .widthSet(okay::size::Percent(labelPercent))
-                                .textSizeSet(medFontSize)
-                                .alignTextCenter()
-                                .alignTextBottom()
-                                .heightGrow(),
-                            ui::spacer(),
-                            ui::text("HV")
-                                .widthSet(okay::size::Percent(labelPercent))
-                                .textSizeSet(medFontSize)
-                                .alignTextCenter()
-                                .alignTextBottom()
-                                .heightGrow(),
-                            ui::text(std::format("{:.2f}", dbc::bmsSoe::batteryVoltage->get()))
-                                .widthSet(okay::size::Percent(valuePercent))
-                                .textSizeSet(medFontSize)
-                                .alignTextCenter()
-                                .alignTextBottom()
-                                .heightGrow(),
-                            ui::text(std::format("{:.2f} mi", dbc::telemetryOdometer::milesDriven->get()))
-                                .widthSet(okay::size::Percent(outerPercent))
-                                .textSizeSet(largeFontSize)
-                                .alignTextRight()
-                                .rightMarginSet(10)
-                                .fontSet(*latoBlack)
-                                .alignTextBottom()
-                                .heightGrow()
-                        )
-                )
-        );
-        // clang-format on
-    }
-
-    okay::UIElement buildDriveStatus() {
-        // clang-format off
-        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(
-            ui::spacer(),
-            ui::row()(
-                ui::spacer(),
-                ui::image(*stateShape)(ui::text(getDriveStateString())
-                        .widthGrow()
-                        .heightGrow()
-                        .textSizeSet(32.0f)
-                        .alignTextCenter()
-                        .alignTextMiddle()
-                        .fontSet(*latoBlack)
-                        .topMarginSet(8))
-                        .backgroundColorSet(getDriveStateColor()),
-                ui::spacer()
-            )
-        );
-        // clang-format on
-    }
-
     okay::UIElement buildSpeedometer() {
         auto props = dynamic_cast<SpeedometerMaterial*>(speedometerMaterial->properties().get());
         props->angle = glm::radians(okay::Engine.time->timeSinceStartSec() * 20.0f);
@@ -243,7 +105,7 @@ class DrivePage : public IPage {
                             .heightFit()
                             .alignTextCenter()
                             .textSizeSet(48.0f)
-                            .fontSet(*latoBlack),
+                            .fontSet(*fonts::latoBlack),
                         ui::h1("MPH")
                             .widthFixed(textWidth)
                             .heightFit()
@@ -255,65 +117,17 @@ class DrivePage : public IPage {
         // clang-format on
     }
 
-    std::string getDriveStateString() {
-        switch (dbc::ecuDriveStatus::driveState->get()) {
-            case 0:
-                return "IDLE";
-            case 1:
-                return "PRECHARGE";
-            case 2:
-                return "NEUTRAL";
-            case 3:
-                return "DRIVE";
-            default:
-                return "UNKNOWN";
-        }
-    }
-
-    glm::vec4 getDriveStateColor() {
-        switch (dbc::ecuDriveStatus::driveState->get()) {
-            case 0:
-                return colors::fromHex(0x219EEBFF);
-            case 1:
-                return colors::fromHex(0xEBCD21FF);
-            case 2:
-                return colors::northwesternPurple;
-            case 3:
-                return colors::fromHex(0x38EB21FF);
-            default:
-                return colors::fromHex(0xFF00FFFF);
-        }
-    }
-
    private:
     std::vector<okay::ECSEntity> _entities;
 
     okay::Mesh centerMesh{okay::Mesh::none()};
     okay::EngineAssetRef<okay::MeshData> centerMeshData{"models/teapot.obj"};
-    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> bgTexture{
-        "textures/bg_pattern.png"};
-    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> topBar{"textures/top_bar.png"};
-    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> botBar{"textures/bottom_bar.png"};
-    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> stateShape{
-        "textures/state_shape.png"};
-    okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBlack{
-        "fonts/Lato-Black.ttf"};
-    okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{
-        "fonts/Lato-Bold.ttf"};
 
     // speedometer
     okay::MaterialHandle speedometerMaterial;
     okay::GameAssetRef<okay::Shader> speedometerShader{"shaders/speedometer"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> speedometerTexture{
         "textures/speedometer.png"};
-
-    // Battery Percentage
-    okay::MaterialHandle batPercentMaterial;
-    okay::GameAssetRef<okay::Shader> batPercentShader{"shaders/battery"};
-    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> batPerecentBG{
-        "textures/bat_percent_bg.png"};
-    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> batPerecentOverlay{
-        "textures/bat_percent_over.png"};
 };
 
 }  // namespace dash

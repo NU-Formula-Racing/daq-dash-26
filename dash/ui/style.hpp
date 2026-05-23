@@ -1,6 +1,8 @@
 #ifndef __STYLE_H__
 #define __STYLE_H__
 
+#include <okay/okay.hpp>
+
 #include <glm/glm.hpp>
 
 namespace dash {
@@ -24,7 +26,14 @@ static constexpr glm::vec4 northwesternPurple = fromHex(0x4E2A84FF);
 
 }  // namespace colors
 
-namespace fonts {};
+namespace fonts {
+
+okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBlack{
+    "fonts/Lato-Black.ttf"};
+okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{
+    "fonts/Lato-Bold.ttf"};
+
+};  // namespace fonts
 
 }  // namespace dash
 

@@ -215,6 +215,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
         odometerAnimation(0);
         socChargeAnimation(0);
+        igbtTempAnimation(0);
+        batteryTempAnimation(0);
     }
 
    private:
@@ -334,7 +336,6 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         }
     }
 
-
     void socChargeAnimation(float time) {                     // bar 1
         glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);  // placeholder
         float lowerBound = 0.1;
@@ -347,15 +348,67 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
         // full bars
         for (int j = 0; j < numFull; j++) {
-            getBar(0).setColor((getBar(1).numPixels() - 1) - j, color);
+            getBar(1).setColor((getBar(1).numPixels() - 1) - j, color);
         }
 
         // partial
-        for (int j = 0; j < getBar(0).numPixels(); j++) {
+        for (int j = 0; j < getBar(1).numPixels(); j++) {
             if (j == (getBar(1).numPixels() - 1) - numFull) {
                 glm::vec4 partialColor =
                     color * (batteryPercentage * getBar(1).numPixels() - numFull);
                 getBar(1).setColor(j, partialColor);
+                continue;
+            }
+        }
+    }
+
+    void igbtTempAnimation(float time) {                     // bar 3
+        glm::vec4 color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);  // placeholder
+        float lowerBound = 0.0;
+        float upperBound = 120.0;
+
+        float tempPercentage =
+            (static_cast<float>(dbc::rearInverterTempStatus::igbtTemp->get()) - lowerBound) / upperBound;
+
+        int numFull = static_cast<int>(floor(tempPercentage * getBar(3).numPixels()));
+
+        // full pixels
+        for (int j = 0; j < numFull; j++) {
+            getBar(3).setColor(j, color);
+        }
+
+        // partial
+        for (int j = 0; j < getBar(3).numPixels(); j++) {
+            if (j == numFull) {
+                glm::vec4 partialColor =
+                    color * (tempPercentage * getBar(3).numPixels() - numFull);
+                getBar(3).setColor(j, partialColor);
+                continue;
+            }
+        }
+    }
+
+    void batteryTempAnimation(float time) {                     // bar 4
+        glm::vec4 color = glm::vec4(0.1f, 0.1f, 1.0f, 1.0f);  // placeholder
+        float lowerBound = 20.0;
+        float upperBound = 60.0;
+
+        float tempPercentage =
+            (static_cast<float>(dbc::bmsDaughterboard::batteryTemperature->get()) - lowerBound) / upperBound;
+
+        int numFull = static_cast<int>(floor(tempPercentage * getBar(4).numPixels()));
+
+        // full pixels
+        for (int j = 0; j < numFull; j++) {
+            getBar(4).setColor(j, color);
+        }
+
+        // partial
+        for (int j = 0; j < getBar(4).numPixels(); j++) {
+            if (j == numFull) {
+                glm::vec4 partialColor =
+                    color * (tempPercentage * getBar(4).numPixels() - numFull);
+                getBar(4).setColor(j, partialColor);
                 continue;
             }
         }

@@ -1,6 +1,8 @@
 #ifndef __ERROR_PAGE_H__
 #define __ERROR_PAGE_H__
 
+#include "okay/core/ui/element.hpp"
+#include "okay/core/ui/text_layout.hpp"
 #include "page.hpp"
 #include "style.hpp"
 
@@ -43,6 +45,7 @@ class ErrorPage : public IPage {
 
         _entities = {
             okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 2),
+            okay::ecs::uiEntity(BIND_TO_THIS(buildContent), 2),
             okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 2),
             okay::ecs::uiEntity(BIND_TO_THIS(buildDriveStatus), 1),
         };
@@ -56,6 +59,158 @@ class ErrorPage : public IPage {
 
     okay::UIElement buildTopHud() {
         return ui::image(*topBar);
+    }
+
+    okay::UIElement buildContent() {
+        const float largeFontSize = 32.0f;
+        const float medFontSize = 24.0f;
+        const float smallFontSize = 16.0f;
+
+        return ui::relFrame(0.0625f, 0.264583333f, 0.9375f, 0.735416667f)(
+            ui::flexbox()
+                .axisSet(okay::UIAxis::Horizontal)
+                .widthGrow()
+                .heightGrow() (
+                    // Error list
+                    ui::flexbox()
+                        .axisSet(okay::UIAxis::Vertical)
+                        .widthGrow()
+                        .heightGrow() (
+                            ui::text("test")
+                                .widthGrow()
+                                .textSizeSet(medFontSize),
+                            ui::text("test")
+                                .widthGrow()
+                                .textSizeSet(medFontSize),
+                            ui::text("test")
+                                .widthGrow()
+                                .textSizeSet(medFontSize)
+                        ),
+                    ui::spacer()
+                        .widthSet(okay::size::Fixed(20)),
+                    // Temperature info
+                    ui::flexbox()
+                        .axisSet(okay::UIAxis::Vertical)
+                        .widthGrow()
+                        .heightGrow() (
+                            ui::image(*tempFull) (
+                                ui::spacer(),
+                                ui::text("CELL")
+                                    .widthGrow()
+                                    .textSizeSet(largeFontSize)
+                                    .alignTextCenter(),
+                                ui::spacer(),
+                                ui::flexbox()
+                                    .axisSet(okay::UIAxis::Horizontal)
+                                    .widthGrow()
+                                    .heightSet(okay::size::Fixed(64))
+                                    .bottomMarginSet(8) (
+                                        ui::flexbox()
+                                            .axisSet(okay::UIAxis::Vertical)
+                                            .widthGrow()
+                                            .heightGrow() (
+                                                ui::spacer(),
+                                                ui::text("minimum")
+                                                    .widthGrow()
+                                                    .textSizeSet(smallFontSize)
+                                                    .alignTextCenter(),
+                                                ui::text("3.79")
+                                                    .widthGrow()
+                                                    .textSizeSet(largeFontSize)
+                                                    .alignTextCenter(),
+                                                ui::spacer()
+                                            ),
+                                        ui::spacer()
+                                            .widthSet(okay::size::Fixed(14)),
+                                        ui::flexbox()
+                                            .axisSet(okay::UIAxis::Vertical)
+                                            .widthGrow()
+                                            .heightGrow() (
+                                                ui::spacer(),
+                                                ui::text("maximum")
+                                                    .widthGrow()
+                                                    .textSizeSet(smallFontSize)
+                                                    .alignTextCenter(),
+                                                ui::text("19")
+                                                    .widthGrow()
+                                                    .textSizeSet(largeFontSize)
+                                                    .alignTextCenter(),
+                                                ui::spacer()
+                                            )
+                                    ),
+                                ui::spacer()
+                                    .widthSet(okay::size::Fixed(20)),
+                                ui::text("IGBT")
+                                    .widthGrow()
+                                    .textSizeSet(largeFontSize)
+                                    .alignTextCenter()
+                                    .bottomMarginSet(10),
+                                ui::spacer(),
+                                ui::flexbox()
+                                    .axisSet(okay::UIAxis::Horizontal)
+                                    .widthGrow()
+                                    .heightSet(okay::size::Fixed(64)) (
+                                        ui::flexbox()
+                                            .axisSet(okay::UIAxis::Vertical)
+                                            .widthGrow()
+                                            .heightGrow() (
+                                                ui::spacer(),
+                                                ui::text("left")
+                                                    .widthGrow()
+                                                    .heightFit()
+                                                    .textSizeSet(smallFontSize)
+                                                    .alignTextCenter(),
+                                                ui::text("3.79")
+                                                    .widthGrow()
+                                                    .heightFit()
+                                                    .textSizeSet(largeFontSize)
+                                                    .alignTextCenter(),
+                                                ui::spacer()
+                                            ),
+                                        ui::spacer()
+                                            .widthSet(okay::size::Fixed(6)),
+                                        ui::flexbox()
+                                            .axisSet(okay::UIAxis::Vertical)
+                                            .widthGrow()
+                                            .heightGrow() (
+                                                ui::spacer(),
+                                                ui::text("rear")
+                                                    .widthGrow()
+                                                    .heightFit()
+                                                    .textSizeSet(smallFontSize)
+                                                    .alignTextTop()
+                                                    .alignTextCenter(),
+                                                ui::text("19")
+                                                    .widthGrow()
+                                                    .heightFit()
+                                                    .textSizeSet(largeFontSize)
+                                                    .alignTextCenter(),
+                                                ui::spacer()
+                                            ),
+                                        ui::spacer()
+                                            .widthSet(okay::size::Fixed(6)),
+                                        ui::flexbox()
+                                            .axisSet(okay::UIAxis::Vertical)
+                                            .widthGrow()
+                                            .heightGrow() (
+                                                ui::spacer(),
+                                                ui::text("right")
+                                                    .widthGrow()
+                                                    .heightFit()
+                                                    .textSizeSet(smallFontSize)
+                                                    .alignTextCenter(),
+                                                ui::text("19")
+                                                    .widthGrow()
+                                                    .heightFit()
+                                                    .textSizeSet(largeFontSize)
+                                                    .alignTextCenter(),
+                                                ui::spacer()
+                                            )
+                                    )
+                                )
+                        )
+                )
+        );
     }
 
     okay::UIElement buildBotHud() {
@@ -142,6 +297,7 @@ class ErrorPage : public IPage {
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> bgTexture{
         "textures/bg_pattern.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> topBar{"textures/top_bar.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> tempFull{"textures/temp_full.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> botBar{"textures/bottom_bar.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> stateShape{
         "textures/state_shape.png"};

@@ -28,6 +28,8 @@ class DrivePage : public IPage {
                 okay::shaderHandle(okay::load::engineShader("shaders/lit"));
             auto materialProperties = std::make_unique<okay::LitMaterial>();
             materialProperties->color.set(colors::fromHex(0xA304FFFF));
+            materialProperties->metallic = 0.8f;
+            materialProperties->anisotropic = 0.8f;
             objectMaterial = okay::materialHandle(objectShader, std::move(materialProperties));
             centerMesh = okay::mesh(*centerMeshData);
         }
@@ -70,9 +72,10 @@ class DrivePage : public IPage {
             okay::ecs::entity()
                 .addComponent<okay::TransformComponent>(glm::vec3(),
                     glm::vec3(0.1f),
-                    glm::angleAxis(glm::radians(-25.0f), glm::vec3(2.0f, 3.0f, 1.0f)))
+                    glm::quatLookAt(
+                        glm::normalize(glm::vec3(0.3f, 0.5f, -1.0f)), glm::vec3(0.0f, 1.0f, 0.0f)))
                 .addComponent<okay::LightComponent>(
-                    okay::LightComponent::directional(glm::vec3{1, 1, 1}, 1.0f))};
+                    okay::LightComponent::directional(glm::vec3{1, 1, 1}, 2.5f))};
     }
 
     void closePage() {

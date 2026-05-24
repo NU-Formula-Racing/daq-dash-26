@@ -439,6 +439,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             getBar(1).setColor(j, color);
         }
 
+        for (int j = numFull; j < getBar(1).numPixels(); j++) {
+            getBar(1).setColor(j, glm::vec4(0.0f));
+        }
+
         // partial
         for (int j = 0; j < getBar(1).numPixels(); j++) {
             if (j == numFull) {

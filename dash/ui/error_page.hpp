@@ -1,6 +1,7 @@
 #ifndef __ERROR_PAGE_H__
 #define __ERROR_PAGE_H__
 
+#include "okay/core/ui/builder.hpp"
 #include "okay/core/ui/element.hpp"
 #include "okay/core/ui/text_layout.hpp"
 #include "page.hpp"
@@ -46,7 +47,6 @@ class ErrorPage : public IPage {
         _entities = {
             okay::ecs::uiEntity(BIND_TO_THIS(buildTopHud), 2),
             okay::ecs::uiEntity(BIND_TO_THIS(buildContent), 2),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildBotHud), 2),
             okay::ecs::uiEntity(BIND_TO_THIS(buildDriveStatus), 1),
         };
     }
@@ -58,7 +58,18 @@ class ErrorPage : public IPage {
     }
 
     okay::UIElement buildTopHud() {
-        return ui::image(*topBar);
+        const float largeFontSize = 32.0f;
+
+        return ui::relFrame(0.0f, 0.0f, 1.0f, 0.125f) (
+            ui::image(*topBar) (
+                ui::text(std::format("log_{:04}.nfr", dbc::telemetryStatus::logFile->get()))
+                    .widthSet(okay::size::Percent(1.0f))
+                    .textSizeSet(largeFontSize)
+                    .alignTextCenter()
+                    .fontSet(*latoBlack)
+                    .topMarginSet(okay::size::Fixed(10))
+            )
+        );
     }
 
     okay::UIElement buildContent() {
@@ -66,7 +77,7 @@ class ErrorPage : public IPage {
         const float medFontSize = 24.0f;
         const float smallFontSize = 16.0f;
 
-        return ui::relFrame(0.0625f, 0.264583333f, 0.9375f, 0.735416667f)(
+        return ui::relFrame(0.0625f, 0.21, 0.9375f, 0.71)(
             ui::flexbox()
                 .axisSet(okay::UIAxis::Horizontal)
                 .widthGrow()
@@ -96,13 +107,7 @@ class ErrorPage : public IPage {
                                 ),
                             ui::image(*errorCodeBot),
                             ui::spacer()
-                        ),
-                    ui::spacer()
-                        .widthSet(okay::size::Fixed(25)),
-                    ui::flexbox()
-                        .axisSet(okay::UIAxis::Vertical)
-                        .widthGrow()
-                        .heightGrow() (
+                                .widthSet(okay::size::Fixed(25)),
                             ui::image(*errorCodeTop) (
                                     ui::text("ECU")
                                         .widthGrow()
@@ -134,7 +139,8 @@ class ErrorPage : public IPage {
                     ui::flexbox()
                         .axisSet(okay::UIAxis::Vertical)
                         .widthGrow()
-                        .heightGrow() (
+                        .heightGrow()
+                        .topMarginSet(okay::size::Fixed(10)) (
                             ui::image(*tempFull) (
                                 ui::spacer(),
                                 ui::text("CELL")
@@ -253,64 +259,6 @@ class ErrorPage : public IPage {
                         )
                 )
         );
-    }
-
-    okay::UIElement buildBotHud() {
-        const float outerPercent = 0.20f;
-        const float valuePercent = 0.12f;
-        const float labelPercent = 0.05f;
-        const float largeFontSize = 32.0f;
-        const float medFontSize = 24.0f;
-
-        // clang-format off
-        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)(
-            ui::spacer(),
-            ui::image(*botBar)
-                .axisSet(okay::UIAxis::Vertical) (
-                    ui::spacer(),
-                    ui::flexbox()
-                        .axisSet(okay::UIAxis::Horizontal)
-                        .bottomMarginSet(5)
-                        .widthSet(okay::size::Percent(1.0f)) (
-                            ui::text(std::format("log_{:04}.nfr", dbc::telemetryStatus::logFile->get()))
-                                .widthSet(okay::size::Percent(outerPercent))
-                                .textSizeSet(largeFontSize)
-                                .alignTextLeft()
-                                .leftMarginSet(10)
-                                .fontSet(*latoBlack)
-                                .alignTextBottom(),
-                            ui::text(std::format("{:.2f}", dbc::pdmBatVolt::batVolt->get()))
-                                .widthSet(okay::size::Percent(valuePercent))
-                                .textSizeSet(medFontSize)
-                                .alignTextCenter()
-                                .alignTextBottom(),
-                            ui::text("LV")
-                                .widthSet(okay::size::Percent(labelPercent))
-                                .textSizeSet(medFontSize)
-                                .alignTextCenter()
-                                .alignTextBottom(),
-                            ui::spacer(),
-                            ui::text("HV")
-                                .widthSet(okay::size::Percent(labelPercent))
-                                .textSizeSet(medFontSize)
-                                .alignTextCenter()
-                                .alignTextBottom(),
-                            ui::text(std::format("{:.2f}", dbc::bmsSoe::batteryVoltage->get()))
-                                .widthSet(okay::size::Percent(valuePercent))
-                                .textSizeSet(medFontSize)
-                                .alignTextCenter()
-                                .alignTextBottom(),
-                            ui::text(std::format("{:.2f} mi", dbc::telemetryOdometer::milesDriven->get()))
-                                .widthSet(okay::size::Percent(outerPercent))
-                                .textSizeSet(largeFontSize)
-                                .alignTextRight()
-                                .rightMarginSet(10)
-                                .fontSet(*latoBlack)
-                                .alignTextBottom()
-                        )
-                )
-        );
-        // clang-format on
     }
 
     okay::UIElement buildDriveStatus() {

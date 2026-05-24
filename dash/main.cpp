@@ -35,12 +35,12 @@ int main() {
             .activeWhen([]() {
                 return true;
             })
-            .withPriority(0),
+            .withPriority(1),
         dash::PageEntry::create(std::make_unique<dash::ErrorPage>())
             .activeWhen([]() {
                 return true;
             })
-            .withPriority(1));
+            .withPriority(0));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);

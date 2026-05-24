@@ -3,6 +3,7 @@
 
 #include "components/rotate.hpp"
 #include "materials/speedometer.hpp"
+#include "okay/core/ui/builder.hpp"
 #include "page.hpp"
 #include "shared_elements.hpp"
 #include "style.hpp"
@@ -69,6 +70,7 @@ class DrivePage : public IPage {
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
+            okay::ecs::uiEntity(BIND_TO_THIS(buildTemperatureDisplay), 1),
             okay::ecs::uiEntity(BIND_TO_THIS(buildSpeedometer), 1),
             okay::ecs::entity()
                 .addComponent<okay::TransformComponent>(
@@ -115,6 +117,11 @@ class DrivePage : public IPage {
                 )
         );
         // clang-format on
+    }
+
+    okay::UIElement buildTemperatureDisplay() {
+        return ui::relCenterFrame(0.5f, 0.5f, 1.0f, 1.0f)(
+            SharedElements::get().buildTemperatureElement());
     }
 
    private:

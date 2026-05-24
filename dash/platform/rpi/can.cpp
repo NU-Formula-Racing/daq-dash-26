@@ -1,8 +1,9 @@
+#include <okay/okay.hpp>
+
 #include <can/can_dbc.hpp>
 #include <chrono>
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
-#include <okay/okay.hpp>
 #include <platform/can.hpp>
 #include <platform/input_manager.hpp>
 #include <platform/interfaces.hpp>

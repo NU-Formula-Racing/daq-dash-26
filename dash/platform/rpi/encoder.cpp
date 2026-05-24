@@ -14,11 +14,17 @@ Encoder::Encoder(uint8_t leftPin, uint8_t rightPin)
       _rightGPIO(std::make_unique<GPIO>(rightPin, false)) {
     InputManager::instance().registerEncoder(_encoderID, leftPin, rightPin);
 
-    _leftGPIO->attachInterrupt([id = _encoderID]() { InputManager::instance().onEncoderEdge(id); },
-                               GPIO::EdgeType::BOTH);
+    _leftGPIO->attachInterrupt(
+        [id = _encoderID]() {
+            InputManager::instance().onEncoderEdge(id);
+        },
+        GPIO::EdgeType::BOTH);
 
-    _rightGPIO->attachInterrupt([id = _encoderID]() { InputManager::instance().onEncoderEdge(id); },
-                                GPIO::EdgeType::BOTH);
+    _rightGPIO->attachInterrupt(
+        [id = _encoderID]() {
+            InputManager::instance().onEncoderEdge(id);
+        },
+        GPIO::EdgeType::BOTH);
 }
 
 Encoder::~Encoder() {

@@ -319,14 +319,14 @@ inline CAN_Signal_BOOL bppcImp = MakeSignalSigned(bool, 16, 8, 1.0, 0.0, false);
 inline CAN_Signal_BOOL brakeInvalidImp = MakeSignalSigned(bool, 24, 8, 1.0, 0.0, false);
 inline CAN_Signal_BOOL appssInvalidImp = MakeSignalSigned(bool, 32, 8, 1.0, 0.0, false);
 inline RX_CAN_Message(5) message{driveBus,
-                                 0x204,
-                                 false,
-                                 5,
-                                 implausibilityPresent,
-                                 appssDisagreementImp,
-                                 bppcImp,
-                                 brakeInvalidImp,
-                                 appssInvalidImp};
+    0x204,
+    false,
+    5,
+    implausibilityPresent,
+    appssDisagreementImp,
+    bppcImp,
+    brakeInvalidImp,
+    appssInvalidImp};
 
 };  // namespace ecuImplausibility
 
@@ -365,13 +365,13 @@ inline CAN_Signal_UINT8 rearPumpDutyCycle = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.
 inline CAN_Signal_UINT8 frontFanDutyCycle = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
 inline CAN_Signal_UINT8 rearFanDutyCycle = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
 inline RX_CAN_Message(4) message{driveBus,
-                                 0x209,
-                                 false,
-                                 4,
-                                 frontPumpDutyCycle,
-                                 rearPumpDutyCycle,
-                                 frontFanDutyCycle,
-                                 rearFanDutyCycle};
+    0x209,
+    false,
+    4,
+    frontPumpDutyCycle,
+    rearPumpDutyCycle,
+    frontFanDutyCycle,
+    rearFanDutyCycle};
 
 static constexpr uint8_t frontPumpDutyCycleMin{0};
 static constexpr uint8_t rearPumpDutyCycleMin{0};
@@ -1437,13 +1437,13 @@ inline CAN_Signal_INT16 brSusPotError = MakeSignalSigned(int16_t, 16, 16, 1.0, 0
 inline CAN_Signal_INT16 brTireTempError = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
 inline CAN_Signal_INT16 brHeartbeatCount = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
 inline RX_CAN_Message(4) message{driveBus,
-                                 0x540,
-                                 false,
-                                 8,
-                                 brStrainGaugeError,
-                                 brSusPotError,
-                                 brTireTempError,
-                                 brHeartbeatCount};
+    0x540,
+    false,
+    8,
+    brStrainGaugeError,
+    brSusPotError,
+    brTireTempError,
+    brHeartbeatCount};
 
 static constexpr int16_t brStrainGaugeErrorMin{0};
 static constexpr int16_t brSusPotErrorMin{0};
@@ -1502,13 +1502,13 @@ inline CAN_Signal_INT16 blSusPotError = MakeSignalSigned(int16_t, 16, 16, 1.0, 0
 inline CAN_Signal_INT16 blTireTempError = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
 inline CAN_Signal_INT16 blHeartbeatCount = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
 inline RX_CAN_Message(4) message{driveBus,
-                                 0x541,
-                                 false,
-                                 8,
-                                 blStrainGaugeError,
-                                 blSusPotError,
-                                 blTireTempError,
-                                 blHeartbeatCount};
+    0x541,
+    false,
+    8,
+    blStrainGaugeError,
+    blSusPotError,
+    blTireTempError,
+    blHeartbeatCount};
 
 static constexpr int16_t blStrainGaugeErrorMin{0};
 static constexpr int16_t blSusPotErrorMin{0};
@@ -1567,13 +1567,13 @@ inline CAN_Signal_INT16 frSusPotError = MakeSignalSigned(int16_t, 16, 16, 1.0, 0
 inline CAN_Signal_INT16 frTireTempError = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
 inline CAN_Signal_INT16 frHeartbeatCount = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
 inline RX_CAN_Message(4) message{driveBus,
-                                 0x542,
-                                 false,
-                                 8,
-                                 frStrainGaugeError,
-                                 frSusPotError,
-                                 frTireTempError,
-                                 frHeartbeatCount};
+    0x542,
+    false,
+    8,
+    frStrainGaugeError,
+    frSusPotError,
+    frTireTempError,
+    frHeartbeatCount};
 
 static constexpr int16_t frStrainGaugeErrorMin{0};
 static constexpr int16_t frSusPotErrorMin{0};
@@ -1632,13 +1632,13 @@ inline CAN_Signal_INT16 flSusPotError = MakeSignalSigned(int16_t, 16, 16, 1.0, 0
 inline CAN_Signal_INT16 flTireTempError = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
 inline CAN_Signal_INT16 flHeartbeatCount = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
 inline RX_CAN_Message(4) message{driveBus,
-                                 0x543,
-                                 false,
-                                 8,
-                                 flStrainGaugeError,
-                                 flSusPotError,
-                                 flTireTempError,
-                                 flHeartbeatCount};
+    0x543,
+    false,
+    8,
+    flStrainGaugeError,
+    flSusPotError,
+    flTireTempError,
+    flHeartbeatCount};
 
 static constexpr int16_t flStrainGaugeErrorMin{0};
 static constexpr int16_t flSusPotErrorMin{0};
@@ -1781,16 +1781,16 @@ inline CAN_Signal_UINT8 utcMinutes = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
 inline CAN_Signal_UINT8 utcSeconds = MakeSignalExp(uint8_t, 40, 8, 1.0, 0.0);
 inline CAN_Signal_UINT16 utcMilliseconds = MakeSignalExp(uint16_t, 48, 16, 1.0, 0.0);
 inline RX_CAN_Message(7) message{driveBus,
-                                 0x559,
-                                 false,
-                                 8,
-                                 utcYear,
-                                 utcMonth,
-                                 utcDay,
-                                 utcHour,
-                                 utcMinutes,
-                                 utcSeconds,
-                                 utcMilliseconds};
+    0x559,
+    false,
+    8,
+    utcYear,
+    utcMonth,
+    utcDay,
+    utcHour,
+    utcMinutes,
+    utcSeconds,
+    utcMilliseconds};
 
 static constexpr uint8_t utcMonthMin{0};
 static constexpr uint8_t utcDayMin{0};
@@ -1837,12 +1837,12 @@ inline CAN_Signal_FLOAT positionUncertaintyEast =
 inline CAN_Signal_FLOAT positionUncertaintyDown =
     MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
 inline RX_CAN_Message(3) message{driveBus,
-                                 0x55C,
-                                 false,
-                                 8,
-                                 positionUncertaintyNorth,
-                                 positionUncertaintyEast,
-                                 positionUncertaintyDown};
+    0x55C,
+    false,
+    8,
+    positionUncertaintyNorth,
+    positionUncertaintyEast,
+    positionUncertaintyDown};
 
 static constexpr float positionUncertaintyNorthMin{0.0};
 static constexpr float positionUncertaintyEastMin{0.0};

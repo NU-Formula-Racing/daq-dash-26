@@ -1,9 +1,10 @@
 #ifndef __CAN_IMGUI_H__
 #define __CAN_IMGUI_H__
 
+#include <okay/core/util/option.hpp>
+
 #include <cstdint>
 #include <nfr_can/CAN_interface.hpp>
-#include <okay/core/util/option.hpp>
 
 class CAN_IMGUI : public ICAN {
     struct SignalInfo {

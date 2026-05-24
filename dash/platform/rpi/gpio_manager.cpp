@@ -1,5 +1,6 @@
-#include <gpiod.hpp>
 #include <okay/okay.hpp>
+
+#include <gpiod.hpp>
 #include <platform/rpi/gpio_manager.hpp>
 
 namespace dash {
@@ -9,8 +10,7 @@ GPIOManager& GPIOManager::instance() {
     return instance;
 }
 
-GPIOManager::GPIOManager() : _chip(std::make_unique<gpiod::chip>("/dev/gpiochip0")) {
-}
+GPIOManager::GPIOManager() : _chip(std::make_unique<gpiod::chip>("/dev/gpiochip0")) {}
 
 bool GPIOManager::registerPin(uint8_t offset, gpiod::line_settings settings) {
     if (_settings.find(offset) != _settings.end()) {
@@ -41,9 +41,9 @@ void GPIOManager::releasePin(uint8_t offset) {
 }
 
 void GPIOManager::registerInterrupt(uint8_t offset,
-                                    gpiod::line_settings settings,
-                                    std::function<void()> callback,
-                                    GPIO::EdgeType edge) {
+    gpiod::line_settings settings,
+    std::function<void()> callback,
+    GPIO::EdgeType edge) {
     _settings[offset] = settings;
 
     if (edge == GPIO::EdgeType::FALLING || edge == GPIO::EdgeType::BOTH) {

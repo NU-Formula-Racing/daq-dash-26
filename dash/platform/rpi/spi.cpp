@@ -19,7 +19,9 @@ struct SPIError {
     bool open_err = false;
     bool config_err = false;
 
-    bool checkError() { return open_err || config_err; }
+    bool checkError() {
+        return open_err || config_err;
+    }
 };
 
 struct SPI::SPIImpl {
@@ -82,12 +84,13 @@ struct SPI::SPIImpl {
         return ok;
     }
 
-    bool write(const uint8_t* tx, size_t len) { return transfer(tx, nullptr, len); }
+    bool write(const uint8_t* tx, size_t len) {
+        return transfer(tx, nullptr, len);
+    }
 };
 
 SPI::SPI(const std::string& device, uint32_t speedHz, uint8_t mode, uint8_t bitsPerWord)
-    : _impl(std::make_unique<SPIImpl>(device, speedHz, mode, bitsPerWord)) {
-}
+    : _impl(std::make_unique<SPIImpl>(device, speedHz, mode, bitsPerWord)) {}
 
 SPI::~SPI() = default;
 

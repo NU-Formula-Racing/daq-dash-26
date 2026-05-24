@@ -6,8 +6,7 @@ struct SPI::SPIImpl {
     // noop
 };
 
-SPI::SPI(const std::string&, uint32_t, uint8_t, uint8_t) : _impl(std::make_unique<SPIImpl>()) {
-}
+SPI::SPI(const std::string&, uint32_t, uint8_t, uint8_t) : _impl(std::make_unique<SPIImpl>()) {}
 
 SPI::~SPI() = default;
 

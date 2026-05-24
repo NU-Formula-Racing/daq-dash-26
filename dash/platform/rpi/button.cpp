@@ -8,11 +8,16 @@ Button::Button(uint8_t gpioPin)
     : _buttonID(gpioPin), _gpio(std::make_unique<GPIO>(gpioPin, false)) {
     InputManager::instance().registerButton(_buttonID);
 
-    _gpio->attachInterrupt([id = _buttonID]() { InputManager::instance().executeUpCallbacks(id); },
-                           GPIO::EdgeType::FALLING);
+    _gpio->attachInterrupt(
+        [id = _buttonID]() {
+            InputManager::instance().executeUpCallbacks(id);
+        },
+        GPIO::EdgeType::FALLING);
 
     _gpio->attachInterrupt(
-        [id = _buttonID]() { InputManager::instance().executeDownCallbacks(id); },
+        [id = _buttonID]() {
+            InputManager::instance().executeDownCallbacks(id);
+        },
         GPIO::EdgeType::RISING);
 }
 

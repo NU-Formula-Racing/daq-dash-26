@@ -8,7 +8,6 @@
 namespace dbc {
 
 inline CAN_Bus driveBus;
-inline CAN_Bus dataBus;
 
 namespace pdmCurrent {
 
@@ -409,1104 +408,956 @@ static constexpr uint8_t torqueStatusMin{0};
 
 };  // namespace ecuTorqueStatus
 
-namespace bmsSoe {
+namespace ecuBspdStatus {
 
-inline CAN_Signal_FLOAT maxDischargeCurrent = MakeSignalSigned(float, 0, 12, 0.1, 0.0, false);
-inline CAN_Signal_FLOAT maxRegenCurrent = MakeSignalSigned(float, 12, 12, 0.1, 0.0, false);
-inline CAN_Signal_FLOAT batteryVoltage = MakeSignalSigned(float, 24, 16, 0.01, 0.0, false);
-inline CAN_Signal_FLOAT batteryTemperature = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT batteryCurrent = MakeSignalSigned(float, 48, 16, 0.01, -100.0, false);
-inline RX_CAN_Message(5) message{driveBus,
-    0x150,
-    false,
-    8,
-    maxDischargeCurrent,
-    maxRegenCurrent,
-    batteryVoltage,
-    batteryTemperature,
-    batteryCurrent};
+inline CAN_Signal_UINT8 highCurrent = MakeSignalExp(uint8_t, 0, 1, 1.0, 0.0);
+inline CAN_Signal_UINT8 hardBrake = MakeSignalExp(uint8_t, 1, 1, 1.0, 0.0);
+inline CAN_Signal_UINT8 brakeError = MakeSignalExp(uint8_t, 2, 1, 1.0, 0.0);
+inline CAN_Signal_UINT8 currentError = MakeSignalExp(uint8_t, 3, 1, 1.0, 0.0);
+inline CAN_Signal_UINT8 bspdShutdownB = MakeSignalExp(uint8_t, 4, 1, 1.0, 0.0);
+inline CAN_Signal_UINT8 bspdErrorB = MakeSignalExp(uint8_t, 5, 1, 1.0, 0.0);
+inline CAN_Signal_UINT8 bspdSensErrorB = MakeSignalExp(uint8_t, 6, 1, 1.0, 0.0);
+inline RX_CAN_Message(7) message{driveBus,
+                                 0x211,
+                                 false,
+                                 1,
+                                 highCurrent,
+                                 hardBrake,
+                                 brakeError,
+                                 currentError,
+                                 bspdShutdownB,
+                                 bspdErrorB,
+                                 bspdSensErrorB};
 
-static constexpr float maxDischargeCurrentMin{0.0};
-static constexpr float maxRegenCurrentMin{0.0};
+static constexpr uint8_t highCurrentMin{0};
+static constexpr uint8_t hardBrakeMin{0};
+static constexpr uint8_t brakeErrorMin{0};
+static constexpr uint8_t currentErrorMin{0};
+static constexpr uint8_t bspdShutdownBMin{0};
+static constexpr uint8_t bspdErrorBMin{0};
+static constexpr uint8_t bspdSensErrorBMin{0};
+
+};  // namespace ecuBspdStatus
+
+namespace bmsPackboard {
+
+inline CAN_Signal_FLOAT batteryCurrent = MakeSignalSigned(float, 0, 32, 0.0001, -100.0, false);
+inline CAN_Signal_FLOAT packboardVoltage = MakeSignalSigned(float, 32, 32, 0.0001, 0.0, false);
+inline RX_CAN_Message(2) message{driveBus, 0x150, false, 8, batteryCurrent, packboardVoltage};
+
+static constexpr float batteryCurrentMin{-75.0};
+static constexpr float packboardVoltageMin{0.0};
+
+};  // namespace bmsPackboard
+
+namespace bmsDaughterboard {
+
+inline CAN_Signal_FLOAT batteryVoltage = MakeSignalSigned(float, 0, 16, 0.01, 0.0, false);
+inline CAN_Signal_FLOAT maxCellVoltage = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT minCellVoltage = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT batteryTemperature = MakeSignalSigned(float, 48, 16, 0.01, -20.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x151, false, 8, batteryVoltage, maxCellVoltage, minCellVoltage, batteryTemperature};
+
 static constexpr float batteryVoltageMin{0.0};
-static constexpr float batteryTemperatureMin{0.0};
-static constexpr float batteryCurrentMin{0.0};
+static constexpr float maxCellVoltageMin{-3.4152};
+static constexpr float minCellVoltageMin{-3.4152};
+static constexpr float batteryTemperatureMin{-20.0};
 
-};  // namespace bmsSoe
-
-namespace bmsFaults {
-
-inline CAN_Signal_BOOL internalfaultSummary = MakeSignalSigned(bool, 0, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL externalFault = MakeSignalSigned(bool, 1, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL undervoltageFault = MakeSignalSigned(bool, 2, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL overvoltageFault = MakeSignalSigned(bool, 3, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL undertemperatureFault = MakeSignalSigned(bool, 4, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL overtemperatureFault = MakeSignalSigned(bool, 5, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL overcurrentFault = MakeSignalSigned(bool, 6, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL openWireFault = MakeSignalSigned(bool, 7, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL openWireTempFault = MakeSignalSigned(bool, 8, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL pecFault = MakeSignalSigned(bool, 9, 1, 1.0, 0.0, false);
-inline CAN_Signal_UINT8 totalPecFailures = MakeSignalExp(uint8_t, 10, 8, 1.0, 0.0);
-inline RX_CAN_Message(11) message{driveBus,
-    0x151,
-    false,
-    3,
-    internalfaultSummary,
-    externalFault,
-    undervoltageFault,
-    overvoltageFault,
-    undertemperatureFault,
-    overtemperatureFault,
-    overcurrentFault,
-    openWireFault,
-    openWireTempFault,
-    pecFault,
-    totalPecFailures};
-
-static constexpr uint8_t totalPecFailuresMin{0};
-
-};  // namespace bmsFaults
+};  // namespace bmsDaughterboard
 
 namespace bmsStatus {
 
-inline CAN_Signal_UINT8 bmsState = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
-inline CAN_Signal_UINT8 imdState = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
-inline CAN_Signal_FLOAT maxCellTemp = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT minCellTemp = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT maxCellVoltage = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT minCellVoltage = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT bmsSoc = MakeSignalSigned(float, 48, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(7) message{driveBus,
-    0x152,
-    false,
-    7,
-    bmsState,
-    imdState,
-    maxCellTemp,
-    minCellTemp,
-    maxCellVoltage,
-    minCellVoltage,
-    bmsSoc};
+inline CAN_Signal_FLOAT soc = MakeSignalSigned(float, 0, 16, 2e-05, 0.0, false);
+inline CAN_Signal_UINT8 bmsState = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
+inline CAN_Signal_BOOL imdState = MakeSignalSigned(bool, 24, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL internalfaultSummary = MakeSignalSigned(bool, 25, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL undervoltageFault = MakeSignalSigned(bool, 26, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL overvoltageFault = MakeSignalSigned(bool, 27, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL undertemperatureFault = MakeSignalSigned(bool, 28, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL overtemperatureFault = MakeSignalSigned(bool, 29, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL openWireFault = MakeSignalSigned(bool, 30, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL openWireTempFault = MakeSignalSigned(bool, 31, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL pecFault = MakeSignalSigned(bool, 32, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL shutdownOpen = MakeSignalSigned(bool, 33, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL vcuTimeout = MakeSignalSigned(bool, 34, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL inverterTimeout = MakeSignalSigned(bool, 35, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL chargerTimeout = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL PecWarning2950 = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
+inline CAN_Signal_UINT16 totalPecFailures = MakeSignalExp(uint16_t, 38, 16, 1.0, 0.0);
+inline RX_CAN_Message(17) message{driveBus,
+                                  0x152,
+                                  false,
+                                  7,
+                                  soc,
+                                  bmsState,
+                                  imdState,
+                                  internalfaultSummary,
+                                  undervoltageFault,
+                                  overvoltageFault,
+                                  undertemperatureFault,
+                                  overtemperatureFault,
+                                  openWireFault,
+                                  openWireTempFault,
+                                  pecFault,
+                                  shutdownOpen,
+                                  vcuTimeout,
+                                  inverterTimeout,
+                                  chargerTimeout,
+                                  PecWarning2950,
+                                  totalPecFailures};
 
+static constexpr float socMin{0.0};
 static constexpr uint8_t bmsStateMin{0};
-static constexpr uint8_t imdStateMin{0};
-static constexpr float maxCellTempMin{0.0};
-static constexpr float minCellTempMin{0.0};
-static constexpr float maxCellVoltageMin{0.0};
-static constexpr float minCellVoltageMin{0.0};
-static constexpr float bmsSocMin{0.0};
+static constexpr uint16_t totalPecFailuresMin{0};
 
 };  // namespace bmsStatus
 
 namespace bmsVoltages0 {
 
-inline CAN_Signal_FLOAT cellV0 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV1 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV2 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV3 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV4 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV5 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV6 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset0 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x153,
-    false,
-    8,
-    cellV0,
-    cellV1,
-    cellV2,
-    cellV3,
-    cellV4,
-    cellV5,
-    cellV6,
-    cellOcvOffset0};
+inline CAN_Signal_FLOAT cellV1 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV2 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV3 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV4 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x153, false, 8, cellV1, cellV2, cellV3, cellV4};
 
-static constexpr float cellV0Min{0.0};
-static constexpr float cellV1Min{0.0};
-static constexpr float cellV2Min{0.0};
-static constexpr float cellV3Min{0.0};
-static constexpr float cellV4Min{0.0};
-static constexpr float cellV5Min{0.0};
-static constexpr float cellV6Min{0.0};
-static constexpr float cellOcvOffset0Min{0.0};
+static constexpr float cellV1Min{-3.4152};
+static constexpr float cellV2Min{-3.4152};
+static constexpr float cellV3Min{-3.4152};
+static constexpr float cellV4Min{-3.4152};
 
 };  // namespace bmsVoltages0
 
 namespace bmsVoltages1 {
 
-inline CAN_Signal_FLOAT cellV7 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV8 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV9 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV10 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV11 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV12 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV13 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset1 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x154,
-    false,
-    8,
-    cellV7,
-    cellV8,
-    cellV9,
-    cellV10,
-    cellV11,
-    cellV12,
-    cellV13,
-    cellOcvOffset1};
+inline CAN_Signal_FLOAT cellV5 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV6 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV7 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV8 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x154, false, 8, cellV5, cellV6, cellV7, cellV8};
 
-static constexpr float cellV7Min{0.0};
-static constexpr float cellV8Min{0.0};
-static constexpr float cellV9Min{0.0};
-static constexpr float cellV10Min{0.0};
-static constexpr float cellV11Min{0.0};
-static constexpr float cellV12Min{0.0};
-static constexpr float cellV13Min{0.0};
-static constexpr float cellOcvOffset1Min{0.0};
+static constexpr float cellV5Min{-3.4152};
+static constexpr float cellV6Min{-3.4152};
+static constexpr float cellV7Min{-3.4152};
+static constexpr float cellV8Min{-3.4152};
 
 };  // namespace bmsVoltages1
 
 namespace bmsVoltages2 {
 
-inline CAN_Signal_FLOAT cellV14 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV15 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV16 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV17 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV18 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV19 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV20 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset2 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x155,
-    false,
-    8,
-    cellV14,
-    cellV15,
-    cellV16,
-    cellV17,
-    cellV18,
-    cellV19,
-    cellV20,
-    cellOcvOffset2};
+inline CAN_Signal_FLOAT cellV9 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV10 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV11 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV12 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x155, false, 8, cellV9, cellV10, cellV11, cellV12};
 
-static constexpr float cellV14Min{0.0};
-static constexpr float cellV15Min{0.0};
-static constexpr float cellV16Min{0.0};
-static constexpr float cellV17Min{0.0};
-static constexpr float cellV18Min{0.0};
-static constexpr float cellV19Min{0.0};
-static constexpr float cellV20Min{0.0};
-static constexpr float cellOcvOffset2Min{0.0};
+static constexpr float cellV9Min{-3.4152};
+static constexpr float cellV10Min{-3.4152};
+static constexpr float cellV11Min{-3.4152};
+static constexpr float cellV12Min{-3.4152};
 
 };  // namespace bmsVoltages2
 
 namespace bmsVoltages3 {
 
-inline CAN_Signal_FLOAT cellV21 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV22 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV23 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV24 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV25 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV26 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV27 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset3 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x156,
-    false,
-    8,
-    cellV21,
-    cellV22,
-    cellV23,
-    cellV24,
-    cellV25,
-    cellV26,
-    cellV27,
-    cellOcvOffset3};
+inline CAN_Signal_FLOAT cellV13 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV14 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV15 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV16 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x156, false, 8, cellV13, cellV14, cellV15, cellV16};
 
-static constexpr float cellV21Min{0.0};
-static constexpr float cellV22Min{0.0};
-static constexpr float cellV23Min{0.0};
-static constexpr float cellV24Min{0.0};
-static constexpr float cellV25Min{0.0};
-static constexpr float cellV26Min{0.0};
-static constexpr float cellV27Min{0.0};
-static constexpr float cellOcvOffset3Min{0.0};
+static constexpr float cellV13Min{-3.4152};
+static constexpr float cellV14Min{-3.4152};
+static constexpr float cellV15Min{-3.4152};
+static constexpr float cellV16Min{-3.4152};
 
 };  // namespace bmsVoltages3
 
 namespace bmsVoltages4 {
 
-inline CAN_Signal_FLOAT cellV28 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV29 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV30 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV31 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV32 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV33 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV34 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset4 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x157,
-    false,
-    8,
-    cellV28,
-    cellV29,
-    cellV30,
-    cellV31,
-    cellV32,
-    cellV33,
-    cellV34,
-    cellOcvOffset4};
+inline CAN_Signal_FLOAT cellV17 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV18 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV19 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV20 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x157, false, 8, cellV17, cellV18, cellV19, cellV20};
 
-static constexpr float cellV28Min{0.0};
-static constexpr float cellV29Min{0.0};
-static constexpr float cellV30Min{0.0};
-static constexpr float cellV31Min{0.0};
-static constexpr float cellV32Min{0.0};
-static constexpr float cellV33Min{0.0};
-static constexpr float cellV34Min{0.0};
-static constexpr float cellOcvOffset4Min{0.0};
+static constexpr float cellV17Min{-3.4152};
+static constexpr float cellV18Min{-3.4152};
+static constexpr float cellV19Min{-3.4152};
+static constexpr float cellV20Min{-3.4152};
 
 };  // namespace bmsVoltages4
 
 namespace bmsVoltages5 {
 
-inline CAN_Signal_FLOAT cellV35 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV36 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV37 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV38 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV39 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV40 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV41 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset5 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x158,
-    false,
-    8,
-    cellV35,
-    cellV36,
-    cellV37,
-    cellV38,
-    cellV39,
-    cellV40,
-    cellV41,
-    cellOcvOffset5};
+inline CAN_Signal_FLOAT cellV21 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV22 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV23 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV24 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x158, false, 8, cellV21, cellV22, cellV23, cellV24};
 
-static constexpr float cellV35Min{0.0};
-static constexpr float cellV36Min{0.0};
-static constexpr float cellV37Min{0.0};
-static constexpr float cellV38Min{0.0};
-static constexpr float cellV39Min{0.0};
-static constexpr float cellV40Min{0.0};
-static constexpr float cellV41Min{0.0};
-static constexpr float cellOcvOffset5Min{0.0};
+static constexpr float cellV21Min{-3.4152};
+static constexpr float cellV22Min{-3.4152};
+static constexpr float cellV23Min{-3.4152};
+static constexpr float cellV24Min{-3.4152};
 
 };  // namespace bmsVoltages5
 
 namespace bmsVoltages6 {
 
-inline CAN_Signal_FLOAT cellV42 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV43 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV44 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV45 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV46 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV47 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV48 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset6 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x159,
-    false,
-    8,
-    cellV42,
-    cellV43,
-    cellV44,
-    cellV45,
-    cellV46,
-    cellV47,
-    cellV48,
-    cellOcvOffset6};
+inline CAN_Signal_FLOAT cellV25 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV26 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV27 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV28 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x159, false, 8, cellV25, cellV26, cellV27, cellV28};
 
-static constexpr float cellV42Min{0.0};
-static constexpr float cellV43Min{0.0};
-static constexpr float cellV44Min{0.0};
-static constexpr float cellV45Min{0.0};
-static constexpr float cellV46Min{0.0};
-static constexpr float cellV47Min{0.0};
-static constexpr float cellV48Min{0.0};
-static constexpr float cellOcvOffset6Min{0.0};
+static constexpr float cellV25Min{-3.4152};
+static constexpr float cellV26Min{-3.4152};
+static constexpr float cellV27Min{-3.4152};
+static constexpr float cellV28Min{-3.4152};
 
 };  // namespace bmsVoltages6
 
 namespace bmsVoltages7 {
 
-inline CAN_Signal_FLOAT cellV49 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV50 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV51 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV52 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV53 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV54 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV55 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset7 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x15A,
-    false,
-    8,
-    cellV49,
-    cellV50,
-    cellV51,
-    cellV52,
-    cellV53,
-    cellV54,
-    cellV55,
-    cellOcvOffset7};
+inline CAN_Signal_FLOAT cellV29 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV30 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV31 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV32 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x15A, false, 8, cellV29, cellV30, cellV31, cellV32};
 
-static constexpr float cellV49Min{0.0};
-static constexpr float cellV50Min{0.0};
-static constexpr float cellV51Min{0.0};
-static constexpr float cellV52Min{0.0};
-static constexpr float cellV53Min{0.0};
-static constexpr float cellV54Min{0.0};
-static constexpr float cellV55Min{0.0};
-static constexpr float cellOcvOffset7Min{0.0};
+static constexpr float cellV29Min{-3.4152};
+static constexpr float cellV30Min{-3.4152};
+static constexpr float cellV31Min{-3.4152};
+static constexpr float cellV32Min{-3.4152};
 
 };  // namespace bmsVoltages7
 
 namespace bmsVoltages8 {
 
-inline CAN_Signal_FLOAT cellV56 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV57 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV58 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV59 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV60 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV61 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV62 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset8 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x15B,
-    false,
-    8,
-    cellV56,
-    cellV57,
-    cellV58,
-    cellV59,
-    cellV60,
-    cellV61,
-    cellV62,
-    cellOcvOffset8};
+inline CAN_Signal_FLOAT cellV33 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV34 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV35 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV36 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x15B, false, 8, cellV33, cellV34, cellV35, cellV36};
 
-static constexpr float cellV56Min{0.0};
-static constexpr float cellV57Min{0.0};
-static constexpr float cellV58Min{0.0};
-static constexpr float cellV59Min{0.0};
-static constexpr float cellV60Min{0.0};
-static constexpr float cellV61Min{0.0};
-static constexpr float cellV62Min{0.0};
-static constexpr float cellOcvOffset8Min{0.0};
+static constexpr float cellV33Min{-3.4152};
+static constexpr float cellV34Min{-3.4152};
+static constexpr float cellV35Min{-3.4152};
+static constexpr float cellV36Min{-3.4152};
 
 };  // namespace bmsVoltages8
 
 namespace bmsVoltages9 {
 
-inline CAN_Signal_FLOAT cellV63 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV64 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV65 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV66 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV67 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV68 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV69 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset9 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x15C,
-    false,
-    8,
-    cellV63,
-    cellV64,
-    cellV65,
-    cellV66,
-    cellV67,
-    cellV68,
-    cellV69,
-    cellOcvOffset9};
+inline CAN_Signal_FLOAT cellV37 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV38 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV39 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV40 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x15C, false, 8, cellV37, cellV38, cellV39, cellV40};
 
-static constexpr float cellV63Min{0.0};
-static constexpr float cellV64Min{0.0};
-static constexpr float cellV65Min{0.0};
-static constexpr float cellV66Min{0.0};
-static constexpr float cellV67Min{0.0};
-static constexpr float cellV68Min{0.0};
-static constexpr float cellV69Min{0.0};
-static constexpr float cellOcvOffset9Min{0.0};
+static constexpr float cellV37Min{-3.4152};
+static constexpr float cellV38Min{-3.4152};
+static constexpr float cellV39Min{-3.4152};
+static constexpr float cellV40Min{-3.4152};
 
 };  // namespace bmsVoltages9
 
 namespace bmsVoltages10 {
 
-inline CAN_Signal_FLOAT cellV70 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV71 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV72 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV73 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV74 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV75 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV76 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset10 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x15D,
-    false,
-    8,
-    cellV70,
-    cellV71,
-    cellV72,
-    cellV73,
-    cellV74,
-    cellV75,
-    cellV76,
-    cellOcvOffset10};
+inline CAN_Signal_FLOAT cellV41 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV42 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV43 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV44 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x15D, false, 8, cellV41, cellV42, cellV43, cellV44};
 
-static constexpr float cellV70Min{0.0};
-static constexpr float cellV71Min{0.0};
-static constexpr float cellV72Min{0.0};
-static constexpr float cellV73Min{0.0};
-static constexpr float cellV74Min{0.0};
-static constexpr float cellV75Min{0.0};
-static constexpr float cellV76Min{0.0};
-static constexpr float cellOcvOffset10Min{0.0};
+static constexpr float cellV41Min{-3.4152};
+static constexpr float cellV42Min{-3.4152};
+static constexpr float cellV43Min{-3.4152};
+static constexpr float cellV44Min{-3.4152};
 
 };  // namespace bmsVoltages10
 
 namespace bmsVoltages11 {
 
-inline CAN_Signal_FLOAT cellV77 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV78 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV79 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV80 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV81 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV82 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV83 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset11 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x15E,
-    false,
-    8,
-    cellV77,
-    cellV78,
-    cellV79,
-    cellV80,
-    cellV81,
-    cellV82,
-    cellV83,
-    cellOcvOffset11};
+inline CAN_Signal_FLOAT cellV45 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV46 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV47 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV48 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x15E, false, 8, cellV45, cellV46, cellV47, cellV48};
 
-static constexpr float cellV77Min{0.0};
-static constexpr float cellV78Min{0.0};
-static constexpr float cellV79Min{0.0};
-static constexpr float cellV80Min{0.0};
-static constexpr float cellV81Min{0.0};
-static constexpr float cellV82Min{0.0};
-static constexpr float cellV83Min{0.0};
-static constexpr float cellOcvOffset11Min{0.0};
+static constexpr float cellV45Min{-3.4152};
+static constexpr float cellV46Min{-3.4152};
+static constexpr float cellV47Min{-3.4152};
+static constexpr float cellV48Min{-3.4152};
 
 };  // namespace bmsVoltages11
 
 namespace bmsVoltages12 {
 
-inline CAN_Signal_FLOAT cellV84 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV85 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV86 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV87 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV88 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV89 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV90 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset12 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x15F,
-    false,
-    8,
-    cellV84,
-    cellV85,
-    cellV86,
-    cellV87,
-    cellV88,
-    cellV89,
-    cellV90,
-    cellOcvOffset12};
+inline CAN_Signal_FLOAT cellV49 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV50 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV51 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV52 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x15F, false, 8, cellV49, cellV50, cellV51, cellV52};
 
-static constexpr float cellV84Min{0.0};
-static constexpr float cellV85Min{0.0};
-static constexpr float cellV86Min{0.0};
-static constexpr float cellV87Min{0.0};
-static constexpr float cellV88Min{0.0};
-static constexpr float cellV89Min{0.0};
-static constexpr float cellV90Min{0.0};
-static constexpr float cellOcvOffset12Min{0.0};
+static constexpr float cellV49Min{-3.4152};
+static constexpr float cellV50Min{-3.4152};
+static constexpr float cellV51Min{-3.4152};
+static constexpr float cellV52Min{-3.4152};
 
 };  // namespace bmsVoltages12
 
 namespace bmsVoltages13 {
 
-inline CAN_Signal_FLOAT cellV91 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV92 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV93 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV94 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV95 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV96 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV97 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset13 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x160,
-    false,
-    8,
-    cellV91,
-    cellV92,
-    cellV93,
-    cellV94,
-    cellV95,
-    cellV96,
-    cellV97,
-    cellOcvOffset13};
+inline CAN_Signal_FLOAT cellV53 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV54 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV55 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV56 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x160, false, 8, cellV53, cellV54, cellV55, cellV56};
 
-static constexpr float cellV91Min{0.0};
-static constexpr float cellV92Min{0.0};
-static constexpr float cellV93Min{0.0};
-static constexpr float cellV94Min{0.0};
-static constexpr float cellV95Min{0.0};
-static constexpr float cellV96Min{0.0};
-static constexpr float cellV97Min{0.0};
-static constexpr float cellOcvOffset13Min{0.0};
+static constexpr float cellV53Min{-3.4152};
+static constexpr float cellV54Min{-3.4152};
+static constexpr float cellV55Min{-3.4152};
+static constexpr float cellV56Min{-3.4152};
 
 };  // namespace bmsVoltages13
 
 namespace bmsVoltages14 {
 
-inline CAN_Signal_FLOAT cellV98 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV99 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV100 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV101 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV102 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV103 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV104 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset14 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x161,
-    false,
-    8,
-    cellV98,
-    cellV99,
-    cellV100,
-    cellV101,
-    cellV102,
-    cellV103,
-    cellV104,
-    cellOcvOffset14};
+inline CAN_Signal_FLOAT cellV57 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV58 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV59 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV60 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x161, false, 8, cellV57, cellV58, cellV59, cellV60};
 
-static constexpr float cellV98Min{0.0};
-static constexpr float cellV99Min{0.0};
-static constexpr float cellV100Min{0.0};
-static constexpr float cellV101Min{0.0};
-static constexpr float cellV102Min{0.0};
-static constexpr float cellV103Min{0.0};
-static constexpr float cellV104Min{0.0};
-static constexpr float cellOcvOffset14Min{0.0};
+static constexpr float cellV57Min{-3.4152};
+static constexpr float cellV58Min{-3.4152};
+static constexpr float cellV59Min{-3.4152};
+static constexpr float cellV60Min{-3.4152};
 
 };  // namespace bmsVoltages14
 
 namespace bmsVoltages15 {
 
-inline CAN_Signal_FLOAT cellV105 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV106 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV107 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV108 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV109 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV110 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV111 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset15 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x162,
-    false,
-    8,
-    cellV105,
-    cellV106,
-    cellV107,
-    cellV108,
-    cellV109,
-    cellV110,
-    cellV111,
-    cellOcvOffset15};
+inline CAN_Signal_FLOAT cellV61 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV62 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV63 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV64 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x162, false, 8, cellV61, cellV62, cellV63, cellV64};
 
-static constexpr float cellV105Min{0.0};
-static constexpr float cellV106Min{0.0};
-static constexpr float cellV107Min{0.0};
-static constexpr float cellV108Min{0.0};
-static constexpr float cellV109Min{0.0};
-static constexpr float cellV110Min{0.0};
-static constexpr float cellV111Min{0.0};
-static constexpr float cellOcvOffset15Min{0.0};
+static constexpr float cellV61Min{-3.4152};
+static constexpr float cellV62Min{-3.4152};
+static constexpr float cellV63Min{-3.4152};
+static constexpr float cellV64Min{-3.4152};
 
 };  // namespace bmsVoltages15
 
 namespace bmsVoltages16 {
 
-inline CAN_Signal_FLOAT cellV112 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV113 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV114 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV115 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV116 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV117 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV118 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset16 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x163,
-    false,
-    8,
-    cellV112,
-    cellV113,
-    cellV114,
-    cellV115,
-    cellV116,
-    cellV117,
-    cellV118,
-    cellOcvOffset16};
+inline CAN_Signal_FLOAT cellV65 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV66 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV67 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV68 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x163, false, 8, cellV65, cellV66, cellV67, cellV68};
 
-static constexpr float cellV112Min{0.0};
-static constexpr float cellV113Min{0.0};
-static constexpr float cellV114Min{0.0};
-static constexpr float cellV115Min{0.0};
-static constexpr float cellV116Min{0.0};
-static constexpr float cellV117Min{0.0};
-static constexpr float cellV118Min{0.0};
-static constexpr float cellOcvOffset16Min{0.0};
+static constexpr float cellV65Min{-3.4152};
+static constexpr float cellV66Min{-3.4152};
+static constexpr float cellV67Min{-3.4152};
+static constexpr float cellV68Min{-3.4152};
 
 };  // namespace bmsVoltages16
 
 namespace bmsVoltages17 {
 
-inline CAN_Signal_FLOAT cellV119 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV120 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV121 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV122 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV123 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV124 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV125 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset17 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x164,
-    false,
-    8,
-    cellV119,
-    cellV120,
-    cellV121,
-    cellV122,
-    cellV123,
-    cellV124,
-    cellV125,
-    cellOcvOffset17};
+inline CAN_Signal_FLOAT cellV69 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV70 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV71 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV72 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x164, false, 8, cellV69, cellV70, cellV71, cellV72};
 
-static constexpr float cellV119Min{0.0};
-static constexpr float cellV120Min{0.0};
-static constexpr float cellV121Min{0.0};
-static constexpr float cellV122Min{0.0};
-static constexpr float cellV123Min{0.0};
-static constexpr float cellV124Min{0.0};
-static constexpr float cellV125Min{0.0};
-static constexpr float cellOcvOffset17Min{0.0};
+static constexpr float cellV69Min{-3.4152};
+static constexpr float cellV70Min{-3.4152};
+static constexpr float cellV71Min{-3.4152};
+static constexpr float cellV72Min{-3.4152};
 
 };  // namespace bmsVoltages17
 
 namespace bmsVoltages18 {
 
-inline CAN_Signal_FLOAT cellV126 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV127 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV128 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV129 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV130 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV131 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV132 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset18 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x165,
-    false,
-    8,
-    cellV126,
-    cellV127,
-    cellV128,
-    cellV129,
-    cellV130,
-    cellV131,
-    cellV132,
-    cellOcvOffset18};
+inline CAN_Signal_FLOAT cellV73 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV74 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV75 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV76 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x165, false, 8, cellV73, cellV74, cellV75, cellV76};
 
-static constexpr float cellV126Min{0.0};
-static constexpr float cellV127Min{0.0};
-static constexpr float cellV128Min{0.0};
-static constexpr float cellV129Min{0.0};
-static constexpr float cellV130Min{0.0};
-static constexpr float cellV131Min{0.0};
-static constexpr float cellV132Min{0.0};
-static constexpr float cellOcvOffset18Min{0.0};
+static constexpr float cellV73Min{-3.4152};
+static constexpr float cellV74Min{-3.4152};
+static constexpr float cellV75Min{-3.4152};
+static constexpr float cellV76Min{-3.4152};
 
 };  // namespace bmsVoltages18
 
 namespace bmsVoltages19 {
 
-inline CAN_Signal_FLOAT cellV133 = MakeSignalSigned(float, 0, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV134 = MakeSignalSigned(float, 8, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV135 = MakeSignalSigned(float, 16, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV136 = MakeSignalSigned(float, 24, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV137 = MakeSignalSigned(float, 32, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV138 = MakeSignalSigned(float, 40, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellV139 = MakeSignalSigned(float, 48, 8, 0.012, 2.0, false);
-inline CAN_Signal_FLOAT cellOcvOffset19 = MakeSignalSigned(float, 56, 8, 0.004, 0.0, false);
-inline RX_CAN_Message(8) message{driveBus,
-    0x166,
-    false,
-    8,
-    cellV133,
-    cellV134,
-    cellV135,
-    cellV136,
-    cellV137,
-    cellV138,
-    cellV139,
-    cellOcvOffset19};
+inline CAN_Signal_FLOAT cellV77 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV78 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV79 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV80 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x166, false, 8, cellV77, cellV78, cellV79, cellV80};
 
-static constexpr float cellV133Min{0.0};
-static constexpr float cellV134Min{0.0};
-static constexpr float cellV135Min{0.0};
-static constexpr float cellV136Min{0.0};
-static constexpr float cellV137Min{0.0};
-static constexpr float cellV138Min{0.0};
-static constexpr float cellV139Min{0.0};
-static constexpr float cellOcvOffset19Min{0.0};
+static constexpr float cellV77Min{-3.4152};
+static constexpr float cellV78Min{-3.4152};
+static constexpr float cellV79Min{-3.4152};
+static constexpr float cellV80Min{-3.4152};
 
 };  // namespace bmsVoltages19
 
+namespace bmsVoltages20 {
+
+inline CAN_Signal_FLOAT cellV81 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV82 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV83 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV84 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x167, false, 8, cellV81, cellV82, cellV83, cellV84};
+
+static constexpr float cellV81Min{-3.4152};
+static constexpr float cellV82Min{-3.4152};
+static constexpr float cellV83Min{-3.4152};
+static constexpr float cellV84Min{-3.4152};
+
+};  // namespace bmsVoltages20
+
+namespace bmsVoltages21 {
+
+inline CAN_Signal_FLOAT cellV85 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV86 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV87 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV88 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x168, false, 8, cellV85, cellV86, cellV87, cellV88};
+
+static constexpr float cellV85Min{-3.4152};
+static constexpr float cellV86Min{-3.4152};
+static constexpr float cellV87Min{-3.4152};
+static constexpr float cellV88Min{-3.4152};
+
+};  // namespace bmsVoltages21
+
+namespace bmsVoltages22 {
+
+inline CAN_Signal_FLOAT cellV89 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV90 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV91 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV92 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x169, false, 8, cellV89, cellV90, cellV91, cellV92};
+
+static constexpr float cellV89Min{-3.4152};
+static constexpr float cellV90Min{-3.4152};
+static constexpr float cellV91Min{-3.4152};
+static constexpr float cellV92Min{-3.4152};
+
+};  // namespace bmsVoltages22
+
+namespace bmsVoltages23 {
+
+inline CAN_Signal_FLOAT cellV93 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV94 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV95 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV96 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x16A, false, 8, cellV93, cellV94, cellV95, cellV96};
+
+static constexpr float cellV93Min{-3.4152};
+static constexpr float cellV94Min{-3.4152};
+static constexpr float cellV95Min{-3.4152};
+static constexpr float cellV96Min{-3.4152};
+
+};  // namespace bmsVoltages23
+
+namespace bmsVoltages24 {
+
+inline CAN_Signal_FLOAT cellV97 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV98 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV99 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV100 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x16B, false, 8, cellV97, cellV98, cellV99, cellV100};
+
+static constexpr float cellV97Min{-3.4152};
+static constexpr float cellV98Min{-3.4152};
+static constexpr float cellV99Min{-3.4152};
+static constexpr float cellV100Min{-3.4152};
+
+};  // namespace bmsVoltages24
+
+namespace bmsVoltages25 {
+
+inline CAN_Signal_FLOAT cellV101 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV102 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV103 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV104 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x16C, false, 8, cellV101, cellV102, cellV103, cellV104};
+
+static constexpr float cellV101Min{-3.4152};
+static constexpr float cellV102Min{-3.4152};
+static constexpr float cellV103Min{-3.4152};
+static constexpr float cellV104Min{-3.4152};
+
+};  // namespace bmsVoltages25
+
+namespace bmsVoltages26 {
+
+inline CAN_Signal_FLOAT cellV105 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV106 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV107 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV108 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x16D, false, 8, cellV105, cellV106, cellV107, cellV108};
+
+static constexpr float cellV105Min{-3.4152};
+static constexpr float cellV106Min{-3.4152};
+static constexpr float cellV107Min{-3.4152};
+static constexpr float cellV108Min{-3.4152};
+
+};  // namespace bmsVoltages26
+
+namespace bmsVoltages27 {
+
+inline CAN_Signal_FLOAT cellV109 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV110 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV111 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV112 = MakeSignalSigned(float, 48, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(4) message{driveBus, 0x16E, false, 8, cellV109, cellV110, cellV111, cellV112};
+
+static constexpr float cellV109Min{-3.4152};
+static constexpr float cellV110Min{-3.4152};
+static constexpr float cellV111Min{-3.4152};
+static constexpr float cellV112Min{-3.4152};
+
+};  // namespace bmsVoltages27
+
+namespace bmsVoltages28 {
+
+inline CAN_Signal_FLOAT cellV113 = MakeSignalSigned(float, 0, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV114 = MakeSignalSigned(float, 16, 16, 0.00015, -3.4152, false);
+inline CAN_Signal_FLOAT cellV115 = MakeSignalSigned(float, 32, 16, 0.00015, -3.4152, false);
+inline RX_CAN_Message(3) message{driveBus, 0x16F, false, 6, cellV113, cellV114, cellV115};
+
+static constexpr float cellV113Min{-3.4152};
+static constexpr float cellV114Min{-3.4152};
+static constexpr float cellV115Min{-3.4152};
+
+};  // namespace bmsVoltages28
+
 namespace bmsTemperatures0 {
 
-inline CAN_Signal_FLOAT cellT0 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT1 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT2 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT3 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT4 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT5 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT6 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT7 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT1 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT2 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT3 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT4 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT5 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT6 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT7 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT8 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{
-    driveBus, 0x167, false, 8, cellT0, cellT1, cellT2, cellT3, cellT4, cellT5, cellT6, cellT7};
+    driveBus, 0x170, false, 8, cellT1, cellT2, cellT3, cellT4, cellT5, cellT6, cellT7, cellT8};
 
-static constexpr float cellT0Min{0.0};
-static constexpr float cellT1Min{0.0};
-static constexpr float cellT2Min{0.0};
-static constexpr float cellT3Min{0.0};
-static constexpr float cellT4Min{0.0};
-static constexpr float cellT5Min{0.0};
-static constexpr float cellT6Min{0.0};
-static constexpr float cellT7Min{0.0};
+static constexpr float cellT1Min{-20.0};
+static constexpr float cellT2Min{-20.0};
+static constexpr float cellT3Min{-20.0};
+static constexpr float cellT4Min{-20.0};
+static constexpr float cellT5Min{-20.0};
+static constexpr float cellT6Min{-20.0};
+static constexpr float cellT7Min{-20.0};
+static constexpr float cellT8Min{-20.0};
 
 };  // namespace bmsTemperatures0
 
 namespace bmsTemperatures1 {
 
-inline CAN_Signal_FLOAT cellT8 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT9 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT10 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT11 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT12 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT13 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT14 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT15 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT9 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT10 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT11 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT12 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT13 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT14 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT15 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT16 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x168,
-    false,
-    8,
-    cellT8,
-    cellT9,
-    cellT10,
-    cellT11,
-    cellT12,
-    cellT13,
-    cellT14,
-    cellT15};
+                                 0x171,
+                                 false,
+                                 8,
+                                 cellT9,
+                                 cellT10,
+                                 cellT11,
+                                 cellT12,
+                                 cellT13,
+                                 cellT14,
+                                 cellT15,
+                                 cellT16};
 
-static constexpr float cellT8Min{0.0};
-static constexpr float cellT9Min{0.0};
-static constexpr float cellT10Min{0.0};
-static constexpr float cellT11Min{0.0};
-static constexpr float cellT12Min{0.0};
-static constexpr float cellT13Min{0.0};
-static constexpr float cellT14Min{0.0};
-static constexpr float cellT15Min{0.0};
+static constexpr float cellT9Min{-20.0};
+static constexpr float cellT10Min{-20.0};
+static constexpr float cellT11Min{-20.0};
+static constexpr float cellT12Min{-20.0};
+static constexpr float cellT13Min{-20.0};
+static constexpr float cellT14Min{-20.0};
+static constexpr float cellT15Min{-20.0};
+static constexpr float cellT16Min{-20.0};
 
 };  // namespace bmsTemperatures1
 
 namespace bmsTemperatures2 {
 
-inline CAN_Signal_FLOAT cellT16 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT17 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT18 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT19 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT20 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT21 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT22 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT23 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT17 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT18 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT19 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT20 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT21 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT22 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT23 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT24 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x169,
-    false,
-    8,
-    cellT16,
-    cellT17,
-    cellT18,
-    cellT19,
-    cellT20,
-    cellT21,
-    cellT22,
-    cellT23};
+                                 0x172,
+                                 false,
+                                 8,
+                                 cellT17,
+                                 cellT18,
+                                 cellT19,
+                                 cellT20,
+                                 cellT21,
+                                 cellT22,
+                                 cellT23,
+                                 cellT24};
 
-static constexpr float cellT16Min{0.0};
-static constexpr float cellT17Min{0.0};
-static constexpr float cellT18Min{0.0};
-static constexpr float cellT19Min{0.0};
-static constexpr float cellT20Min{0.0};
-static constexpr float cellT21Min{0.0};
-static constexpr float cellT22Min{0.0};
-static constexpr float cellT23Min{0.0};
+static constexpr float cellT17Min{-20.0};
+static constexpr float cellT18Min{-20.0};
+static constexpr float cellT19Min{-20.0};
+static constexpr float cellT20Min{-20.0};
+static constexpr float cellT21Min{-20.0};
+static constexpr float cellT22Min{-20.0};
+static constexpr float cellT23Min{-20.0};
+static constexpr float cellT24Min{-20.0};
 
 };  // namespace bmsTemperatures2
 
 namespace bmsTemperatures3 {
 
-inline CAN_Signal_FLOAT cellT24 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT25 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT26 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT27 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT28 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT29 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT30 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT31 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT25 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT26 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT27 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT28 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT29 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT30 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT31 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT32 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x16A,
-    false,
-    8,
-    cellT24,
-    cellT25,
-    cellT26,
-    cellT27,
-    cellT28,
-    cellT29,
-    cellT30,
-    cellT31};
+                                 0x173,
+                                 false,
+                                 8,
+                                 cellT25,
+                                 cellT26,
+                                 cellT27,
+                                 cellT28,
+                                 cellT29,
+                                 cellT30,
+                                 cellT31,
+                                 cellT32};
 
-static constexpr float cellT24Min{0.0};
-static constexpr float cellT25Min{0.0};
-static constexpr float cellT26Min{0.0};
-static constexpr float cellT27Min{0.0};
-static constexpr float cellT28Min{0.0};
-static constexpr float cellT29Min{0.0};
-static constexpr float cellT30Min{0.0};
-static constexpr float cellT31Min{0.0};
+static constexpr float cellT25Min{-20.0};
+static constexpr float cellT26Min{-20.0};
+static constexpr float cellT27Min{-20.0};
+static constexpr float cellT28Min{-20.0};
+static constexpr float cellT29Min{-20.0};
+static constexpr float cellT30Min{-20.0};
+static constexpr float cellT31Min{-20.0};
+static constexpr float cellT32Min{-20.0};
 
 };  // namespace bmsTemperatures3
 
 namespace bmsTemperatures4 {
 
-inline CAN_Signal_FLOAT cellT32 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT33 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT34 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT35 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT36 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT37 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT38 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT39 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT33 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT34 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT35 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT36 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT37 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT38 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT39 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT40 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x16B,
-    false,
-    8,
-    cellT32,
-    cellT33,
-    cellT34,
-    cellT35,
-    cellT36,
-    cellT37,
-    cellT38,
-    cellT39};
+                                 0x174,
+                                 false,
+                                 8,
+                                 cellT33,
+                                 cellT34,
+                                 cellT35,
+                                 cellT36,
+                                 cellT37,
+                                 cellT38,
+                                 cellT39,
+                                 cellT40};
 
-static constexpr float cellT32Min{0.0};
-static constexpr float cellT33Min{0.0};
-static constexpr float cellT34Min{0.0};
-static constexpr float cellT35Min{0.0};
-static constexpr float cellT36Min{0.0};
-static constexpr float cellT37Min{0.0};
-static constexpr float cellT38Min{0.0};
-static constexpr float cellT39Min{0.0};
+static constexpr float cellT33Min{-20.0};
+static constexpr float cellT34Min{-20.0};
+static constexpr float cellT35Min{-20.0};
+static constexpr float cellT36Min{-20.0};
+static constexpr float cellT37Min{-20.0};
+static constexpr float cellT38Min{-20.0};
+static constexpr float cellT39Min{-20.0};
+static constexpr float cellT40Min{-20.0};
 
 };  // namespace bmsTemperatures4
 
 namespace bmsTemperatures5 {
 
-inline CAN_Signal_FLOAT cellT40 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT41 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT42 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT43 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT44 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT45 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT46 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT47 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT41 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT42 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT43 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT44 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT45 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT46 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT47 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT48 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x16C,
-    false,
-    8,
-    cellT40,
-    cellT41,
-    cellT42,
-    cellT43,
-    cellT44,
-    cellT45,
-    cellT46,
-    cellT47};
+                                 0x175,
+                                 false,
+                                 8,
+                                 cellT41,
+                                 cellT42,
+                                 cellT43,
+                                 cellT44,
+                                 cellT45,
+                                 cellT46,
+                                 cellT47,
+                                 cellT48};
 
-static constexpr float cellT40Min{0.0};
-static constexpr float cellT41Min{0.0};
-static constexpr float cellT42Min{0.0};
-static constexpr float cellT43Min{0.0};
-static constexpr float cellT44Min{0.0};
-static constexpr float cellT45Min{0.0};
-static constexpr float cellT46Min{0.0};
-static constexpr float cellT47Min{0.0};
+static constexpr float cellT41Min{-20.0};
+static constexpr float cellT42Min{-20.0};
+static constexpr float cellT43Min{-20.0};
+static constexpr float cellT44Min{-20.0};
+static constexpr float cellT45Min{-20.0};
+static constexpr float cellT46Min{-20.0};
+static constexpr float cellT47Min{-20.0};
+static constexpr float cellT48Min{-20.0};
 
 };  // namespace bmsTemperatures5
 
 namespace bmsTemperatures6 {
 
-inline CAN_Signal_FLOAT cellT48 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT49 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT50 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT51 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT52 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT53 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT54 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT55 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT49 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT50 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT51 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT52 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT53 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT54 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT55 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT56 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x16D,
-    false,
-    8,
-    cellT48,
-    cellT49,
-    cellT50,
-    cellT51,
-    cellT52,
-    cellT53,
-    cellT54,
-    cellT55};
+                                 0x176,
+                                 false,
+                                 8,
+                                 cellT49,
+                                 cellT50,
+                                 cellT51,
+                                 cellT52,
+                                 cellT53,
+                                 cellT54,
+                                 cellT55,
+                                 cellT56};
 
-static constexpr float cellT48Min{0.0};
-static constexpr float cellT49Min{0.0};
-static constexpr float cellT50Min{0.0};
-static constexpr float cellT51Min{0.0};
-static constexpr float cellT52Min{0.0};
-static constexpr float cellT53Min{0.0};
-static constexpr float cellT54Min{0.0};
-static constexpr float cellT55Min{0.0};
+static constexpr float cellT49Min{-20.0};
+static constexpr float cellT50Min{-20.0};
+static constexpr float cellT51Min{-20.0};
+static constexpr float cellT52Min{-20.0};
+static constexpr float cellT53Min{-20.0};
+static constexpr float cellT54Min{-20.0};
+static constexpr float cellT55Min{-20.0};
+static constexpr float cellT56Min{-20.0};
 
 };  // namespace bmsTemperatures6
 
 namespace bmsTemperatures7 {
 
-inline CAN_Signal_FLOAT cellT56 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT57 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT58 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT59 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT60 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT61 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT62 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT63 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT57 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT58 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT59 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT60 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT61 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT62 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT63 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT64 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x16E,
-    false,
-    8,
-    cellT56,
-    cellT57,
-    cellT58,
-    cellT59,
-    cellT60,
-    cellT61,
-    cellT62,
-    cellT63};
+                                 0x177,
+                                 false,
+                                 8,
+                                 cellT57,
+                                 cellT58,
+                                 cellT59,
+                                 cellT60,
+                                 cellT61,
+                                 cellT62,
+                                 cellT63,
+                                 cellT64};
 
-static constexpr float cellT56Min{0.0};
-static constexpr float cellT57Min{0.0};
-static constexpr float cellT58Min{0.0};
-static constexpr float cellT59Min{0.0};
-static constexpr float cellT60Min{0.0};
-static constexpr float cellT61Min{0.0};
-static constexpr float cellT62Min{0.0};
-static constexpr float cellT63Min{0.0};
+static constexpr float cellT57Min{-20.0};
+static constexpr float cellT58Min{-20.0};
+static constexpr float cellT59Min{-20.0};
+static constexpr float cellT60Min{-20.0};
+static constexpr float cellT61Min{-20.0};
+static constexpr float cellT62Min{-20.0};
+static constexpr float cellT63Min{-20.0};
+static constexpr float cellT64Min{-20.0};
 
 };  // namespace bmsTemperatures7
 
 namespace bmsTemperatures8 {
 
-inline CAN_Signal_FLOAT cellT64 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT65 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT66 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT67 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT68 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT69 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT70 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT71 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT65 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT66 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT67 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT68 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT69 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT70 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT71 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT72 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x16F,
-    false,
-    8,
-    cellT64,
-    cellT65,
-    cellT66,
-    cellT67,
-    cellT68,
-    cellT69,
-    cellT70,
-    cellT71};
+                                 0x178,
+                                 false,
+                                 8,
+                                 cellT65,
+                                 cellT66,
+                                 cellT67,
+                                 cellT68,
+                                 cellT69,
+                                 cellT70,
+                                 cellT71,
+                                 cellT72};
 
-static constexpr float cellT64Min{0.0};
-static constexpr float cellT65Min{0.0};
-static constexpr float cellT66Min{0.0};
-static constexpr float cellT67Min{0.0};
-static constexpr float cellT68Min{0.0};
-static constexpr float cellT69Min{0.0};
-static constexpr float cellT70Min{0.0};
-static constexpr float cellT71Min{0.0};
+static constexpr float cellT65Min{-20.0};
+static constexpr float cellT66Min{-20.0};
+static constexpr float cellT67Min{-20.0};
+static constexpr float cellT68Min{-20.0};
+static constexpr float cellT69Min{-20.0};
+static constexpr float cellT70Min{-20.0};
+static constexpr float cellT71Min{-20.0};
+static constexpr float cellT72Min{-20.0};
 
 };  // namespace bmsTemperatures8
 
 namespace bmsTemperatures9 {
 
-inline CAN_Signal_FLOAT cellT72 = MakeSignalSigned(float, 0, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT73 = MakeSignalSigned(float, 8, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT74 = MakeSignalSigned(float, 16, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT75 = MakeSignalSigned(float, 24, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT76 = MakeSignalSigned(float, 32, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT77 = MakeSignalSigned(float, 40, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT78 = MakeSignalSigned(float, 48, 8, 1.0, -40.0, false);
-inline CAN_Signal_FLOAT cellT79 = MakeSignalSigned(float, 56, 8, 1.0, -40.0, false);
+inline CAN_Signal_FLOAT cellT73 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT74 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT75 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT76 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT77 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT78 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT79 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT80 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-    0x170,
-    false,
-    8,
-    cellT72,
-    cellT73,
-    cellT74,
-    cellT75,
-    cellT76,
-    cellT77,
-    cellT78,
-    cellT79};
+                                 0x179,
+                                 false,
+                                 8,
+                                 cellT73,
+                                 cellT74,
+                                 cellT75,
+                                 cellT76,
+                                 cellT77,
+                                 cellT78,
+                                 cellT79,
+                                 cellT80};
 
-static constexpr float cellT72Min{0.0};
-static constexpr float cellT73Min{0.0};
-static constexpr float cellT74Min{0.0};
-static constexpr float cellT75Min{0.0};
-static constexpr float cellT76Min{0.0};
-static constexpr float cellT77Min{0.0};
-static constexpr float cellT78Min{0.0};
-static constexpr float cellT79Min{0.0};
+static constexpr float cellT73Min{-20.0};
+static constexpr float cellT74Min{-20.0};
+static constexpr float cellT75Min{-20.0};
+static constexpr float cellT76Min{-20.0};
+static constexpr float cellT77Min{-20.0};
+static constexpr float cellT78Min{-20.0};
+static constexpr float cellT79Min{-20.0};
+static constexpr float cellT80Min{-20.0};
 
 };  // namespace bmsTemperatures9
+
+namespace bmsTemperatures10 {
+
+inline CAN_Signal_FLOAT cellT81 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT82 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT83 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT84 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT85 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT86 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT87 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT88 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
+inline RX_CAN_Message(8) message{driveBus,
+                                 0x17A,
+                                 false,
+                                 8,
+                                 cellT81,
+                                 cellT82,
+                                 cellT83,
+                                 cellT84,
+                                 cellT85,
+                                 cellT86,
+                                 cellT87,
+                                 cellT88};
+
+static constexpr float cellT81Min{-20.0};
+static constexpr float cellT82Min{-20.0};
+static constexpr float cellT83Min{-20.0};
+static constexpr float cellT84Min{-20.0};
+static constexpr float cellT85Min{-20.0};
+static constexpr float cellT86Min{-20.0};
+static constexpr float cellT87Min{-20.0};
+static constexpr float cellT88Min{-20.0};
+
+};  // namespace bmsTemperatures10
+
+namespace bmsTemperatures11 {
+
+inline CAN_Signal_FLOAT cellT89 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT90 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT91 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT92 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT93 = MakeSignalSigned(float, 32, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT94 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT95 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT96 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
+inline RX_CAN_Message(8) message{driveBus,
+                                 0x17B,
+                                 false,
+                                 8,
+                                 cellT89,
+                                 cellT90,
+                                 cellT91,
+                                 cellT92,
+                                 cellT93,
+                                 cellT94,
+                                 cellT95,
+                                 cellT96};
+
+static constexpr float cellT89Min{-20.0};
+static constexpr float cellT90Min{-20.0};
+static constexpr float cellT91Min{-20.0};
+static constexpr float cellT92Min{-20.0};
+static constexpr float cellT93Min{-20.0};
+static constexpr float cellT94Min{-20.0};
+static constexpr float cellT95Min{-20.0};
+static constexpr float cellT96Min{-20.0};
+
+};  // namespace bmsTemperatures11
+
+namespace bmsTemperatures12 {
+
+inline CAN_Signal_FLOAT cellT97 = MakeSignalSigned(float, 0, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT98 = MakeSignalSigned(float, 8, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT99 = MakeSignalSigned(float, 16, 8, 0.5, -20.0, false);
+inline CAN_Signal_FLOAT cellT100 = MakeSignalSigned(float, 24, 8, 0.5, -20.0, false);
+inline RX_CAN_Message(4) message{driveBus, 0x17C, false, 4, cellT97, cellT98, cellT99, cellT100};
+
+static constexpr float cellT97Min{-20.0};
+static constexpr float cellT98Min{-20.0};
+static constexpr float cellT99Min{-20.0};
+static constexpr float cellT100Min{-20.0};
+
+};  // namespace bmsTemperatures12
 
 namespace can2usbControllerError {
 
@@ -1941,7 +1792,6 @@ inline RX_CAN_Message(7) message{driveBus,
     utcSeconds,
     utcMilliseconds};
 
-static constexpr uint8_t utcYearMin{0};
 static constexpr uint8_t utcMonthMin{0};
 static constexpr uint8_t utcDayMin{0};
 static constexpr uint8_t utcHourMin{0};
@@ -2123,8 +1973,9 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x20A, "ECU_LUT_Response"},
     {0x20B, "ECU_Temp_Limiting_Status"},
     {0x20C, "ECU_Torque_Status"},
-    {0x150, "BMS_SOE"},
-    {0x151, "BMS_Faults"},
+    {0x211, "ECU_BSPD_Status"},
+    {0x150, "BMS_Packboard"},
+    {0x151, "BMS_Daughterboard"},
     {0x152, "BMS_Status"},
     {0x153, "BMS_Voltages_0"},
     {0x154, "BMS_Voltages_1"},
@@ -2146,16 +1997,28 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x164, "BMS_Voltages_17"},
     {0x165, "BMS_Voltages_18"},
     {0x166, "BMS_Voltages_19"},
-    {0x167, "BMS_Temperatures_0"},
-    {0x168, "BMS_Temperatures_1"},
-    {0x169, "BMS_Temperatures_2"},
-    {0x16A, "BMS_Temperatures_3"},
-    {0x16B, "BMS_Temperatures_4"},
-    {0x16C, "BMS_Temperatures_5"},
-    {0x16D, "BMS_Temperatures_6"},
-    {0x16E, "BMS_Temperatures_7"},
-    {0x16F, "BMS_Temperatures_8"},
-    {0x170, "BMS_Temperatures_9"},
+    {0x167, "BMS_Voltages_20"},
+    {0x168, "BMS_Voltages_21"},
+    {0x169, "BMS_Voltages_22"},
+    {0x16A, "BMS_Voltages_23"},
+    {0x16B, "BMS_Voltages_24"},
+    {0x16C, "BMS_Voltages_25"},
+    {0x16D, "BMS_Voltages_26"},
+    {0x16E, "BMS_Voltages_27"},
+    {0x16F, "BMS_Voltages_28"},
+    {0x170, "BMS_Temperatures_0"},
+    {0x171, "BMS_Temperatures_1"},
+    {0x172, "BMS_Temperatures_2"},
+    {0x173, "BMS_Temperatures_3"},
+    {0x174, "BMS_Temperatures_4"},
+    {0x175, "BMS_Temperatures_5"},
+    {0x176, "BMS_Temperatures_6"},
+    {0x177, "BMS_Temperatures_7"},
+    {0x178, "BMS_Temperatures_8"},
+    {0x179, "BMS_Temperatures_9"},
+    {0x17A, "BMS_Temperatures_10"},
+    {0x17B, "BMS_Temperatures_11"},
+    {0x17C, "BMS_Temperatures_12"},
     {0x004, "CAN2USB_Controller_Error"},
     {0x024, "CAN2USB_Controller_Error_NACK_Error"},
     {0x00C, "CAN2USB_Controller_Error_Protocol_Violation"},
@@ -2271,269 +2134,251 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x20B, 1}, "Battery_Temp_Limiting"},
     {{0x20B, 2}, "Motor_Temp_Limiting"},
     {{0x20C, 0}, "Torque_Status"},
-    {{0x150, 0}, "Max_Discharge_Current"},
-    {{0x150, 1}, "Max_Regen_Current"},
-    {{0x150, 2}, "Battery_Voltage"},
-    {{0x150, 3}, "Battery_Temperature"},
-    {{0x150, 4}, "Battery_Current"},
-    {{0x151, 0}, "InternalFault_Summary"},
-    {{0x151, 1}, "External_Fault"},
-    {{0x151, 2}, "Undervoltage_Fault"},
-    {{0x151, 3}, "Overvoltage_Fault"},
-    {{0x151, 4}, "Undertemperature_Fault"},
-    {{0x151, 5}, "Overtemperature_Fault"},
-    {{0x151, 6}, "Overcurrent_Fault"},
-    {{0x151, 7}, "Open_Wire_Fault"},
-    {{0x151, 8}, "Open_Wire_Temp_Fault"},
-    {{0x151, 9}, "Pec_Fault"},
-    {{0x151, 10}, "Total_PEC_Failures"},
-    {{0x152, 0}, "BMS_State"},
-    {{0x152, 1}, "IMD_State"},
-    {{0x152, 2}, "Max_Cell_Temp"},
-    {{0x152, 3}, "Min_Cell_Temp"},
-    {{0x152, 4}, "Max_Cell_Voltage"},
-    {{0x152, 5}, "Min_Cell_Voltage"},
-    {{0x152, 6}, "BMS_SOC"},
-    {{0x153, 0}, "Cell_V_0"},
-    {{0x153, 1}, "Cell_V_1"},
-    {{0x153, 2}, "Cell_V_2"},
-    {{0x153, 3}, "Cell_V_3"},
-    {{0x153, 4}, "Cell_V_4"},
-    {{0x153, 5}, "Cell_V_5"},
-    {{0x153, 6}, "Cell_V_6"},
-    {{0x153, 7}, "Cell_OCV_Offset_0"},
-    {{0x154, 0}, "Cell_V_7"},
-    {{0x154, 1}, "Cell_V_8"},
-    {{0x154, 2}, "Cell_V_9"},
-    {{0x154, 3}, "Cell_V_10"},
-    {{0x154, 4}, "Cell_V_11"},
-    {{0x154, 5}, "Cell_V_12"},
-    {{0x154, 6}, "Cell_V_13"},
-    {{0x154, 7}, "Cell_OCV_Offset_1"},
-    {{0x155, 0}, "Cell_V_14"},
-    {{0x155, 1}, "Cell_V_15"},
-    {{0x155, 2}, "Cell_V_16"},
-    {{0x155, 3}, "Cell_V_17"},
-    {{0x155, 4}, "Cell_V_18"},
-    {{0x155, 5}, "Cell_V_19"},
-    {{0x155, 6}, "Cell_V_20"},
-    {{0x155, 7}, "Cell_OCV_Offset_2"},
-    {{0x156, 0}, "Cell_V_21"},
-    {{0x156, 1}, "Cell_V_22"},
-    {{0x156, 2}, "Cell_V_23"},
-    {{0x156, 3}, "Cell_V_24"},
-    {{0x156, 4}, "Cell_V_25"},
-    {{0x156, 5}, "Cell_V_26"},
-    {{0x156, 6}, "Cell_V_27"},
-    {{0x156, 7}, "Cell_OCV_Offset_3"},
-    {{0x157, 0}, "Cell_V_28"},
-    {{0x157, 1}, "Cell_V_29"},
-    {{0x157, 2}, "Cell_V_30"},
-    {{0x157, 3}, "Cell_V_31"},
-    {{0x157, 4}, "Cell_V_32"},
-    {{0x157, 5}, "Cell_V_33"},
-    {{0x157, 6}, "Cell_V_34"},
-    {{0x157, 7}, "Cell_OCV_Offset_4"},
-    {{0x158, 0}, "Cell_V_35"},
-    {{0x158, 1}, "Cell_V_36"},
-    {{0x158, 2}, "Cell_V_37"},
-    {{0x158, 3}, "Cell_V_38"},
-    {{0x158, 4}, "Cell_V_39"},
-    {{0x158, 5}, "Cell_V_40"},
-    {{0x158, 6}, "Cell_V_41"},
-    {{0x158, 7}, "Cell_OCV_Offset_5"},
-    {{0x159, 0}, "Cell_V_42"},
-    {{0x159, 1}, "Cell_V_43"},
-    {{0x159, 2}, "Cell_V_44"},
-    {{0x159, 3}, "Cell_V_45"},
-    {{0x159, 4}, "Cell_V_46"},
-    {{0x159, 5}, "Cell_V_47"},
-    {{0x159, 6}, "Cell_V_48"},
-    {{0x159, 7}, "Cell_OCV_Offset_6"},
-    {{0x15A, 0}, "Cell_V_49"},
-    {{0x15A, 1}, "Cell_V_50"},
-    {{0x15A, 2}, "Cell_V_51"},
-    {{0x15A, 3}, "Cell_V_52"},
-    {{0x15A, 4}, "Cell_V_53"},
-    {{0x15A, 5}, "Cell_V_54"},
-    {{0x15A, 6}, "Cell_V_55"},
-    {{0x15A, 7}, "Cell_OCV_Offset_7"},
-    {{0x15B, 0}, "Cell_V_56"},
-    {{0x15B, 1}, "Cell_V_57"},
-    {{0x15B, 2}, "Cell_V_58"},
-    {{0x15B, 3}, "Cell_V_59"},
-    {{0x15B, 4}, "Cell_V_60"},
-    {{0x15B, 5}, "Cell_V_61"},
-    {{0x15B, 6}, "Cell_V_62"},
-    {{0x15B, 7}, "Cell_OCV_Offset_8"},
-    {{0x15C, 0}, "Cell_V_63"},
-    {{0x15C, 1}, "Cell_V_64"},
-    {{0x15C, 2}, "Cell_V_65"},
-    {{0x15C, 3}, "Cell_V_66"},
-    {{0x15C, 4}, "Cell_V_67"},
-    {{0x15C, 5}, "Cell_V_68"},
-    {{0x15C, 6}, "Cell_V_69"},
-    {{0x15C, 7}, "Cell_OCV_Offset_9"},
-    {{0x15D, 0}, "Cell_V_70"},
-    {{0x15D, 1}, "Cell_V_71"},
-    {{0x15D, 2}, "Cell_V_72"},
-    {{0x15D, 3}, "Cell_V_73"},
-    {{0x15D, 4}, "Cell_V_74"},
-    {{0x15D, 5}, "Cell_V_75"},
-    {{0x15D, 6}, "Cell_V_76"},
-    {{0x15D, 7}, "Cell_OCV_Offset_10"},
-    {{0x15E, 0}, "Cell_V_77"},
-    {{0x15E, 1}, "Cell_V_78"},
-    {{0x15E, 2}, "Cell_V_79"},
-    {{0x15E, 3}, "Cell_V_80"},
-    {{0x15E, 4}, "Cell_V_81"},
-    {{0x15E, 5}, "Cell_V_82"},
-    {{0x15E, 6}, "Cell_V_83"},
-    {{0x15E, 7}, "Cell_OCV_Offset_11"},
-    {{0x15F, 0}, "Cell_V_84"},
-    {{0x15F, 1}, "Cell_V_85"},
-    {{0x15F, 2}, "Cell_V_86"},
-    {{0x15F, 3}, "Cell_V_87"},
-    {{0x15F, 4}, "Cell_V_88"},
-    {{0x15F, 5}, "Cell_V_89"},
-    {{0x15F, 6}, "Cell_V_90"},
-    {{0x15F, 7}, "Cell_OCV_Offset_12"},
-    {{0x160, 0}, "Cell_V_91"},
-    {{0x160, 1}, "Cell_V_92"},
-    {{0x160, 2}, "Cell_V_93"},
-    {{0x160, 3}, "Cell_V_94"},
-    {{0x160, 4}, "Cell_V_95"},
-    {{0x160, 5}, "Cell_V_96"},
-    {{0x160, 6}, "Cell_V_97"},
-    {{0x160, 7}, "Cell_OCV_Offset_13"},
-    {{0x161, 0}, "Cell_V_98"},
-    {{0x161, 1}, "Cell_V_99"},
-    {{0x161, 2}, "Cell_V_100"},
-    {{0x161, 3}, "Cell_V_101"},
-    {{0x161, 4}, "Cell_V_102"},
-    {{0x161, 5}, "Cell_V_103"},
-    {{0x161, 6}, "Cell_V_104"},
-    {{0x161, 7}, "Cell_OCV_Offset_14"},
-    {{0x162, 0}, "Cell_V_105"},
-    {{0x162, 1}, "Cell_V_106"},
-    {{0x162, 2}, "Cell_V_107"},
-    {{0x162, 3}, "Cell_V_108"},
-    {{0x162, 4}, "Cell_V_109"},
-    {{0x162, 5}, "Cell_V_110"},
-    {{0x162, 6}, "Cell_V_111"},
-    {{0x162, 7}, "Cell_OCV_Offset_15"},
-    {{0x163, 0}, "Cell_V_112"},
-    {{0x163, 1}, "Cell_V_113"},
-    {{0x163, 2}, "Cell_V_114"},
-    {{0x163, 3}, "Cell_V_115"},
-    {{0x163, 4}, "Cell_V_116"},
-    {{0x163, 5}, "Cell_V_117"},
-    {{0x163, 6}, "Cell_V_118"},
-    {{0x163, 7}, "Cell_OCV_Offset_16"},
-    {{0x164, 0}, "Cell_V_119"},
-    {{0x164, 1}, "Cell_V_120"},
-    {{0x164, 2}, "Cell_V_121"},
-    {{0x164, 3}, "Cell_V_122"},
-    {{0x164, 4}, "Cell_V_123"},
-    {{0x164, 5}, "Cell_V_124"},
-    {{0x164, 6}, "Cell_V_125"},
-    {{0x164, 7}, "Cell_OCV_Offset_17"},
-    {{0x165, 0}, "Cell_V_126"},
-    {{0x165, 1}, "Cell_V_127"},
-    {{0x165, 2}, "Cell_V_128"},
-    {{0x165, 3}, "Cell_V_129"},
-    {{0x165, 4}, "Cell_V_130"},
-    {{0x165, 5}, "Cell_V_131"},
-    {{0x165, 6}, "Cell_V_132"},
-    {{0x165, 7}, "Cell_OCV_Offset_18"},
-    {{0x166, 0}, "Cell_V_133"},
-    {{0x166, 1}, "Cell_V_134"},
-    {{0x166, 2}, "Cell_V_135"},
-    {{0x166, 3}, "Cell_V_136"},
-    {{0x166, 4}, "Cell_V_137"},
-    {{0x166, 5}, "Cell_V_138"},
-    {{0x166, 6}, "Cell_V_139"},
-    {{0x166, 7}, "Cell_OCV_Offset_19"},
-    {{0x167, 0}, "Cell_T_0"},
-    {{0x167, 1}, "Cell_T_1"},
-    {{0x167, 2}, "Cell_T_2"},
-    {{0x167, 3}, "Cell_T_3"},
-    {{0x167, 4}, "Cell_T_4"},
-    {{0x167, 5}, "Cell_T_5"},
-    {{0x167, 6}, "Cell_T_6"},
-    {{0x167, 7}, "Cell_T_7"},
-    {{0x168, 0}, "Cell_T_8"},
-    {{0x168, 1}, "Cell_T_9"},
-    {{0x168, 2}, "Cell_T_10"},
-    {{0x168, 3}, "Cell_T_11"},
-    {{0x168, 4}, "Cell_T_12"},
-    {{0x168, 5}, "Cell_T_13"},
-    {{0x168, 6}, "Cell_T_14"},
-    {{0x168, 7}, "Cell_T_15"},
-    {{0x169, 0}, "Cell_T_16"},
-    {{0x169, 1}, "Cell_T_17"},
-    {{0x169, 2}, "Cell_T_18"},
-    {{0x169, 3}, "Cell_T_19"},
-    {{0x169, 4}, "Cell_T_20"},
-    {{0x169, 5}, "Cell_T_21"},
-    {{0x169, 6}, "Cell_T_22"},
-    {{0x169, 7}, "Cell_T_23"},
-    {{0x16A, 0}, "Cell_T_24"},
-    {{0x16A, 1}, "Cell_T_25"},
-    {{0x16A, 2}, "Cell_T_26"},
-    {{0x16A, 3}, "Cell_T_27"},
-    {{0x16A, 4}, "Cell_T_28"},
-    {{0x16A, 5}, "Cell_T_29"},
-    {{0x16A, 6}, "Cell_T_30"},
-    {{0x16A, 7}, "Cell_T_31"},
-    {{0x16B, 0}, "Cell_T_32"},
-    {{0x16B, 1}, "Cell_T_33"},
-    {{0x16B, 2}, "Cell_T_34"},
-    {{0x16B, 3}, "Cell_T_35"},
-    {{0x16B, 4}, "Cell_T_36"},
-    {{0x16B, 5}, "Cell_T_37"},
-    {{0x16B, 6}, "Cell_T_38"},
-    {{0x16B, 7}, "Cell_T_39"},
-    {{0x16C, 0}, "Cell_T_40"},
-    {{0x16C, 1}, "Cell_T_41"},
-    {{0x16C, 2}, "Cell_T_42"},
-    {{0x16C, 3}, "Cell_T_43"},
-    {{0x16C, 4}, "Cell_T_44"},
-    {{0x16C, 5}, "Cell_T_45"},
-    {{0x16C, 6}, "Cell_T_46"},
-    {{0x16C, 7}, "Cell_T_47"},
-    {{0x16D, 0}, "Cell_T_48"},
-    {{0x16D, 1}, "Cell_T_49"},
-    {{0x16D, 2}, "Cell_T_50"},
-    {{0x16D, 3}, "Cell_T_51"},
-    {{0x16D, 4}, "Cell_T_52"},
-    {{0x16D, 5}, "Cell_T_53"},
-    {{0x16D, 6}, "Cell_T_54"},
-    {{0x16D, 7}, "Cell_T_55"},
-    {{0x16E, 0}, "Cell_T_56"},
-    {{0x16E, 1}, "Cell_T_57"},
-    {{0x16E, 2}, "Cell_T_58"},
-    {{0x16E, 3}, "Cell_T_59"},
-    {{0x16E, 4}, "Cell_T_60"},
-    {{0x16E, 5}, "Cell_T_61"},
-    {{0x16E, 6}, "Cell_T_62"},
-    {{0x16E, 7}, "Cell_T_63"},
-    {{0x16F, 0}, "Cell_T_64"},
-    {{0x16F, 1}, "Cell_T_65"},
-    {{0x16F, 2}, "Cell_T_66"},
-    {{0x16F, 3}, "Cell_T_67"},
-    {{0x16F, 4}, "Cell_T_68"},
-    {{0x16F, 5}, "Cell_T_69"},
-    {{0x16F, 6}, "Cell_T_70"},
-    {{0x16F, 7}, "Cell_T_71"},
-    {{0x170, 0}, "Cell_T_72"},
-    {{0x170, 1}, "Cell_T_73"},
-    {{0x170, 2}, "Cell_T_74"},
-    {{0x170, 3}, "Cell_T_75"},
-    {{0x170, 4}, "Cell_T_76"},
-    {{0x170, 5}, "Cell_T_77"},
-    {{0x170, 6}, "Cell_T_78"},
-    {{0x170, 7}, "Cell_T_79"},
+    {{0x211, 0}, "high_current"},
+    {{0x211, 1}, "hard_brake"},
+    {{0x211, 2}, "brake_error"},
+    {{0x211, 3}, "current_error"},
+    {{0x211, 4}, "bspd_shutdown_b"},
+    {{0x211, 5}, "bspd_error_b"},
+    {{0x211, 6}, "bspd_sens_error_b"},
+    {{0x150, 0}, "Battery_Current"},
+    {{0x150, 1}, "Packboard_Voltage"},
+    {{0x151, 0}, "Battery_Voltage"},
+    {{0x151, 1}, "Max_Cell_Voltage"},
+    {{0x151, 2}, "Min_Cell_Voltage"},
+    {{0x151, 3}, "Battery_Temperature"},
+    {{0x152, 0}, "SOC"},
+    {{0x152, 1}, "BMS_State"},
+    {{0x152, 2}, "IMD_State"},
+    {{0x152, 3}, "InternalFault_Summary"},
+    {{0x152, 4}, "Undervoltage_Fault"},
+    {{0x152, 5}, "Overvoltage_Fault"},
+    {{0x152, 6}, "Undertemperature_Fault"},
+    {{0x152, 7}, "Overtemperature_Fault"},
+    {{0x152, 8}, "Open_Wire_Fault"},
+    {{0x152, 9}, "Open_Wire_Temp_Fault"},
+    {{0x152, 10}, "Pec_Fault"},
+    {{0x152, 11}, "Shutdown_Open"},
+    {{0x152, 12}, "VCU_Timeout"},
+    {{0x152, 13}, "Inverter_Timeout"},
+    {{0x152, 14}, "Charger_Timeout"},
+    {{0x152, 15}, "2950_PEC_Warning"},
+    {{0x152, 16}, "Total_PEC_Failures"},
+    {{0x153, 0}, "Cell_V_1"},
+    {{0x153, 1}, "Cell_V_2"},
+    {{0x153, 2}, "Cell_V_3"},
+    {{0x153, 3}, "Cell_V_4"},
+    {{0x154, 0}, "Cell_V_5"},
+    {{0x154, 1}, "Cell_V_6"},
+    {{0x154, 2}, "Cell_V_7"},
+    {{0x154, 3}, "Cell_V_8"},
+    {{0x155, 0}, "Cell_V_9"},
+    {{0x155, 1}, "Cell_V_10"},
+    {{0x155, 2}, "Cell_V_11"},
+    {{0x155, 3}, "Cell_V_12"},
+    {{0x156, 0}, "Cell_V_13"},
+    {{0x156, 1}, "Cell_V_14"},
+    {{0x156, 2}, "Cell_V_15"},
+    {{0x156, 3}, "Cell_V_16"},
+    {{0x157, 0}, "Cell_V_17"},
+    {{0x157, 1}, "Cell_V_18"},
+    {{0x157, 2}, "Cell_V_19"},
+    {{0x157, 3}, "Cell_V_20"},
+    {{0x158, 0}, "Cell_V_21"},
+    {{0x158, 1}, "Cell_V_22"},
+    {{0x158, 2}, "Cell_V_23"},
+    {{0x158, 3}, "Cell_V_24"},
+    {{0x159, 0}, "Cell_V_25"},
+    {{0x159, 1}, "Cell_V_26"},
+    {{0x159, 2}, "Cell_V_27"},
+    {{0x159, 3}, "Cell_V_28"},
+    {{0x15A, 0}, "Cell_V_29"},
+    {{0x15A, 1}, "Cell_V_30"},
+    {{0x15A, 2}, "Cell_V_31"},
+    {{0x15A, 3}, "Cell_V_32"},
+    {{0x15B, 0}, "Cell_V_33"},
+    {{0x15B, 1}, "Cell_V_34"},
+    {{0x15B, 2}, "Cell_V_35"},
+    {{0x15B, 3}, "Cell_V_36"},
+    {{0x15C, 0}, "Cell_V_37"},
+    {{0x15C, 1}, "Cell_V_38"},
+    {{0x15C, 2}, "Cell_V_39"},
+    {{0x15C, 3}, "Cell_V_40"},
+    {{0x15D, 0}, "Cell_V_41"},
+    {{0x15D, 1}, "Cell_V_42"},
+    {{0x15D, 2}, "Cell_V_43"},
+    {{0x15D, 3}, "Cell_V_44"},
+    {{0x15E, 0}, "Cell_V_45"},
+    {{0x15E, 1}, "Cell_V_46"},
+    {{0x15E, 2}, "Cell_V_47"},
+    {{0x15E, 3}, "Cell_V_48"},
+    {{0x15F, 0}, "Cell_V_49"},
+    {{0x15F, 1}, "Cell_V_50"},
+    {{0x15F, 2}, "Cell_V_51"},
+    {{0x15F, 3}, "Cell_V_52"},
+    {{0x160, 0}, "Cell_V_53"},
+    {{0x160, 1}, "Cell_V_54"},
+    {{0x160, 2}, "Cell_V_55"},
+    {{0x160, 3}, "Cell_V_56"},
+    {{0x161, 0}, "Cell_V_57"},
+    {{0x161, 1}, "Cell_V_58"},
+    {{0x161, 2}, "Cell_V_59"},
+    {{0x161, 3}, "Cell_V_60"},
+    {{0x162, 0}, "Cell_V_61"},
+    {{0x162, 1}, "Cell_V_62"},
+    {{0x162, 2}, "Cell_V_63"},
+    {{0x162, 3}, "Cell_V_64"},
+    {{0x163, 0}, "Cell_V_65"},
+    {{0x163, 1}, "Cell_V_66"},
+    {{0x163, 2}, "Cell_V_67"},
+    {{0x163, 3}, "Cell_V_68"},
+    {{0x164, 0}, "Cell_V_69"},
+    {{0x164, 1}, "Cell_V_70"},
+    {{0x164, 2}, "Cell_V_71"},
+    {{0x164, 3}, "Cell_V_72"},
+    {{0x165, 0}, "Cell_V_73"},
+    {{0x165, 1}, "Cell_V_74"},
+    {{0x165, 2}, "Cell_V_75"},
+    {{0x165, 3}, "Cell_V_76"},
+    {{0x166, 0}, "Cell_V_77"},
+    {{0x166, 1}, "Cell_V_78"},
+    {{0x166, 2}, "Cell_V_79"},
+    {{0x166, 3}, "Cell_V_80"},
+    {{0x167, 0}, "Cell_V_81"},
+    {{0x167, 1}, "Cell_V_82"},
+    {{0x167, 2}, "Cell_V_83"},
+    {{0x167, 3}, "Cell_V_84"},
+    {{0x168, 0}, "Cell_V_85"},
+    {{0x168, 1}, "Cell_V_86"},
+    {{0x168, 2}, "Cell_V_87"},
+    {{0x168, 3}, "Cell_V_88"},
+    {{0x169, 0}, "Cell_V_89"},
+    {{0x169, 1}, "Cell_V_90"},
+    {{0x169, 2}, "Cell_V_91"},
+    {{0x169, 3}, "Cell_V_92"},
+    {{0x16A, 0}, "Cell_V_93"},
+    {{0x16A, 1}, "Cell_V_94"},
+    {{0x16A, 2}, "Cell_V_95"},
+    {{0x16A, 3}, "Cell_V_96"},
+    {{0x16B, 0}, "Cell_V_97"},
+    {{0x16B, 1}, "Cell_V_98"},
+    {{0x16B, 2}, "Cell_V_99"},
+    {{0x16B, 3}, "Cell_V_100"},
+    {{0x16C, 0}, "Cell_V_101"},
+    {{0x16C, 1}, "Cell_V_102"},
+    {{0x16C, 2}, "Cell_V_103"},
+    {{0x16C, 3}, "Cell_V_104"},
+    {{0x16D, 0}, "Cell_V_105"},
+    {{0x16D, 1}, "Cell_V_106"},
+    {{0x16D, 2}, "Cell_V_107"},
+    {{0x16D, 3}, "Cell_V_108"},
+    {{0x16E, 0}, "Cell_V_109"},
+    {{0x16E, 1}, "Cell_V_110"},
+    {{0x16E, 2}, "Cell_V_111"},
+    {{0x16E, 3}, "Cell_V_112"},
+    {{0x16F, 0}, "Cell_V_113"},
+    {{0x16F, 1}, "Cell_V_114"},
+    {{0x16F, 2}, "Cell_V_115"},
+    {{0x170, 0}, "Cell_T_1"},
+    {{0x170, 1}, "Cell_T_2"},
+    {{0x170, 2}, "Cell_T_3"},
+    {{0x170, 3}, "Cell_T_4"},
+    {{0x170, 4}, "Cell_T_5"},
+    {{0x170, 5}, "Cell_T_6"},
+    {{0x170, 6}, "Cell_T_7"},
+    {{0x170, 7}, "Cell_T_8"},
+    {{0x171, 0}, "Cell_T_9"},
+    {{0x171, 1}, "Cell_T_10"},
+    {{0x171, 2}, "Cell_T_11"},
+    {{0x171, 3}, "Cell_T_12"},
+    {{0x171, 4}, "Cell_T_13"},
+    {{0x171, 5}, "Cell_T_14"},
+    {{0x171, 6}, "Cell_T_15"},
+    {{0x171, 7}, "Cell_T_16"},
+    {{0x172, 0}, "Cell_T_17"},
+    {{0x172, 1}, "Cell_T_18"},
+    {{0x172, 2}, "Cell_T_19"},
+    {{0x172, 3}, "Cell_T_20"},
+    {{0x172, 4}, "Cell_T_21"},
+    {{0x172, 5}, "Cell_T_22"},
+    {{0x172, 6}, "Cell_T_23"},
+    {{0x172, 7}, "Cell_T_24"},
+    {{0x173, 0}, "Cell_T_25"},
+    {{0x173, 1}, "Cell_T_26"},
+    {{0x173, 2}, "Cell_T_27"},
+    {{0x173, 3}, "Cell_T_28"},
+    {{0x173, 4}, "Cell_T_29"},
+    {{0x173, 5}, "Cell_T_30"},
+    {{0x173, 6}, "Cell_T_31"},
+    {{0x173, 7}, "Cell_T_32"},
+    {{0x174, 0}, "Cell_T_33"},
+    {{0x174, 1}, "Cell_T_34"},
+    {{0x174, 2}, "Cell_T_35"},
+    {{0x174, 3}, "Cell_T_36"},
+    {{0x174, 4}, "Cell_T_37"},
+    {{0x174, 5}, "Cell_T_38"},
+    {{0x174, 6}, "Cell_T_39"},
+    {{0x174, 7}, "Cell_T_40"},
+    {{0x175, 0}, "Cell_T_41"},
+    {{0x175, 1}, "Cell_T_42"},
+    {{0x175, 2}, "Cell_T_43"},
+    {{0x175, 3}, "Cell_T_44"},
+    {{0x175, 4}, "Cell_T_45"},
+    {{0x175, 5}, "Cell_T_46"},
+    {{0x175, 6}, "Cell_T_47"},
+    {{0x175, 7}, "Cell_T_48"},
+    {{0x176, 0}, "Cell_T_49"},
+    {{0x176, 1}, "Cell_T_50"},
+    {{0x176, 2}, "Cell_T_51"},
+    {{0x176, 3}, "Cell_T_52"},
+    {{0x176, 4}, "Cell_T_53"},
+    {{0x176, 5}, "Cell_T_54"},
+    {{0x176, 6}, "Cell_T_55"},
+    {{0x176, 7}, "Cell_T_56"},
+    {{0x177, 0}, "Cell_T_57"},
+    {{0x177, 1}, "Cell_T_58"},
+    {{0x177, 2}, "Cell_T_59"},
+    {{0x177, 3}, "Cell_T_60"},
+    {{0x177, 4}, "Cell_T_61"},
+    {{0x177, 5}, "Cell_T_62"},
+    {{0x177, 6}, "Cell_T_63"},
+    {{0x177, 7}, "Cell_T_64"},
+    {{0x178, 0}, "Cell_T_65"},
+    {{0x178, 1}, "Cell_T_66"},
+    {{0x178, 2}, "Cell_T_67"},
+    {{0x178, 3}, "Cell_T_68"},
+    {{0x178, 4}, "Cell_T_69"},
+    {{0x178, 5}, "Cell_T_70"},
+    {{0x178, 6}, "Cell_T_71"},
+    {{0x178, 7}, "Cell_T_72"},
+    {{0x179, 0}, "Cell_T_73"},
+    {{0x179, 1}, "Cell_T_74"},
+    {{0x179, 2}, "Cell_T_75"},
+    {{0x179, 3}, "Cell_T_76"},
+    {{0x179, 4}, "Cell_T_77"},
+    {{0x179, 5}, "Cell_T_78"},
+    {{0x179, 6}, "Cell_T_79"},
+    {{0x179, 7}, "Cell_T_80"},
+    {{0x17A, 0}, "Cell_T_81"},
+    {{0x17A, 1}, "Cell_T_82"},
+    {{0x17A, 2}, "Cell_T_83"},
+    {{0x17A, 3}, "Cell_T_84"},
+    {{0x17A, 4}, "Cell_T_85"},
+    {{0x17A, 5}, "Cell_T_86"},
+    {{0x17A, 6}, "Cell_T_87"},
+    {{0x17A, 7}, "Cell_T_88"},
+    {{0x17B, 0}, "Cell_T_89"},
+    {{0x17B, 1}, "Cell_T_90"},
+    {{0x17B, 2}, "Cell_T_91"},
+    {{0x17B, 3}, "Cell_T_92"},
+    {{0x17B, 4}, "Cell_T_93"},
+    {{0x17B, 5}, "Cell_T_94"},
+    {{0x17B, 6}, "Cell_T_95"},
+    {{0x17B, 7}, "Cell_T_96"},
+    {{0x17C, 0}, "Cell_T_97"},
+    {{0x17C, 1}, "Cell_T_98"},
+    {{0x17C, 2}, "Cell_T_99"},
+    {{0x17C, 3}, "Cell_T_100"},
     {{0x004, 0}, "Controller_Error"},
     {{0x024, 0}, "Controller_Error_NACK"},
     {{0x00C, 0}, "Controller_Error_Protocol_Violation"},

@@ -86,12 +86,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
         }
 
-        dbc::ecuDriveStatus::message.attach_rx_callback([this]() {
-            onECUDriveStatus();
-        });
-        startAnimation([this](float time) {
-            idle(time);
-        });
+        dbc::ecuDriveStatus::message.attach_rx_callback([this]() { onECUDriveStatus(); });
+        dbc::telemetryOdometer::message.attach_rx_callback([this]() { initializeOdometer(); });
+
+        startAnimation([this](float time) { idle(time); });
         updateDisplay();
     }
 
@@ -100,7 +98,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             float time = okay::Engine.time->timeSinceStartMs() - _animationStartTimeMs;
             _animationFunction(time);
         }
-
+        checkErrorOccured();
+        bmsSocAnimation(0);
         updateDisplay();
     }
 
@@ -123,25 +122,20 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
     void updateDisplay() {
         for (int i = 0; i < 3; i++) {
+            NeopixelStrip& strip = _strips[i];
+
             for (int j = 0; j < 5; j++) {
-                if (!_bars[j].isDirty())
-                    continue;
-
-                // this guy is broken
-                if (j == 2)
-                    continue;
-
                 if (i != getHWIndexForBar(j))
                     continue;
 
                 for (int k = 0; k < _bars[j].numPixels(); k++) {
-                    _strips[i].setColor(_bars[j].toHardwareIndex(k), _bars[j].currentColors()[k]);
+                    strip.setColor(_bars[j].toHardwareIndex(k), _bars[j].currentColors()[k]);
                 }
 
                 _bars[j].clearDirty();
             }
 
-            _strips[i].show();
+            strip.show();
         }
     }
 
@@ -149,11 +143,79 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         return _bars[barNum];
     }
 
+    void initializeOdometer(){
+        if (odometerInitialized) return;
+        odometerInitialized = true;
+        startOdometer = dbc::telemetryOdometer::milesDriven->get();
+    }
+
+    bool errorOccured() {
+        const int errorCode = 0x03;
+
+        bool hardFaultError = dbc::bmsStatus::internalfaultSummary->get() != 0 ||
+                              dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode ||
+                              dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode ||
+                              dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
+
+        bool imdError = !(dbc::bmsStatus::imdState->get());
+
+        if (hardFaultError || imdError) {
+            return true;
+        }
+
+        return false;
+    }
+
+    void error(float time) {
+        const float hardFaultPeriod = 250.0f;
+        const float imdPeriod = 1000.0f;
+        const int errorCode = 0x03;
+
+        bool imdError = !(dbc::bmsStatus::imdState->get());
+
+        const float period = (imdError) ? imdPeriod : hardFaultPeriod;
+        float brightness = static_cast<int>(floor(time / period)) % 2;
+
+        glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        color *= brightness;
+        // set the colors
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < getBar(i).numPixels(); j++) {
+                getBar(i).setColor(j, color);
+            }
+        }
+    }
+
+    void checkErrorOccured() {
+        // error  check if error state is not no error & error state is the same, then return
+        bool error_val = errorOccured();
+        if (error_val) {
+            if (!currentErrorState) {
+                currentErrorState = true;
+                startAnimation([this](float time) { error(time); });
+            }
+            return;
+        }
+
+        if (currentErrorState) {
+            errorReset = true;
+        }
+
+        currentErrorState = false;
+        onECUDriveStatus();
+    }
+
     void onECUDriveStatus() {
+        if (currentErrorState) {
+            return;
+        }
+
         uint8_t state = dbc::ecuDriveStatus::driveState->get();
 
-        if (state == currentState)
+        if (errorReset == false && state == currentState)
             return;
+
+        errorReset = false;
 
         currentState = state;
 
@@ -188,6 +250,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     uint32_t _animationStartTimeMs{0};
     std::function<void(float)> _animationFunction;
     uint8_t currentState{0};
+    bool currentErrorState{false};
+    bool errorReset{false};
+    float startOdometer;
+    bool odometerInitialized{false};
 
     void startAnimation(std::function<void(float)> animationFunction) {
         _animationStartTimeMs = okay::Engine.time->timeSinceStartMs();
@@ -288,6 +354,169 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         return glm::vec4(r, g, b, 1.0f);
     }
 
+    void bmsSocAnimation(float time) {
+        float bmsSoc = dbc::bmsStatus::soc->get();
+
+        glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+        if (bmsSoc > 0.50) {
+            color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+        } else if (bmsSoc > 0.30) {
+            color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+        } else {
+            color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+
+        float batteryPercentage = static_cast<float>(dbc::bmsStatus::soc->get());
+
+        if (batteryPercentage > 1.0){
+            batteryPercentage = 1.0;
+        }
+
+        int bar2NumPixels = getBar(2).numPixels();
+
+        int numFull = static_cast<int>(floor(batteryPercentage * bar2NumPixels));
+
+        // full bars
+        for (int j = bar2NumPixels - 1; j > (bar2NumPixels - 1 - numFull); j--) {
+            getBar(2).setColor(j, color);
+        }
+
+        // partial
+        if (numFull != bar2NumPixels){
+            glm::vec4 partialColor = color * (batteryPercentage * getBar(2).numPixels() - numFull);
+            getBar(2).setColor(bar2NumPixels - numFull - 1, partialColor);
+        }
+            
+    }
+ 
+    void odometerAnimation(float time) {  // bar 0
+        glm::vec4 nuPurple = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+        float odmVal = static_cast<float>(dbc::telemetryOdometer::milesDriven->get());
+
+        float odometerPercentage = (odmVal - (odometerInitialized ? startOdometer : odmVal)) * 1.60934 / 22;
+
+        if (odometerPercentage > 1.0){
+            odometerPercentage = 1.0;
+        }
+
+        int numFull = static_cast<int>(floor(odometerPercentage * getBar(0).numPixels()));
+
+        // full bars
+        for (int j = 0; j < numFull; j++) {
+            getBar(0).setColor(j, nuPurple);
+        }
+
+        // partial
+        for (int j = 0; j < getBar(0).numPixels(); j++) {
+            if (j == numFull) {
+                glm::vec4 partialColor =
+                    nuPurple * (odometerPercentage * getBar(0).numPixels() - numFull);
+                getBar(0).setColor(j, partialColor);
+            }
+        }
+    }
+
+    void socChargeAnimation(float time) {                     // bar 1
+        /* glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f); */  // placeholder
+
+        glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+        float lowerBound = 0.1;
+        float upperBound = 0.9;
+
+        float bmsSoc = static_cast<float>(dbc::bmsStatus::soc->get());
+        float batteryPercentage =
+            (1.0 - bmsSoc - lowerBound) / (upperBound - lowerBound);
+
+        if (bmsSoc > 0.50) {
+            color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+        } else if (bmsSoc > 0.30) {
+            color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+        } else {
+            color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        if (batteryPercentage > 1.0){
+            batteryPercentage = 1.0;
+        }
+
+        int numFull = static_cast<int>(floor(batteryPercentage * getBar(1).numPixels()));
+
+        // full bars
+        for (int j = 0; j < numFull; j++) {
+            getBar(1).setColor(j, color);
+        }
+
+        // partial
+        for (int j = 0; j < getBar(1).numPixels(); j++) {
+            if (j == numFull) {
+                glm::vec4 partialColor =
+                    color * (batteryPercentage * getBar(1).numPixels() - numFull);
+                getBar(1).setColor(j, partialColor);
+            }
+        }
+    }
+
+    void igbtTempAnimation(float time) {                     // bar 3
+        glm::vec4 color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);  // placeholder
+        float lowerBound = 0.0;
+        float upperBound = 120.0;
+
+        float tempPercentage =
+            (static_cast<float>(dbc::rearInverterTempStatus::igbtTemp->get()) - lowerBound) / (upperBound - lowerBound);
+
+        if (tempPercentage > 1.0){
+            tempPercentage = 1.0;
+        }
+
+        int numFull = static_cast<int>(floor(tempPercentage * getBar(3).numPixels()));
+
+        // full pixels
+        for (int j = 0; j < numFull; j++) {
+            getBar(3).setColor(j, color);
+        }
+
+        // partial
+        for (int j = 0; j < getBar(3).numPixels(); j++) {
+            if (j == numFull) {
+                glm::vec4 partialColor =
+                    color * (tempPercentage * getBar(3).numPixels() - numFull);
+                getBar(3).setColor(j, partialColor);
+            }
+        }
+    }
+
+    void batteryTempAnimation(float time) {                     // bar 4
+        glm::vec4 color = glm::vec4(0.1f, 0.1f, 1.0f, 1.0f);  // placeholder
+        float lowerBound = 20.0;
+        float upperBound = 60.0;
+
+        float tempPercentage =
+            (static_cast<float>(dbc::bmsDaughterboard::batteryTemperature->get()) - lowerBound) / (upperBound - lowerBound);
+
+        if (tempPercentage > 1.0){
+            tempPercentage = 1.0;
+        }
+
+        int numFull = static_cast<int>(floor(tempPercentage * getBar(4).numPixels()));
+
+        // full pixels
+        for (int j = 0; j < numFull; j++) {
+            getBar(4).setColor(j, color);
+        }
+
+        // partial
+        for (int j = 0; j < getBar(4).numPixels(); j++) {
+            if (j == numFull) {
+                glm::vec4 partialColor =
+                    color * (tempPercentage * getBar(4).numPixels() - numFull);
+                getBar(4).setColor(j, partialColor);
+            }
+        }
+    }
+
     void idle(float time) {
         const float breathePeriod = 2000.0f;
         float brightness = (std::sin(time / breathePeriod) + 1.0f) / 2.0f;  // +1 for normalize
@@ -307,6 +536,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float moveSpeed = 1 / 200.0f;
 
         for (int i = 0; i < 5; i++) {  // for all 5 bars
+            if (i == 2)
+                continue;
             int barOffset = i * 2;
             for (int j = 0; j < getBar(i).numPixels(); j++) {  // this indexes the leds on each bar
                 int colorIndex = static_cast<int>(time * moveSpeed + j + barOffset);
@@ -323,7 +554,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
         float prechargePercentage =
             static_cast<float>(dbc::rearInverterMotorStatus::dcVoltage->get()) /
-            static_cast<float>(dbc::bmsSoe::batteryVoltage->get());
+            static_cast<float>(dbc::bmsDaughterboard::batteryVoltage->get());
         for (int i = 0; i < 5; i++) {
             // probably something here
             float t = 0.9f / getBar(i).numPixels();
@@ -341,6 +572,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float blinkTime = 500;
         const int numBlinks = 3;
 
+        bool bppc = dbc::ecuImplausibility::bppcImp->get();
+
         if (time < blinkTime * 2 * numBlinks) {
             // we are still blinking
             float brightness = static_cast<int>(floor(time / blinkTime)) % 2;
@@ -348,17 +581,65 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             color *= brightness;
             // set the colors
             for (int i = 0; i < 5; i++) {
+                if (i == 2)
+                    continue;
                 for (int j = 0; j < getBar(i).numPixels(); j++) {
                     getBar(i).setColor(j, color);
                 }
             }
         } else {
+            // bppc error check
+            if (bppc) {
+                glm::vec4 yellow = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+                for (int i = 0; i < 5; i++) {
+                    if (i == 2)
+                        continue;
+                    for (int j = 0; j < getBar(i).numPixels(); j++) {
+                        getBar(i).setColor(j, yellow);
+                    }
+                }
+                return;
+            }
+
+            glm::vec4 black = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+            for (int i = 0; i < 5; i++) {
+                // probably something here
+                for (int j = 0; j < getBar(i).numPixels(); j++) {
+                        getBar(i).setColor(j, black);
+                    }
+                }
+
+        odometerAnimation(0);
+        socChargeAnimation(0);
+        igbtTempAnimation(0);
+        batteryTempAnimation(0);
+    
+
+            /*
+
             // we are now in throttle light mode
-            const float appsMax = 100;
-            float throttlePercentage =
-                static_cast<float>(dbc::ecuThrottle::apps1Throttle->get()) / appsMax;
+            const float currentMax = 235;
+            int32_t rawCurrent = dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get();
+            int32_t rawThrottle = rawCurrent > currentMax ? currentMax : rawCurrent;
+            float throttlePercentage = static_cast<float>(rawThrottle) / currentMax;
             glm::vec4 botColor = colorFromHex(0x00FF00);
             glm::vec4 topColor = colorFromHex(0xFFDD00);
+
+            for (int i = 0; i < 5; i++) {
+                if (i == 2)
+                    continue;
+                int numPixels = getBar(i).numPixels();
+                int numFull = static_cast<int>(floor(throttlePercentage * numPixels));
+
+                for (int j = 0; j < numFull; j++) {
+                    glm::vec4 color = glm::mix(
+                        botColor, topColor, static_cast<float>(j) / static_cast<float>(numPixels));
+                    getBar(i).setColor(j, color);
+                }
+            }
+
+            // we are now in throttle light mode
 
             for (int i = 0; i < 5; i++) {
                 int numPixels = getBar(i).numPixels();
@@ -385,6 +666,10 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                     getBar(i).setColor(j, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
                 }
             }
+
+            */
+
+
         }
     }
 };

@@ -1,6 +1,7 @@
 #ifndef __SHARED_ELEMENTS_H__
 #define __SHARED_ELEMENTS_H__
 
+#include "car_state.hpp"
 #include "materials/bat_percent.hpp"
 #include "style.hpp"
 
@@ -46,7 +47,7 @@ class SharedElements {
 
     okay::UIElement buildTopHud() {
         auto props = dynamic_cast<BatPercentMaterial*>(batPercentMaterial->properties().get());
-        props->percent = dbc::bmsStatus::bmsSoc->get();
+        props->percent = dbc::bmsStatus::soc->get();
         // clang-format off
         return ui::image(*topBar)
             .axisSet(okay::UIAxis::Horizontal) (
@@ -62,7 +63,7 @@ class SharedElements {
                             .axisSet(okay::UIAxis::Horizontal) (
                                 ui::spacer(),
                                 ui::image(*batPerecentOverlay)
-                                    .textSet(std::format("{:.1f}%", dbc::bmsStatus::bmsSoc->get() * 100.0f))
+                                    .textSet(std::format("{:.1f}%", dbc::bmsStatus::soc->get() * 100.0f))
                                     .alignTextCenter()
                                     .alignTextMiddle()
                                     .fontSet(*fonts::latoBlack)
@@ -120,7 +121,7 @@ class SharedElements {
                                 .alignTextCenter()
                                 .alignTextBottom()
                                 .heightGrow(),
-                            ui::text(std::format("{:.2f}", dbc::bmsSoe::batteryVoltage->get()))
+                            ui::text(std::format("{:.2f}", dbc::bmsPackboard::packboardVoltage->get()))
                                 .widthSet(okay::size::Percent(valuePercent))
                                 .textSizeSet(medFontSize)
                                 .alignTextCenter()
@@ -146,7 +147,7 @@ class SharedElements {
             ui::spacer(),
             ui::row()(
                 ui::spacer(),
-                ui::image(*stateShape)(ui::text(getDriveStateString())
+                ui::image(*stateShape)(ui::text(CarState::getDriveStateString())
                         .widthGrow()
                         .heightGrow()
                         .textSizeSet(32.0f)
@@ -154,7 +155,7 @@ class SharedElements {
                         .alignTextMiddle()
                         .fontSet(*fonts::latoBlack)
                         .topMarginSet(8))
-                        .backgroundColorSet(getDriveStateColor()),
+                        .backgroundColorSet(CarState::getDriveStateColor()),
                 ui::spacer()
             )
         );
@@ -174,7 +175,7 @@ class SharedElements {
             .topMarginSet(okay::size::Fixed(10)) (
                 ui::image(*tempFull) (
                     ui::spacer(),
-                    ui::text("CELL")
+                    ui::text("BATTERY")
                         .widthGrow()
                         .heightGrow()
                         .textSizeSet(largeFontSize)
@@ -190,12 +191,12 @@ class SharedElements {
                                 .widthGrow()
                                 .heightGrow() (
                                     ui::spacer(),
-                                    ui::text("minimum")
+                                    ui::text("current")
                                         .widthGrow()
                                         .heightGrow()
                                         .textSizeSet(smallFontSize)
                                         .alignTextCenter(),
-                                    ui::text(std::format("{:.1f} C", dbc::bmsStatus::minCellTemp->get()))
+                                    ui::text(std::format("{:.1f} A", dbc::bmsPackboard::batteryCurrent->get()))
                                         .widthGrow()
                                         .heightGrow()
                                         .textSizeSet(largeFontSize)
@@ -209,12 +210,12 @@ class SharedElements {
                                 .widthGrow()
                                 .heightGrow() (
                                     ui::spacer(),
-                                    ui::text("maximum")
+                                    ui::text("temp")
                                         .widthGrow()
                                         .heightGrow()
                                         .textSizeSet(smallFontSize)
                                         .alignTextCenter(),
-                                    ui::text(std::format("{:.1f} C", dbc::bmsStatus::maxCellTemp->get()))
+                                    ui::text(std::format("{:.1f} C", dbc::bmsDaughterboard::batteryTemperature->get()))
                                         .widthGrow()
                                         .heightGrow()
                                         .textSizeSet(largeFontSize)
@@ -296,36 +297,6 @@ class SharedElements {
             );
 
         // clang-format on
-    }
-
-    std::string getDriveStateString() {
-        switch (dbc::ecuDriveStatus::driveState->get()) {
-            case 0:
-                return "IDLE";
-            case 1:
-                return "PRECHARGE";
-            case 2:
-                return "NEUTRAL";
-            case 3:
-                return "DRIVE";
-            default:
-                return "UNKNOWN";
-        }
-    }
-
-    glm::vec4 getDriveStateColor() {
-        switch (dbc::ecuDriveStatus::driveState->get()) {
-            case 0:
-                return colors::fromHex(0x219EEBFF);
-            case 1:
-                return colors::fromHex(0xEBCD21FF);
-            case 2:
-                return colors::northwesternPurple;
-            case 3:
-                return colors::fromHex(0x38EB21FF);
-            default:
-                return colors::fromHex(0xFF00FFFF);
-        }
     }
 
     okay::MaterialHandle skyboxMaterial;

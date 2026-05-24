@@ -134,38 +134,72 @@ class DebugPage : public IPage {
             keyValuePair(
                 "BMS Command",
                 dbc::ecuBmsCommandMessage::bmsCommand->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("VCU Implausibilities"),
+            keyErrorValuePair(
+                "Implausibility Present",
+                dbc::ecuImplausibility::implausibilityPresent->get()
+            ),
+            keyErrorValuePair(
+                "APPS Disagreement",
+                dbc::ecuImplausibility::appssDisagreementImp->get()
+            ),
+            keyErrorValuePair(
+                "BPPC Implausibility",
+                dbc::ecuImplausibility::bppcImp->get()
+            ),
+            keyErrorValuePair(
+                "Brake Invalid",
+                dbc::ecuImplausibility::brakeInvalidImp->get()
+            ),
+            keyErrorValuePair(
+                "APPS Invalid",
+                dbc::ecuImplausibility::appssInvalidImp->get()
             )
         );
         // clang-format off
     }
 
     okay::UIElement buildBMS() {
-            // clang-format off
+        // clang-format off
         return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("SOE"),
+            ui::h2("Packboard"),
             keyValuePair(
-                "Max Discharge Current",
-                dbc::bmsSoe::maxDischargeCurrent->get()
+                "Battery Current",
+                dbc::bmsPackboard::batteryCurrent->get()
             ),
             keyValuePair(
-                "Max Regen Current",
-                dbc::bmsSoe::maxRegenCurrent->get()
+                "Packboard Voltage",
+                dbc::bmsPackboard::packboardVoltage->get()
             ),
+
+            ui::vspacer(10),
+            ui::h2("Daughterboard"),
             keyValuePair(
                 "Battery Voltage",
-                dbc::bmsSoe::batteryVoltage->get()
+                dbc::bmsDaughterboard::batteryVoltage->get()
+            ),
+            keyValuePair(
+                "Max Cell Voltage",
+                dbc::bmsDaughterboard::maxCellVoltage->get()
+            ),
+            keyValuePair(
+                "Min Cell Voltage",
+                dbc::bmsDaughterboard::minCellVoltage->get()
             ),
             keyValuePair(
                 "Battery Temperature",
-                dbc::bmsSoe::batteryTemperature->get()
-            ),
-            keyValuePair(
-                "Battery Current",
-                dbc::bmsSoe::batteryCurrent->get()
+                dbc::bmsDaughterboard::batteryTemperature->get()
             ),
 
             ui::vspacer(10),
             ui::h2("Status"),
+            keyValuePair(
+                "SOC",
+                dbc::bmsStatus::soc->get()
+            ),
             keyValuePair(
                 "BMS State",
                 dbc::bmsStatus::bmsState->get()
@@ -175,24 +209,23 @@ class DebugPage : public IPage {
                 dbc::bmsStatus::imdState->get()
             ),
             keyValuePair(
-                "Max Cell Temp",
-                dbc::bmsStatus::maxCellTemp->get()
+                "Total PEC Failures",
+                dbc::bmsStatus::totalPecFailures->get()
             ),
-            keyValuePair(
-                "Min Cell Temp",
-                dbc::bmsStatus::minCellTemp->get()
+
+            ui::vspacer(10),
+            ui::h2("Timeouts"),
+            keyErrorValuePair(
+                "VCU Timeout",
+                dbc::bmsStatus::vcuTimeout->get()
             ),
-            keyValuePair(
-                "Max Cell Voltage",
-                dbc::bmsStatus::maxCellVoltage->get()
+            keyErrorValuePair(
+                "Inverter Timeout",
+                dbc::bmsStatus::inverterTimeout->get()
             ),
-            keyValuePair(
-                "Min Cell Voltage",
-                dbc::bmsStatus::minCellVoltage->get()
-            ),
-            keyValuePair(
-                "BMS SOC",
-                dbc::bmsStatus::bmsSoc->get()
+            keyErrorValuePair(
+                "Charger Timeout",
+                dbc::bmsStatus::chargerTimeout->get()
             )
         );
         // clang-format on
@@ -262,76 +295,72 @@ class DebugPage : public IPage {
     okay::UIElement buildFaults() {
         // clang-format off
         return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("VCU Implausibilities"),
-            keyErrorValuePair(
-                "Implausibility Present",
-                dbc::ecuImplausibility::implausibilityPresent->get()
-            ),
-            keyErrorValuePair(
-                "APPS Disagreement",
-                dbc::ecuImplausibility::appssDisagreementImp->get()
-            ),
-            keyErrorValuePair(
-                "BPPC Implausibility",
-                dbc::ecuImplausibility::bppcImp->get()
-            ),
-            keyErrorValuePair(
-                "Brake Invalid",
-                dbc::ecuImplausibility::brakeInvalidImp->get()
-            ),
-            keyErrorValuePair(
-                "APPS Invalid",
-                dbc::ecuImplausibility::appssInvalidImp->get()
-            ),
-
-            ui::vspacer(10),
             ui::h2("BMS Faults"),
             keyErrorValuePair(
                 "Internal Fault Summary",
-                dbc::bmsFaults::internalfaultSummary->get()
-            ),
-            keyErrorValuePair(
-                "External Fault",
-                dbc::bmsFaults::externalFault->get()
+                dbc::bmsStatus::internalfaultSummary->get()
             ),
             keyErrorValuePair(
                 "Undervoltage Fault",
-                dbc::bmsFaults::undervoltageFault->get()
+                dbc::bmsStatus::undervoltageFault->get()
             ),
             keyErrorValuePair(
                 "Overvoltage Fault",
-                dbc::bmsFaults::overvoltageFault->get()
+                dbc::bmsStatus::overvoltageFault->get()
             ),
             keyErrorValuePair(
                 "Undertemperature Fault",
-                dbc::bmsFaults::undertemperatureFault->get()
+                dbc::bmsStatus::undertemperatureFault->get()
             ),
             keyErrorValuePair(
                 "Overtemperature Fault",
-                dbc::bmsFaults::overtemperatureFault->get()
-            ),
-            keyErrorValuePair(
-                "Overcurrent Fault",
-                dbc::bmsFaults::overcurrentFault->get()
+                dbc::bmsStatus::overtemperatureFault->get()
             ),
             keyErrorValuePair(
                 "Open Wire Fault",
-                dbc::bmsFaults::openWireFault->get()
+                dbc::bmsStatus::openWireFault->get()
             ),
             keyErrorValuePair(
                 "Open Wire Temp Fault",
-                dbc::bmsFaults::openWireTempFault->get()
+                dbc::bmsStatus::openWireTempFault->get()
             ),
             keyErrorValuePair(
                 "PEC Fault",
-                dbc::bmsFaults::pecFault->get()
+                dbc::bmsStatus::pecFault->get()
             ),
-            keyValuePair(
-                "Total PEC Failures",
-                dbc::bmsFaults::totalPecFailures->get()
+            keyErrorValuePair(
+                "Shutdown Open",
+                dbc::bmsStatus::shutdownOpen->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("BSPD"),
+            keyErrorValuePair(
+                "High Current",
+                dbc::ecuBspdStatus::highCurrent->get()
+            ),
+            keyErrorValuePair(
+                "Hard Brake",
+                dbc::ecuBspdStatus::hardBrake->get()
+            ),
+            keyErrorValuePair(
+                "Brake Error",
+                dbc::ecuBspdStatus::brakeError->get()
+            ),
+            keyErrorValuePair(
+                "Current Error",
+                dbc::ecuBspdStatus::currentError->get()
+            ),
+            keyErrorValuePair(
+                "BSPD Error",
+                dbc::ecuBspdStatus::bspdErrorB->get()
+            ),
+            keyErrorValuePair(
+                "BSPD Sensor Error",
+                dbc::ecuBspdStatus::bspdSensErrorB->get()
             )
         );
-        // clang-format off
+        // clang-format on
     }
 
     template <typename T>

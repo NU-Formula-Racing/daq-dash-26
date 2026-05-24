@@ -1,3 +1,4 @@
+#include "ui/car_state.hpp"
 #include "ui/components/rotate.hpp"
 #include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
@@ -10,12 +11,17 @@
 #include <csignal>
 #include <math.h>
 #include <memory>
+#include <platform/button.hpp>
 #include <platform/can.hpp>
 #include <platform/interfaces.hpp>
 #include <platform/neopixel_manager.hpp>
 #include <sstream>
 
 static void __exitSignal(int sig);
+
+static bool s_debugPageActive{false};
+
+static dash::Button downButton{20};
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
@@ -29,22 +35,26 @@ int main() {
         .enableIMGUI = true,
     };
 
+    downButton.onDown([]() {
+        s_debugPageActive = !s_debugPageActive;
+    });
+
     std::unique_ptr<dash::PageManager> pageManager = std::make_unique<dash::PageManager>(
         dash::PageEntry::create(std::make_unique<dash::DrivePage>())
             .activeWhen([]() {
-                return true;
+                return !s_debugPageActive;
             })
-            .withPriority(3),
+            .withPriority(0),
         dash::PageEntry::create(std::make_unique<dash::ErrorPage>())
             .activeWhen([]() {
-                return true;
+                return false;
             })
             .withPriority(0),
         dash::PageEntry::create(std::make_unique<dash::DebugPage>())
             .activeWhen([]() {
-                return true;
+                return s_debugPageActive || dash::CarState::hardFaultPresent();
             })
-            .withPriority(2));
+            .withPriority(1));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);
@@ -61,6 +71,8 @@ int main() {
     okay::registerBuiltinComponentsAndSystems();
     okay::ecs::registerComponent<dash::RotateComponent>();
     okay::ecs::registerSystem(std::make_unique<dash::RotateSystem>());
+
+    dbc::bmsStatus::imdState->set(1);
 
     game.run();
 

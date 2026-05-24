@@ -23,42 +23,36 @@ class DrivePage : public IPage {
     DrivePage() {}
 
     void initializePage() {
-        okay::ShaderHandle objectShader =
-            okay::shaderHandle(okay::load::engineShader("shaders/lit"));
-        auto materialProperties = std::make_unique<okay::LitMaterial>();
-        materialProperties->color.set(colors::fromHex(0xA304FFFF));
-        okay::MaterialHandle objectMaterial =
-            okay::materialHandle(objectShader, std::move(materialProperties));
-
-        okay::ecs::entity()
-            .addComponent<okay::TransformComponent>(glm::vec3(),
-                glm::vec3(0.1f),
-                glm::angleAxis(glm::radians(-25.0f), glm::vec3(2.0f, 3.0f, 1.0f)))
-            .addComponent<okay::LightComponent>(
-                okay::LightComponent::directional(glm::vec3{1, 1, 1}, 1.0f));
-
-        centerMesh = okay::mesh(*centerMeshData);
+        if (centerMesh.isEmpty()) {
+            okay::ShaderHandle objectShader =
+                okay::shaderHandle(okay::load::engineShader("shaders/lit"));
+            auto materialProperties = std::make_unique<okay::LitMaterial>();
+            materialProperties->color.set(colors::fromHex(0xA304FFFF));
+            objectMaterial = okay::materialHandle(objectShader, std::move(materialProperties));
+            centerMesh = okay::mesh(*centerMeshData);
+        }
 
         okay::UIStyle::main().setMainFont(*fonts::latoBold);
 
-        auto speedometerProperties = std::make_unique<SpeedometerMaterial>();
-        speedometerProperties->isTransparent = true;
-        speedometerProperties->useScreenspaceCoords = true;
-        speedometerProperties->color = colors::white;
-        speedometerProperties->albedo = *speedometerTexture;
-        speedometerProperties->trailColor = colors::fromHex(0xA304FFFF);
-        speedometerProperties->angle = glm::radians(45.0f);
-        speedometerProperties->trailRads = glm::radians(120.0f);
-        speedometerProperties->bgColor = colors::fromHex(0x342F2EFF);
+        if (!speedometerMaterial.isValid()) {
+            auto speedometerProperties = std::make_unique<SpeedometerMaterial>();
+            speedometerProperties->isTransparent = true;
+            speedometerProperties->useScreenspaceCoords = true;
+            speedometerProperties->color = colors::white;
+            speedometerProperties->albedo = *speedometerTexture;
+            speedometerProperties->trailColor = colors::fromHex(0xA304FFFF);
+            speedometerProperties->angle = glm::radians(45.0f);
+            speedometerProperties->trailRads = glm::radians(120.0f);
+            speedometerProperties->bgColor = colors::fromHex(0x342F2EFF);
+
+            speedometerMaterial = okay::materialHandle(
+                okay::shaderHandle(*speedometerShader), std::move(speedometerProperties));
+        }
 
         okay::Engine.systems.getSystemChecked<okay::Renderer>()->setSkyboxMaterial(
             dash::SharedElements::get().skyboxMaterial);
 
-        speedometerMaterial = okay::materialHandle(
-            okay::shaderHandle(*speedometerShader), std::move(speedometerProperties));
-
-        _entities = {
-            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
+        _entities = {okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
             okay::ecs::uiEntity(BIND_TO_THIS(buildTemperatureDisplay), 1),
@@ -73,7 +67,12 @@ class DrivePage : public IPage {
                 .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 30.0f})
                 .addComponent<okay::CameraComponent>(
                     okay::CameraComponent{okay::Camera::PerspectiveLens{45.0f, 0.1f, 100.0f}}),
-        };
+            okay::ecs::entity()
+                .addComponent<okay::TransformComponent>(glm::vec3(),
+                    glm::vec3(0.1f),
+                    glm::angleAxis(glm::radians(-25.0f), glm::vec3(2.0f, 3.0f, 1.0f)))
+                .addComponent<okay::LightComponent>(
+                    okay::LightComponent::directional(glm::vec3{1, 1, 1}, 1.0f))};
     }
 
     void closePage() {
@@ -146,6 +145,7 @@ class DrivePage : public IPage {
 
     okay::Mesh centerMesh{okay::Mesh::none()};
     okay::GameAssetRef<okay::MeshData> centerMeshData{"models/northwestern_n.obj"};
+    okay::MaterialHandle objectMaterial;
 
     // speedometer
     okay::MaterialHandle speedometerMaterial;

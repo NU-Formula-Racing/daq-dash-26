@@ -418,16 +418,16 @@ inline CAN_Signal_UINT8 bspdShutdownB = MakeSignalExp(uint8_t, 4, 1, 1.0, 0.0);
 inline CAN_Signal_UINT8 bspdErrorB = MakeSignalExp(uint8_t, 5, 1, 1.0, 0.0);
 inline CAN_Signal_UINT8 bspdSensErrorB = MakeSignalExp(uint8_t, 6, 1, 1.0, 0.0);
 inline RX_CAN_Message(7) message{driveBus,
-                                 0x211,
-                                 false,
-                                 1,
-                                 highCurrent,
-                                 hardBrake,
-                                 brakeError,
-                                 currentError,
-                                 bspdShutdownB,
-                                 bspdErrorB,
-                                 bspdSensErrorB};
+    0x211,
+    false,
+    1,
+    highCurrent,
+    hardBrake,
+    brakeError,
+    currentError,
+    bspdShutdownB,
+    bspdErrorB,
+    bspdSensErrorB};
 
 static constexpr uint8_t highCurrentMin{0};
 static constexpr uint8_t hardBrakeMin{0};
@@ -486,26 +486,26 @@ inline CAN_Signal_BOOL chargerTimeout = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, 
 inline CAN_Signal_BOOL PecWarning2950 = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
 inline CAN_Signal_UINT16 totalPecFailures = MakeSignalExp(uint16_t, 38, 16, 1.0, 0.0);
 inline RX_CAN_Message(17) message{driveBus,
-                                  0x152,
-                                  false,
-                                  7,
-                                  soc,
-                                  bmsState,
-                                  imdState,
-                                  internalfaultSummary,
-                                  undervoltageFault,
-                                  overvoltageFault,
-                                  undertemperatureFault,
-                                  overtemperatureFault,
-                                  openWireFault,
-                                  openWireTempFault,
-                                  pecFault,
-                                  shutdownOpen,
-                                  vcuTimeout,
-                                  inverterTimeout,
-                                  chargerTimeout,
-                                  PecWarning2950,
-                                  totalPecFailures};
+    0x152,
+    false,
+    7,
+    soc,
+    bmsState,
+    imdState,
+    internalfaultSummary,
+    undervoltageFault,
+    overvoltageFault,
+    undertemperatureFault,
+    overtemperatureFault,
+    openWireFault,
+    openWireTempFault,
+    pecFault,
+    shutdownOpen,
+    vcuTimeout,
+    inverterTimeout,
+    chargerTimeout,
+    PecWarning2950,
+    totalPecFailures};
 
 static constexpr float socMin{0.0};
 static constexpr uint8_t bmsStateMin{0};
@@ -981,17 +981,17 @@ inline CAN_Signal_FLOAT cellT14 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT15 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT16 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x171,
-                                 false,
-                                 8,
-                                 cellT9,
-                                 cellT10,
-                                 cellT11,
-                                 cellT12,
-                                 cellT13,
-                                 cellT14,
-                                 cellT15,
-                                 cellT16};
+    0x171,
+    false,
+    8,
+    cellT9,
+    cellT10,
+    cellT11,
+    cellT12,
+    cellT13,
+    cellT14,
+    cellT15,
+    cellT16};
 
 static constexpr float cellT9Min{-20.0};
 static constexpr float cellT10Min{-20.0};
@@ -1015,17 +1015,17 @@ inline CAN_Signal_FLOAT cellT22 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT23 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT24 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x172,
-                                 false,
-                                 8,
-                                 cellT17,
-                                 cellT18,
-                                 cellT19,
-                                 cellT20,
-                                 cellT21,
-                                 cellT22,
-                                 cellT23,
-                                 cellT24};
+    0x172,
+    false,
+    8,
+    cellT17,
+    cellT18,
+    cellT19,
+    cellT20,
+    cellT21,
+    cellT22,
+    cellT23,
+    cellT24};
 
 static constexpr float cellT17Min{-20.0};
 static constexpr float cellT18Min{-20.0};
@@ -1049,17 +1049,17 @@ inline CAN_Signal_FLOAT cellT30 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT31 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT32 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x173,
-                                 false,
-                                 8,
-                                 cellT25,
-                                 cellT26,
-                                 cellT27,
-                                 cellT28,
-                                 cellT29,
-                                 cellT30,
-                                 cellT31,
-                                 cellT32};
+    0x173,
+    false,
+    8,
+    cellT25,
+    cellT26,
+    cellT27,
+    cellT28,
+    cellT29,
+    cellT30,
+    cellT31,
+    cellT32};
 
 static constexpr float cellT25Min{-20.0};
 static constexpr float cellT26Min{-20.0};
@@ -1083,17 +1083,17 @@ inline CAN_Signal_FLOAT cellT38 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT39 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT40 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x174,
-                                 false,
-                                 8,
-                                 cellT33,
-                                 cellT34,
-                                 cellT35,
-                                 cellT36,
-                                 cellT37,
-                                 cellT38,
-                                 cellT39,
-                                 cellT40};
+    0x174,
+    false,
+    8,
+    cellT33,
+    cellT34,
+    cellT35,
+    cellT36,
+    cellT37,
+    cellT38,
+    cellT39,
+    cellT40};
 
 static constexpr float cellT33Min{-20.0};
 static constexpr float cellT34Min{-20.0};
@@ -1117,17 +1117,17 @@ inline CAN_Signal_FLOAT cellT46 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT47 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT48 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x175,
-                                 false,
-                                 8,
-                                 cellT41,
-                                 cellT42,
-                                 cellT43,
-                                 cellT44,
-                                 cellT45,
-                                 cellT46,
-                                 cellT47,
-                                 cellT48};
+    0x175,
+    false,
+    8,
+    cellT41,
+    cellT42,
+    cellT43,
+    cellT44,
+    cellT45,
+    cellT46,
+    cellT47,
+    cellT48};
 
 static constexpr float cellT41Min{-20.0};
 static constexpr float cellT42Min{-20.0};
@@ -1151,17 +1151,17 @@ inline CAN_Signal_FLOAT cellT54 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT55 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT56 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x176,
-                                 false,
-                                 8,
-                                 cellT49,
-                                 cellT50,
-                                 cellT51,
-                                 cellT52,
-                                 cellT53,
-                                 cellT54,
-                                 cellT55,
-                                 cellT56};
+    0x176,
+    false,
+    8,
+    cellT49,
+    cellT50,
+    cellT51,
+    cellT52,
+    cellT53,
+    cellT54,
+    cellT55,
+    cellT56};
 
 static constexpr float cellT49Min{-20.0};
 static constexpr float cellT50Min{-20.0};
@@ -1185,17 +1185,17 @@ inline CAN_Signal_FLOAT cellT62 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT63 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT64 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x177,
-                                 false,
-                                 8,
-                                 cellT57,
-                                 cellT58,
-                                 cellT59,
-                                 cellT60,
-                                 cellT61,
-                                 cellT62,
-                                 cellT63,
-                                 cellT64};
+    0x177,
+    false,
+    8,
+    cellT57,
+    cellT58,
+    cellT59,
+    cellT60,
+    cellT61,
+    cellT62,
+    cellT63,
+    cellT64};
 
 static constexpr float cellT57Min{-20.0};
 static constexpr float cellT58Min{-20.0};
@@ -1219,17 +1219,17 @@ inline CAN_Signal_FLOAT cellT70 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT71 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT72 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x178,
-                                 false,
-                                 8,
-                                 cellT65,
-                                 cellT66,
-                                 cellT67,
-                                 cellT68,
-                                 cellT69,
-                                 cellT70,
-                                 cellT71,
-                                 cellT72};
+    0x178,
+    false,
+    8,
+    cellT65,
+    cellT66,
+    cellT67,
+    cellT68,
+    cellT69,
+    cellT70,
+    cellT71,
+    cellT72};
 
 static constexpr float cellT65Min{-20.0};
 static constexpr float cellT66Min{-20.0};
@@ -1253,17 +1253,17 @@ inline CAN_Signal_FLOAT cellT78 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT79 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT80 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x179,
-                                 false,
-                                 8,
-                                 cellT73,
-                                 cellT74,
-                                 cellT75,
-                                 cellT76,
-                                 cellT77,
-                                 cellT78,
-                                 cellT79,
-                                 cellT80};
+    0x179,
+    false,
+    8,
+    cellT73,
+    cellT74,
+    cellT75,
+    cellT76,
+    cellT77,
+    cellT78,
+    cellT79,
+    cellT80};
 
 static constexpr float cellT73Min{-20.0};
 static constexpr float cellT74Min{-20.0};
@@ -1287,17 +1287,17 @@ inline CAN_Signal_FLOAT cellT86 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT87 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT88 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x17A,
-                                 false,
-                                 8,
-                                 cellT81,
-                                 cellT82,
-                                 cellT83,
-                                 cellT84,
-                                 cellT85,
-                                 cellT86,
-                                 cellT87,
-                                 cellT88};
+    0x17A,
+    false,
+    8,
+    cellT81,
+    cellT82,
+    cellT83,
+    cellT84,
+    cellT85,
+    cellT86,
+    cellT87,
+    cellT88};
 
 static constexpr float cellT81Min{-20.0};
 static constexpr float cellT82Min{-20.0};
@@ -1321,17 +1321,17 @@ inline CAN_Signal_FLOAT cellT94 = MakeSignalSigned(float, 40, 8, 0.5, -20.0, fal
 inline CAN_Signal_FLOAT cellT95 = MakeSignalSigned(float, 48, 8, 0.5, -20.0, false);
 inline CAN_Signal_FLOAT cellT96 = MakeSignalSigned(float, 56, 8, 0.5, -20.0, false);
 inline RX_CAN_Message(8) message{driveBus,
-                                 0x17B,
-                                 false,
-                                 8,
-                                 cellT89,
-                                 cellT90,
-                                 cellT91,
-                                 cellT92,
-                                 cellT93,
-                                 cellT94,
-                                 cellT95,
-                                 cellT96};
+    0x17B,
+    false,
+    8,
+    cellT89,
+    cellT90,
+    cellT91,
+    cellT92,
+    cellT93,
+    cellT94,
+    cellT95,
+    cellT96};
 
 static constexpr float cellT89Min{-20.0};
 static constexpr float cellT90Min{-20.0};

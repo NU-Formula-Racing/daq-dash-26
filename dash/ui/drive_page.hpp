@@ -120,7 +120,7 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildTemperatureDisplay() {
-        return ui::relCenterFrame(0.5f, 0.5f, 1.0f, 1.0f)(
+        return ui::relCenterFrame(0.75f, 0.5f, 1.0f, 1.0f)(
             SharedElements::get().buildTemperatureElement());
     }
 

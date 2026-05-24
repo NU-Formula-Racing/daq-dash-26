@@ -166,41 +166,56 @@ class SharedElements {
         const float medFontSize = 24.0f;
         const float smallFontSize = 16.0f;
 
-        // clang-format on
-        return ui::image(*tempFull)(ui::spacer(),
-            ui::text("CELL").widthGrow().textSizeSet(largeFontSize).alignTextCenter(),
+        // clang-format off
+        return ui::image(*tempFull)(
+            ui::spacer(),
+            ui::text("CELL")
+                .widthGrow()
+                .textSizeSet(largeFontSize)
+                .alignTextCenter(),
             ui::spacer(),
             ui::flexbox()
                 .axisSet(okay::UIAxis::Horizontal)
                 .widthGrow()
                 .heightSet(okay::size::Fixed(64))
-                .bottomMarginSet(8)(ui::flexbox()
-                                        .axisSet(okay::UIAxis::Vertical)
-                                        .widthGrow()
-                                        .heightGrow()(ui::spacer(),
-                                            ui::text("minimum")
-                                                .widthGrow()
-                                                .heightFit()
-                                                .textSizeSet(smallFontSize)
-                                                .alignTextCenter(),
-                                            ui::text("3.79")
-                                                .widthGrow()
-                                                .heightFit()
-                                                .textSizeSet(largeFontSize)
-                                                .alignTextCenter(),
-                                            ui::spacer()),
-                    ui::spacer().widthSet(okay::size::Fixed(14)),
+                .bottomMarginSet(8)(
                     ui::flexbox()
                         .axisSet(okay::UIAxis::Vertical)
                         .widthGrow()
-                        .heightGrow()(ui::spacer(),
+                        .heightGrow()(
+                            ui::spacer(),
+                            ui::text("minimum")
+                                .widthGrow()
+                                .heightFit()
+                                .textSizeSet(smallFontSize)
+                                .alignTextCenter(),
+                            ui::text("3.79")
+                                .widthGrow()
+                                .heightFit()
+                                .textSizeSet(largeFontSize)
+                                .alignTextCenter(),
+                            ui::spacer()
+                    ),
+                    ui::spacer()
+                        .widthSet(okay::size::Fixed(14)),
+                    ui::flexbox()
+                        .axisSet(okay::UIAxis::Vertical)
+                        .widthGrow()
+                        .heightGrow()(
+                            ui::spacer(),
                             ui::text("maximum")
                                 .widthGrow()
                                 .textSizeSet(smallFontSize)
                                 .alignTextCenter(),
-                            ui::text("19").widthGrow().textSizeSet(largeFontSize).alignTextCenter(),
-                            ui::spacer())),
-            ui::spacer().widthSet(okay::size::Fixed(20)),
+                            ui::text("19")
+                                .widthGrow()
+                                .textSizeSet(largeFontSize)
+                                .alignTextCenter(),
+                            ui::spacer()
+                        )
+                ),
+            ui::spacer()
+                .widthSet(okay::size::Fixed(20)),
             ui::text("IGBT")
                 .widthGrow()
                 .textSizeSet(largeFontSize)
@@ -210,26 +225,31 @@ class SharedElements {
             ui::flexbox()
                 .axisSet(okay::UIAxis::Horizontal)
                 .widthGrow()
-                .heightSet(okay::size::Fixed(64))(ui::flexbox()
-                                                      .axisSet(okay::UIAxis::Vertical)
-                                                      .widthGrow()
-                                                      .heightGrow()(ui::spacer(),
-                                                          ui::text("left")
-                                                              .widthGrow()
-                                                              .heightFit()
-                                                              .textSizeSet(smallFontSize)
-                                                              .alignTextCenter(),
-                                                          ui::text("3.79")
-                                                              .widthGrow()
-                                                              .heightFit()
-                                                              .textSizeSet(largeFontSize)
-                                                              .alignTextCenter(),
-                                                          ui::spacer()),
-                    ui::spacer().widthSet(okay::size::Fixed(6)),
+                .heightSet(okay::size::Fixed(64)) (
                     ui::flexbox()
                         .axisSet(okay::UIAxis::Vertical)
                         .widthGrow()
-                        .heightGrow()(ui::spacer(),
+                            .heightGrow()(
+                                ui::spacer(),
+                                    ui::text("left")
+                                        .widthGrow()
+                                        .heightFit()
+                                        .textSizeSet(smallFontSize)
+                                        .alignTextCenter(),
+                                    ui::text("3.79")
+                                        .widthGrow()
+                                        .heightFit()
+                                        .textSizeSet(largeFontSize)
+                                        .alignTextCenter(),
+                                ui::spacer()
+                            ),
+                    ui::spacer()
+                        .widthSet(okay::size::Fixed(6)),
+                    ui::flexbox()
+                        .axisSet(okay::UIAxis::Vertical)
+                        .widthGrow()
+                        .heightGrow()(
+                            ui::spacer(),
                             ui::text("rear")
                                 .widthGrow()
                                 .heightFit()
@@ -241,12 +261,15 @@ class SharedElements {
                                 .heightFit()
                                 .textSizeSet(largeFontSize)
                                 .alignTextCenter(),
-                            ui::spacer()),
-                    ui::spacer().widthSet(okay::size::Fixed(6)),
+                            ui::spacer()
+                        ),
+                    ui::spacer()
+                        .widthSet(okay::size::Fixed(6)),
                     ui::flexbox()
                         .axisSet(okay::UIAxis::Vertical)
                         .widthGrow()
-                        .heightGrow()(ui::spacer(),
+                        .heightGrow()(
+                            ui::spacer(),
                             ui::text("right")
                                 .widthGrow()
                                 .heightFit()

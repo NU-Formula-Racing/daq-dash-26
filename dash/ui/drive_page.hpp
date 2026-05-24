@@ -18,16 +18,6 @@ namespace ui = okay::ui;
 
 namespace dash {
 
-#define BIND_TO_THIS(fnName)   \
-    [this]() {                 \
-        return this->fnName(); \
-    }
-
-#define LAMBDA_WRAP(fn) \
-    []() {              \
-        return fn();    \
-    }
-
 class DrivePage : public IPage {
    public:
     DrivePage() {}
@@ -147,7 +137,7 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildTemperatureDisplay() {
-        return ui::relCenterFrame(0.75f, 0.5f, 0.5f, 0.5f)(
+        return ui::relCenterFrame(0.75f, 0.45f, 0.5f, 0.5f)(
             SharedElements::get().buildTemperatureElement().leftMarginSet(50));
     }
 

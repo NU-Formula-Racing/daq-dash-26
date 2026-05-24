@@ -167,122 +167,133 @@ class SharedElements {
         const float smallFontSize = 16.0f;
 
         // clang-format off
-        return ui::image(*tempFull)(
-            ui::spacer(),
-            ui::text("CELL")
-                .widthGrow()
-                .textSizeSet(largeFontSize)
-                .alignTextCenter()
-                .alignTextMiddle(),
-            ui::spacer(),
-            ui::flexbox()
-                .axisSet(okay::UIAxis::Horizontal)
-                .widthGrow()
-                .heightSet(okay::size::Fixed(64))
-                .bottomMarginSet(8)(
-                    ui::flexbox()
-                        .axisSet(okay::UIAxis::Vertical)
+        return ui::flexbox()
+            .axisSet(okay::UIAxis::Vertical)
+            .widthGrow()
+            .heightGrow()
+            .topMarginSet(okay::size::Fixed(10)) (
+                ui::image(*tempFull) (
+                    ui::spacer(),
+                    ui::text("CELL")
                         .widthGrow()
-                        .heightGrow()(
-                            ui::spacer(),
-                            ui::text("minimum")
+                        .heightGrow()
+                        .textSizeSet(largeFontSize)
+                        .alignTextCenter(),
+                    ui::spacer(),
+                    ui::flexbox()
+                        .axisSet(okay::UIAxis::Horizontal)
+                        .widthGrow()
+                        .heightSet(okay::size::Fixed(64))
+                        .bottomMarginSet(8) (
+                            ui::flexbox()
+                                .axisSet(okay::UIAxis::Vertical)
                                 .widthGrow()
-                                .heightFit()
-                                .textSizeSet(smallFontSize)
-                                .alignTextCenter(),
-                            ui::text("3.79")
-                                .widthGrow()
-                                .heightFit()
-                                .textSizeSet(largeFontSize)
-                                .alignTextCenter(),
+                                .heightGrow() (
+                                    ui::spacer(),
+                                    ui::text("minimum")
+                                        .widthGrow()
+                                        .heightGrow()
+                                        .textSizeSet(smallFontSize)
+                                        .alignTextCenter(),
+                                    ui::text(std::format("{:.1f} C", dbc::bmsStatus::minCellTemp->get()))
+                                        .widthGrow()
+                                        .heightGrow()
+                                        .textSizeSet(largeFontSize)
+                                        .alignTextCenter(),
+                                    ui::spacer()
+                                ),
                             ui::spacer()
-                    ),
+                                .widthSet(okay::size::Fixed(14)),
+                            ui::flexbox()
+                                .axisSet(okay::UIAxis::Vertical)
+                                .widthGrow()
+                                .heightGrow() (
+                                    ui::spacer(),
+                                    ui::text("maximum")
+                                        .widthGrow()
+                                        .heightGrow()
+                                        .textSizeSet(smallFontSize)
+                                        .alignTextCenter(),
+                                    ui::text(std::format("{:.1f} C", dbc::bmsStatus::maxCellTemp->get()))
+                                        .widthGrow()
+                                        .heightGrow()
+                                        .textSizeSet(largeFontSize)
+                                        .alignTextCenter(),
+                                    ui::spacer()
+                                )
+                        ),
                     ui::spacer()
-                        .widthSet(okay::size::Fixed(14)),
-                    ui::flexbox()
-                        .axisSet(okay::UIAxis::Vertical)
+                        .widthSet(okay::size::Fixed(20)),
+                    ui::text("INVERTER")
                         .widthGrow()
-                        .heightGrow()(
-                            ui::spacer(),
-                            ui::text("maximum")
-                                .widthGrow()
-                                .textSizeSet(smallFontSize)
-                                .alignTextCenter(),
-                            ui::text("19")
-                                .widthGrow()
-                                .textSizeSet(largeFontSize)
-                                .alignTextCenter(),
-                            ui::spacer()
-                        )
-                ),
-            ui::spacer()
-                .widthSet(okay::size::Fixed(20)),
-            ui::text("INVERTER")
-                .widthGrow()
-                .textSizeSet(largeFontSize)
-                .alignTextCenter()
-                .bottomMarginSet(10)
-                .alignTextMiddle(),
-            ui::spacer(),
-            ui::flexbox()
-                .axisSet(okay::UIAxis::Horizontal)
-                .widthGrow()
-                .heightSet(okay::size::Fixed(64)) (
+                        .heightGrow()
+                        .textSizeSet(largeFontSize)
+                        .alignTextCenter()
+                        .bottomMarginSet(10),
+                    ui::spacer(),
                     ui::flexbox()
-                        .axisSet(okay::UIAxis::Vertical)
+                        .axisSet(okay::UIAxis::Horizontal)
                         .widthGrow()
-                            .heightGrow()(
-                                ui::spacer(),
+                        .heightSet(okay::size::Fixed(64)) (
+                            ui::flexbox()
+                                .axisSet(okay::UIAxis::Vertical)
+                                .widthGrow()
+                                .heightGrow() (
+                                    ui::spacer(),
                                     ui::text("left")
                                         .widthGrow()
                                         .heightFit()
                                         .textSizeSet(smallFontSize)
                                         .alignTextCenter(),
-                                    ui::text("3.79")
+                                    ui::text(std::format("{} C", dbc::frontLeftInverterTempStatus::igbtTemp->get()))
                                         .widthGrow()
                                         .heightFit()
                                         .textSizeSet(largeFontSize)
                                         .alignTextCenter(),
-                                ui::spacer()
-                            ),
-                    ui::spacer()
-                        .widthSet(okay::size::Fixed(6)),
-                    ui::flexbox()
-                        .axisSet(okay::UIAxis::Vertical)
-                        .widthGrow()
-                        .heightGrow()(
-                            ui::spacer(),
-                            ui::text("rear")
-                                .widthGrow()
-                                .heightFit()
-                                .textSizeSet(smallFontSize)
-                                .alignTextTop()
-                                .alignTextCenter(),
-                            ui::text("19")
-                                .widthGrow()
-                                .heightFit()
-                                .textSizeSet(largeFontSize)
-                                .alignTextCenter(),
+                                    ui::spacer()
+                                ),
                             ui::spacer()
-                        ),
-                    ui::spacer()
-                        .widthSet(okay::size::Fixed(6)),
-                    ui::flexbox()
-                        .axisSet(okay::UIAxis::Vertical)
-                        .widthGrow()
-                        .heightGrow()(
-                            ui::spacer(),
-                            ui::text("right")
+                                .widthSet(okay::size::Fixed(6)),
+                            ui::flexbox()
+                                .axisSet(okay::UIAxis::Vertical)
                                 .widthGrow()
-                                .heightFit()
-                                .textSizeSet(smallFontSize)
-                                .alignTextCenter(),
-                            ui::text("19")
+                                .heightGrow() (
+                                    ui::spacer(),
+                                    ui::text("rear")
+                                        .widthGrow()
+                                        .heightFit()
+                                        .textSizeSet(smallFontSize)
+                                        .alignTextTop()
+                                        .alignTextCenter(),
+                                    ui::text(std::format("{} C", dbc::rearInverterTempStatus::igbtTemp->get()))
+                                        .widthGrow()
+                                        .heightFit()
+                                        .textSizeSet(largeFontSize)
+                                        .alignTextCenter(),
+                                    ui::spacer()
+                                ),
+                            ui::spacer()
+                                .widthSet(okay::size::Fixed(6)),
+                            ui::flexbox()
+                                .axisSet(okay::UIAxis::Vertical)
                                 .widthGrow()
-                                .heightFit()
-                                .textSizeSet(largeFontSize)
-                                .alignTextCenter(),
-                            ui::spacer())));
+                                .heightGrow() (
+                                    ui::spacer(),
+                                    ui::text("right")
+                                        .widthGrow()
+                                        .heightFit()
+                                        .textSizeSet(smallFontSize)
+                                        .alignTextCenter(),
+                                    ui::text(std::format("{} C", dbc::frontRightInverterTempStatus::igbtTemp->get()))
+                                        .widthGrow()
+                                        .heightFit()
+                                        .textSizeSet(largeFontSize)
+                                        .alignTextCenter(),
+                                    ui::spacer()
+                                )
+                        )
+                    )
+            );
 
         // clang-format on
     }

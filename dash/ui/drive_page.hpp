@@ -101,13 +101,13 @@ class DrivePage : public IPage {
                     .backgroundImageSet(*speedometerTexture)(
                         ui::spacer(),
                         ui::h1("75")
-                            .widthFixed(textWidth)
+                            .widthSet(okay::size::Fixed(textWidth))
                             .heightFit()
                             .alignTextCenter()
                             .textSizeSet(48.0f)
                             .fontSet(*fonts::latoBlack),
                         ui::h1("MPH")
-                            .widthFixed(textWidth)
+                            .widthSet(okay::size::Fixed(textWidth))
                             .heightFit()
                             .alignTextCenter()
                             .textSizeSet(20.0f),

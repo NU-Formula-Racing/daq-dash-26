@@ -76,18 +76,60 @@ class ErrorPage : public IPage {
                         .axisSet(okay::UIAxis::Vertical)
                         .widthGrow()
                         .heightGrow() (
-                            ui::text("test")
-                                .widthGrow()
-                                .textSizeSet(medFontSize),
-                            ui::text("test")
-                                .widthGrow()
-                                .textSizeSet(medFontSize),
-                            ui::text("test")
-                                .widthGrow()
-                                .textSizeSet(medFontSize)
+                            ui::image(*errorCodeTop) (
+                                    ui::text("BMS")
+                                        .widthGrow()
+                                        .textSizeSet(medFontSize)
+                                        .leftMarginSet(15)
+                                ),
+                            ui::image(*errorCodeMid) (
+                                    ui::text("OUR_VOLT")
+                                        .widthGrow()
+                                        .textSizeSet(medFontSize)
+                                        .leftMarginSet(15)
+                                ),
+                            ui::image(*errorCodeMid) (
+                                    ui::text("OUR_TEMP")
+                                        .widthGrow()
+                                        .textSizeSet(medFontSize)
+                                        .leftMarginSet(15)
+                                ),
+                            ui::image(*errorCodeBot),
+                            ui::spacer()
                         ),
                     ui::spacer()
-                        .widthSet(okay::size::Fixed(20)),
+                        .widthSet(okay::size::Fixed(25)),
+                    ui::flexbox()
+                        .axisSet(okay::UIAxis::Vertical)
+                        .widthGrow()
+                        .heightGrow() (
+                            ui::image(*errorCodeTop) (
+                                    ui::text("ECU")
+                                        .widthGrow()
+                                        .textSizeSet(medFontSize)
+                                        .leftMarginSet(15)
+                                ),
+                            ui::image(*errorCodeMid) (
+                                    ui::text("IMPLS_PRSNT")
+                                        .widthGrow()
+                                        .textSizeSet(medFontSize)
+                                        .leftMarginSet(15)
+                                ),
+                            ui::image(*errorCodeMid) (
+                                    ui::text("IMPLS_BRK_INVLD_IMP")
+                                        .widthGrow()
+                                        .textSizeSet(medFontSize)
+                                        .leftMarginSet(15)
+                                ),
+                            ui::image(*errorCodeMid) (
+                                    ui::text("IMPLS_APPS_INVLD_IMP")
+                                        .widthGrow()
+                                        .textSizeSet(medFontSize)
+                                        .leftMarginSet(15)
+                                ),
+                            ui::image(*errorCodeBot),
+                            ui::spacer()
+                        ),
                     // Temperature info
                     ui::flexbox()
                         .axisSet(okay::UIAxis::Vertical)
@@ -297,7 +339,13 @@ class ErrorPage : public IPage {
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> bgTexture{
         "textures/bg_pattern.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> topBar{"textures/top_bar.png"};
+
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> errorCodeTop{"textures/error_code_top.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> errorCodeMid{"textures/error_code_mid.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> errorCodeBot{"textures/error_code_bot.png"};
+
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> tempFull{"textures/temp_full.png"};
+
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> botBar{"textures/bottom_bar.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> stateShape{
         "textures/state_shape.png"};

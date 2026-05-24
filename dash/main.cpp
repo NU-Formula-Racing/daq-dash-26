@@ -1,9 +1,8 @@
-#include "page.hpp"
 #include "ui/components/rotate.hpp"
+#include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
 #include "ui/error_page.hpp"
 #include "ui/page.hpp"
-#include "ui/shared_elements.hpp"
 
 #include <okay/okay.hpp>
 
@@ -35,12 +34,17 @@ int main() {
             .activeWhen([]() {
                 return true;
             })
-            .withPriority(1),
+            .withPriority(3),
         dash::PageEntry::create(std::make_unique<dash::ErrorPage>())
             .activeWhen([]() {
                 return true;
             })
-            .withPriority(0));
+            .withPriority(0),
+        dash::PageEntry::create(std::make_unique<dash::DebugPage>())
+            .activeWhen([]() {
+                return true;
+            })
+            .withPriority(2));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);

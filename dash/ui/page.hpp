@@ -8,6 +8,16 @@
 #include <utility>
 #include <vector>
 
+#define BIND_TO_THIS(fnName)   \
+    [this]() {                 \
+        return this->fnName(); \
+    }
+
+#define LAMBDA_WRAP(fn) \
+    []() {              \
+        return fn();    \
+    }
+
 namespace dash {
 
 class IPage {

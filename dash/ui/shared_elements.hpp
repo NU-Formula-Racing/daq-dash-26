@@ -172,7 +172,8 @@ class SharedElements {
             ui::text("CELL")
                 .widthGrow()
                 .textSizeSet(largeFontSize)
-                .alignTextCenter(),
+                .alignTextCenter()
+                .alignTextMiddle(),
             ui::spacer(),
             ui::flexbox()
                 .axisSet(okay::UIAxis::Horizontal)
@@ -216,11 +217,12 @@ class SharedElements {
                 ),
             ui::spacer()
                 .widthSet(okay::size::Fixed(20)),
-            ui::text("IGBT")
+            ui::text("INVERTER")
                 .widthGrow()
                 .textSizeSet(largeFontSize)
                 .alignTextCenter()
-                .bottomMarginSet(10),
+                .bottomMarginSet(10)
+                .alignTextMiddle(),
             ui::spacer(),
             ui::flexbox()
                 .axisSet(okay::UIAxis::Horizontal)

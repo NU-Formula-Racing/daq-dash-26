@@ -35,7 +35,7 @@ class DrivePage : public IPage {
         okay::ShaderHandle objectShader =
             okay::shaderHandle(okay::load::engineShader("shaders/lit"));
         auto materialProperties = std::make_unique<okay::LitMaterial>();
-        materialProperties->color.set(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+        materialProperties->color.set(colors::northwesternPurple);
         okay::MaterialHandle objectMaterial =
             okay::materialHandle(objectShader, std::move(materialProperties));
 
@@ -74,7 +74,7 @@ class DrivePage : public IPage {
             okay::ecs::uiEntity(BIND_TO_THIS(buildSpeedometer), 1),
             okay::ecs::entity()
                 .addComponent<okay::TransformComponent>(
-                    glm::vec3(0.0f), glm::vec3(0.5f), glm::identity<glm::quat>())
+                    glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.2f), glm::identity<glm::quat>())
                 .addComponent<okay::MeshRendererComponent>(
                     centerMesh, objectMaterial, static_cast<uint8_t>(255))
                 .addComponent<RotateComponent>(0.25f),
@@ -120,15 +120,15 @@ class DrivePage : public IPage {
     }
 
     okay::UIElement buildTemperatureDisplay() {
-        return ui::relCenterFrame(0.75f, 0.5f, 1.0f, 1.0f)(
-            SharedElements::get().buildTemperatureElement());
+        return ui::relCenterFrame(0.75f, 0.5f, 0.5f, 0.5f)(
+            SharedElements::get().buildTemperatureElement().leftMarginSet(50));
     }
 
    private:
     std::vector<okay::ECSEntity> _entities;
 
     okay::Mesh centerMesh{okay::Mesh::none()};
-    okay::EngineAssetRef<okay::MeshData> centerMeshData{"models/teapot.obj"};
+    okay::GameAssetRef<okay::MeshData> centerMeshData{"models/northwestern_n.obj"};
 
     // speedometer
     okay::MaterialHandle speedometerMaterial;

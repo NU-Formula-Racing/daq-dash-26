@@ -369,6 +369,11 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
         int numFull = static_cast<int>(floor(batteryPercentage * bar2NumPixels));
 
+        // set all to black
+        for (int j = 0; j < bar2NumPixels; j++) {
+            getBar(2).setColor(j, glm::vec4(0.0f));
+        }
+
         // full bars
         for (int j = bar2NumPixels - 1; j > (bar2NumPixels - 1 - numFull); j--) {
             getBar(2).setColor(j, color);

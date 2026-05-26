@@ -173,6 +173,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         }
 
         color *= brightness;
+        
         // set the colors
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < getBar(i).numPixels(); j++) {

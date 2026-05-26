@@ -98,7 +98,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         startAnimation([this](float time) {
             idle(time);
         });
-        updateDisplay();
+        // updateDisplay();
     }
 
     void tick() {

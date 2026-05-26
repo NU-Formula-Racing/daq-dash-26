@@ -3,6 +3,7 @@
 
 #include "car_state.hpp"
 #include "materials/bat_percent.hpp"
+#include "okay/core/ui/element.hpp"
 #include "style.hpp"
 
 #include <okay/okay.hpp>
@@ -297,6 +298,24 @@ class SharedElements {
             );
 
         // clang-format on
+    }
+
+    okay::UIElement buildPerformanceUI() {
+        return ui::frame(10, 10, 200, 100)(ui::flexbox()
+                .marginSet(10)
+                .paddingSet(10)
+                .rightPaddingSet(20)
+                .backgroundColorSet(glm::vec4{0.05f, 0.0f, 0.05f, 0.5f})
+                .borderColorSet(glm::vec4{1.0f, 1.0f, 1.0f, 0.8f})
+                .borderRadiusSet(10)
+                .borderWidthSet(1)(ui::h2("Performance"),
+                    ui::vspacer(2),
+                    ui::h3(std::format("FPS: {:2f}", okay::Engine.time->fps())),
+                    ui::h3(std::format("ECS Entity count: {}", okay::ecs::entityCount())),
+                    ui::h3(std::format("Renderer Entity count: {}",
+                        okay::Engine.systems.getSystemChecked<okay::Renderer>()
+                            ->world()
+                            .numRenderItems()))));
     }
 
     okay::MaterialHandle skyboxMaterial;

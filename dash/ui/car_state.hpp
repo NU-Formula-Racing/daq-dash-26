@@ -12,13 +12,19 @@ class CarState {
    public:
     enum class ECUState { IDLE, PRECHARGE, NEUTRAL, DRIVE };
 
-    static bool hardFaultPresent() {
-        const int errorCode = 0x03;
-
-        bool hardFaultError = dbc::bmsStatus::internalfaultSummary->get() != 0 ||
-                              dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode ||
+    static bool driveFaultPresent(){
+        const int errorCode = 0x03;   
+        bool driveFaultPresent = dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode ||
                               dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode ||
                               dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
+        
+        return driveFaultPresent;
+    }
+
+    static bool hardFaultPresent() {
+
+        bool hardFaultError = dbc::bmsStatus::internalfaultSummary->get() != 0;
+                        
 
         bool imdError = !(dbc::bmsStatus::imdState->get());
 

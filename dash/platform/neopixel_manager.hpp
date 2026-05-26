@@ -166,7 +166,12 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float period = (imdError) ? imdPeriod : hardFaultPeriod;
         float brightness = static_cast<int>(floor(time / period)) % 2;
 
-        glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        glm::vec4 color = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f); // default to orange
+
+        if (CarState::hardFaultPresent()) { // only change to red IF it's a hard fault present
+            glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        }
+
         color *= brightness;
         // set the colors
         for (int i = 0; i < 5; i++) {
@@ -178,7 +183,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
     void checkErrorOccured() {
         // error  check if error state is not no error & error state is the same, then return
-        bool errorValue = CarState::hardFaultPresent();
+        bool errorValue = CarState::hardFaultPresent() || CarState::driveFaultPresent();
         if (errorValue) {
             if (!currentErrorState) {
                 currentErrorState = true;

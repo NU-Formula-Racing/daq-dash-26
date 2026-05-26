@@ -10,6 +10,7 @@
 #include <platform/interfaces.hpp>
 #include <stdint.h>
 #include <ui/car_state.hpp>
+#include <ui/style.hpp>
 
 namespace dash {
 
@@ -167,14 +168,14 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float period = (imdError) ? imdPeriod : hardFaultPeriod;
         float brightness = static_cast<int>(floor(time / period)) % 2;
 
-        glm::vec4 color = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f); // default to orange
+        glm::vec4 color = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f); // default to orange
 
         if (CarState::hardFaultPresent()) { // only change to red IF it's a hard fault present
-            glm::vec4 color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+            color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
         }
 
         color *= brightness;
-        
+
         // set the colors
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < getBar(i).numPixels(); j++) {
@@ -394,7 +395,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
     }
 
     void odometerAnimation(float time) {  // bar 0
-        glm::vec4 nuPurple = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+        glm::vec4 nuPurple = colors::northwesternPurple;
         float odmVal = static_cast<float>(dbc::telemetryOdometer::milesDriven->get());
 
         float odometerPercentage =
@@ -421,8 +422,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         }
     }
 
+    /*
     void socChargeAnimation(float time) {                           // bar 1
-        /* glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f); */  // placeholder
 
         glm::vec4 color = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -464,6 +465,56 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
         }
     }
+    */
+
+    void socChargeAnimation(float time) {                           // bar 1
+
+        glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f); // green
+        glm::vec4 color2 = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f); // this one is red
+
+        float lowerBound = 0.0;
+        float upperBound = 1.0;
+
+        float bmsSoc = static_cast<float>(dbc::bmsStatus::soc->get());
+        float batteryPercentage = (bmsSoc - lowerBound) / (upperBound - lowerBound);
+
+        if (batteryPercentage > 1.0) {
+            batteryPercentage = 1.0;
+        }
+
+        int numFull = static_cast<int>(floor(batteryPercentage * getBar(1).numPixels())); // this is the number that will be green
+
+        // probably something here
+
+        // full bars
+        for (int j = 0; j < numFull; j++) {
+            getBar(1).setColor(j, color);
+        }
+
+        // set the full inverse bars lol
+        if ((numFull) < getBar(1).numPixels()) {
+            for (int j = (numFull); j < getBar(1).numPixels(); j++) {
+            getBar(1).setColor(j, color2);
+            }
+        }
+
+        if ((batteryPercentage * getBar(1).numPixels()) != static_cast<float>(numFull)) {
+            glm::vec4 partialColor = glm::mix(color2, color, (batteryPercentage * getBar(1).numPixels() - numFull));
+            // glm::vec4 partialColor = (color * (batteryPercentage * getBar(1).numPixels() - numFull)) + (color2 * (1 - (batteryPercentage * getBar(1).numPixels() - numFull)));
+            getBar(1).setColor(numFull, partialColor); // index numFull is the LED that needs to be partially colored
+        }
+
+/*
+        // partial NEED TO CHANGE TO BLEND
+        for (int j = 0; j < getBar(1).numPixels(); j++) {
+            if (j == numFull) {
+                glm::vec4 partialColor =
+                    (color * (batteryPercentage * getBar(1).numPixels() - numFull)) + (green * (1 - (batteryPercentage * getBar(1).numPixels() - numFull)));
+                getBar(1).setColor(j, partialColor);
+            }
+        } */
+    }
+
 
     void igbtTempAnimation(float time) {                      // bar 3
         glm::vec4 color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);  // placeholder
@@ -602,7 +653,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         } else {
             // bppc error check
             if (bppc) {
-                glm::vec4 yellow = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+                glm::vec4 yellow = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f); // this is orange
                 for (int i = 0; i < 5; i++) {
                     if (i == 2)
                         continue;
@@ -626,6 +677,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             socChargeAnimation(0);
             igbtTempAnimation(0);
             batteryTempAnimation(0);
+            bmsSocAnimation(0);
 
             /*
 

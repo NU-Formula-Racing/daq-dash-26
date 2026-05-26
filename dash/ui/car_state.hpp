@@ -14,11 +14,11 @@ class CarState {
 
     static bool driveFaultPresent(){
         const int errorCode = 0x03;   
-        bool driveFaultPresent = dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode ||
+        bool driveFaultError = dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode ||
                               dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode ||
                               dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
         
-        return driveFaultPresent;
+        return driveFaultError;
     }
 
     static bool hardFaultPresent() {

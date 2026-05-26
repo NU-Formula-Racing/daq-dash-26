@@ -17,33 +17,39 @@ static GPIO s_canGPIO{0, true};
 static Clock s_canClock;
 
 void CANManager::initialize() {
-    okay::Engine.logger.debug("CANManager::initialize()");
-    GPIOManager::instance().tick();
-    dbc::driveBus.set_driver(std::make_unique<MCP2515>(s_canSpi, s_canGPIO, s_canClock));
+    std::thread workerThread([this]() {
+        okay::Engine.logger.debug("CANManager::initialize()");
+        GPIOManager::instance().tick();
+        dbc::driveBus.set_driver(std::make_unique<MCP2515>(s_canSpi, s_canGPIO, s_canClock));
 
-    // check for errors
-    if (s_canGPIO.checkError()) {
-        okay::Engine.logger.error("Failed to initialize GPIO");
-    }
-
-    BaudRate baud500k = BaudRate::kBaud500K;
-    if (!dbc::driveBus.init(baud500k)) {
-        okay::Engine.logger.error("Failed to initialize CAN bus");
-        while (true) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        // check for errors
+        if (s_canGPIO.checkError()) {
+            okay::Engine.logger.error("Failed to initialize GPIO");
         }
-    }
 
-    okay::Engine.logger.debug("CANManager::initialize() finished!");
+        BaudRate baud500k = BaudRate::kBaud500K;
+        if (!dbc::driveBus.init(baud500k)) {
+            okay::Engine.logger.error("Failed to initialize CAN bus");
+            while (true) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            }
+        }
+
+        okay::Engine.logger.debug("CANManager::initialize() finished!");
+
+        while (true) {
+            GPIOManager::instance().tick();
+            InputManager::instance().tick();
+            dbc::driveBus.tick_bus();
+
+            MCP2515* driver = static_cast<MCP2515*>(dbc::driveBus.get_driver());
+            driver->updateMissCounter();
+        }
+    });
+
+    workerThread.detach();
 }
 
-void CANManager::tick() {
-    GPIOManager::instance().tick();
-    InputManager::instance().tick();
-    dbc::driveBus.tick_bus();
-
-    MCP2515* driver = static_cast<MCP2515*>(dbc::driveBus.get_driver());
-    driver->updateMissCounter();
-}
+void CANManager::tick() {}
 
 }  // namespace dash

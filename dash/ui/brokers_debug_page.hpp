@@ -1,5 +1,5 @@
-#ifndef __DAQ_DEBUG_PAGE_H__
-#define __DAQ_DEBUG_PAGE_H__
+#ifndef __BROKERS_DEBUG_PAGE_H__
+#define __BROKERS_DEBUG_PAGE_H__
 
 #include "okay/core/ui/builder.hpp"
 #include "okay/core/ui/element.hpp"
@@ -25,12 +25,12 @@ namespace ui = okay::ui;
 
 namespace dash {
 
-class DAQDebugPage : public IPage {
+class BrokersDebugPage : public IPage {
    public:
-    DAQDebugPage() {}
+    BrokersDebugPage() {}
 
     void initializePage() {
-        okay::Engine.logger.debug("Creating entities for DAQ/LV Debug page!");
+        okay::Engine.logger.debug("Creating entities for Brokers Debug page!");
 
         okay::Engine.systems.getSystemChecked<okay::Renderer>()->setSkyboxMaterial(
             SharedElements::get().skyboxMaterial);
@@ -40,11 +40,11 @@ class DAQDebugPage : public IPage {
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildDAQDebug), 3),
+            okay::ecs::uiEntity(BIND_TO_THIS(buildBrokersDebug), 3),
         };
     }
 
-    okay::UIElement buildDAQDebug() {
+    okay::UIElement buildBrokersDebug() {
         // clang-format off
         return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)
             .axisSet(okay::UIAxis::Vertical)(
@@ -57,20 +57,20 @@ class DAQDebugPage : public IPage {
                     .bottomMarginSet(20) (
                         ui::spacer(),
                         buildContainer()(
-                            ui::h1("FRONT BROKERS"), // both front brokers
-                            buildFrontBrokers()
+                            ui::h1("FR BROKER"), // both front brokers
+                            buildFrontRightBroker()
                         ),
                         buildContainer()(
-                            ui::h1("BACK BROKERS"), // both back brokers
-                            buildBackBrokers()
+                            ui::h1("FL BROKER"), // both back brokers
+                            buildFrontLeftBroker()
                         ),
                         buildContainer()(
-                            ui::h1("IMU"),
-                            buildIMU()
+                            ui::h1("BR BROKER"),
+                            buildBackLeftBroker()
                         ),
                         buildContainer()(
-                            ui::h1("TELEMETRY"),
-                            buildTelemetry()
+                            ui::h1("BL BROKER"),
+                            buildBackRightBroker()
                         ),
                         ui::spacer()
                     ),
@@ -91,7 +91,7 @@ class DAQDebugPage : public IPage {
             .backgroundColorSet(glm::vec4(0.0f, 0.0f, 0.0f, 0.5f));
     }
 
-    okay::UIElement buildFrontBrokers() {
+    okay::UIElement buildFrontLeftBroker() {
         // clang-format off
         return ui::growbox(okay::UIAxis::Vertical) (
             ui::h2("Front Left Broker"),
@@ -158,10 +158,15 @@ class DAQDebugPage : public IPage {
             keyValuePair(
                 "FL Sus Pot Calibrated",
                 dbc::flBrokerSusCalibrated::flSusPotCalibrated->get()
-            ),
+            )
+        );
+        // clang-format off
+    }
 
-            ui::vspacer(10),
-            ui::h2("Front Right Broker"),
+     okay::UIElement buildFrontRightBroker() {
+        // clang-format off
+        return ui::growbox(okay::UIAxis::Vertical) (
+        ui::h2("Front Right Broker"),
             keyValuePair(
                 "FR Tire Temp 0",
                 dbc::frBrokerTemp1::frTireTemp0->get()
@@ -225,15 +230,16 @@ class DAQDebugPage : public IPage {
             keyValuePair(
                 "FR Sus Pot Calibrated",
                 dbc::frBrokerSusCalibrated::frSusPotCalibrated->get()
-            )   
+            )  
         );
         // clang-format off
-    }
+    } 
 
-    okay::UIElement buildBackBrokers() {
+
+    okay::UIElement buildBackLeftBroker() {
         // clang-format off
         return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("Back Left Broker"),
+        ui::h2("Back Left Broker"),
             keyValuePair(
                 "BL Tire Temp 0",
                 dbc::blBrokerTemp1::blTireTemp0->get()
@@ -297,9 +303,14 @@ class DAQDebugPage : public IPage {
             keyValuePair(
                 "BL Sus Pot Calibrated",
                 dbc::blBrokerSusCalibrated::blSusPotCalibrated->get()
-            ),
+            )  
+        );
+        // clang-format off
+    } 
 
-            ui::vspacer(10),
+    okay::UIElement buildBackRightBroker() {
+        // clang-format off
+        return ui::growbox(okay::UIAxis::Vertical) (
             ui::h2("Back Right Broker"),
             keyValuePair(
                 "BR Tire Temp 0",
@@ -367,319 +378,7 @@ class DAQDebugPage : public IPage {
             )
         );
         // clang-format off
-    }
-
-
-    okay::UIElement buildIMU() {
-        // clang-format off
-        return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("IMU Status"),
-            keyValuePair(
-                    "X Axis Acceleration", 
-                    dbc::imuAcceleration::xAxisAcceleration->get()
-            ),
-
-            keyValuePair(
-                    "Y Axis Acceleration", 
-                    dbc::imuAcceleration::yAxisAcceleration->get()
-            ),
-
-            keyValuePair(
-                    "Z Axis Acceleration", 
-                    dbc::imuAcceleration::zAxisAcceleration->get()
-            ),
-
-            keyValuePair(
-                    "Yaw", 
-                    dbc::imuYawPitchRoll::yaw->get()
-            ),
-
-            keyValuePair(
-                    "Pitch", 
-                    dbc::imuYawPitchRoll::pitch->get()
-            ),
-
-            keyValuePair(
-                    "Roll", 
-                    dbc::imuYawPitchRoll::roll->get()
-            ),
-
-            keyValuePair(
-                    "X Axis Angular Rate", 
-                    dbc::imuAngularRate::xAxisAngularRate->get()
-            ),
-
-            keyValuePair(
-                    "Y Axis Angular Rate", 
-                    dbc::imuAngularRate::yAxisAngularRate->get()
-            ),
-
-            keyValuePair(
-                    "Z Axis Angular Rate", 
-                    dbc::imuAngularRate::zAxisAngularRate->get()
-            ),
-
-            keyValuePair(
-                    "Position Latitude", 
-                    dbc::imuPositionIns::positionLatitude->get()
-            ),
-
-            keyValuePair(
-                    "Position Longitude", 
-                    dbc::imuPositionIns::positionLongitude->get()
-            ),
-
-            keyValuePair(
-                    "Position Altutude", 
-                    dbc::imuPositionIns::positionAltutude->get()
-            ),
-
-            keyValuePair(
-                    "X Axis Velocity", 
-                    dbc::imuVelocity::xAxisVelocity->get()
-            ),
-
-            keyValuePair(
-                    "Y Axis Velocity", 
-                    dbc::imuVelocity::yAxisVelocity->get()
-            ),
-
-            keyValuePair(
-                    "Z Axis Velocity", 
-                    dbc::imuVelocity::zAxisVelocity->get()
-            ),
-
-            keyValuePair(
-                    "X Axis Magnetometer", 
-                    dbc::imuMag::xAxisMagnetometer->get()
-            ),
-
-            keyValuePair(
-                    "Y Axis Magnetometer", 
-                    dbc::imuMag::yAxisMagnetometer->get()
-            ),
-
-            keyValuePair(
-                    "Z Axis Magnetometer", 
-                    dbc::imuMag::zAxisMagnetometer->get()
-            ),
-
-            keyValuePair(
-                    "Temperature", 
-                    dbc::imuPresTemp::temperature->get()
-            ),
-
-            keyValuePair(
-                    "Pressure", 
-                    dbc::imuPresTemp::pressure->get()
-            ),
-
-            keyValuePair(
-                    "No G X Axis Acceleration", 
-                    dbc::imuAccelerationNoG::noGXAxisAcceleration->get()
-            ),
-
-            keyValuePair(
-                    "No G Y Axis Acceleration", 
-                    dbc::imuAccelerationNoG::noGYAxisAcceleration->get()
-            ),
-
-            keyValuePair(
-                    "No G Z Axis Acceleration", 
-                    dbc::imuAccelerationNoG::noGZAxisAcceleration->get()
-            ),
-
-            keyValuePair(
-                    "INS Mode", 
-                    dbc::imuInsStatus::insMode->get()
-            ),
-
-            keyValuePair(
-                    "GNSS Fix", 
-                    dbc::imuInsStatus::gnssFix->get()
-            ),
-
-            keyValuePair(
-                    "INS Error", 
-                    dbc::imuInsStatus::insError->get()
-            ),
-
-            keyValuePair(
-                    "GNSS Heading INS", 
-                    dbc::imuInsStatus::gnssHeadingIns->get()
-            ),
-
-            keyValuePair(
-                    "GNSS Compass", 
-                    dbc::imuInsStatus::gnssCompass->get()
-            ),
-
-            keyValuePair(
-                    "UTC Year", 
-                    dbc::imuUtcTime::utcYear->get()
-            ),
-
-            keyValuePair(
-                    "UTC Month", 
-                    dbc::imuUtcTime::utcMonth->get()
-            ),
-
-            keyValuePair(
-                    "UTC Day", 
-                    dbc::imuUtcTime::utcDay->get()
-            ),
-
-            keyValuePair(
-                    "UTC Hour", 
-                    dbc::imuUtcTime::utcHour->get()
-            ),
-
-            keyValuePair(
-                    "UTC Minutes", 
-                    dbc::imuUtcTime::utcMinutes->get()
-            ),
-
-            keyValuePair(
-                    "UTC Seconds", 
-                    dbc::imuUtcTime::utcSeconds->get()
-            ),
-
-            keyValuePair(
-                    "UTC Milliseconds", 
-                    dbc::imuUtcTime::utcMilliseconds->get()
-            ),
-
-            keyValuePair(
-                    "X Axis Delta Velocity", 
-                    dbc::imuDeltaVel::xAxisDeltaVelocity->get()
-            ),
-
-            keyValuePair(
-                    "Y Axis Delta Velocity", 
-                    dbc::imuDeltaVel::yAxisDeltaVelocity->get()
-            ),
-
-            keyValuePair(
-                    "Z Axis Delta Velocity", 
-                    dbc::imuDeltaVel::zAxisDeltaVelocity->get()
-            )
-        );
-        // clang-format on
-    }
-
-    okay::UIElement buildTelemetry() {
-        // clang-format off
-        return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("Telemetry Faults"),
-            keyValuePair(
-                    "RTC Hour", 
-                    dbc::telemetryRtcTime::rtcHour->get()
-            ),
-
-            keyValuePair(
-                    "RTC Minute", 
-                    dbc::telemetryRtcTime::rtcMinute->get()
-            ),
-
-            keyValuePair(
-                    "RTC Second", 
-                    dbc::telemetryRtcTime::rtcSecond->get()
-            ),
-
-            keyValuePair(
-                    "RTC Subsecond", 
-                    dbc::telemetryRtcTime::rtcSubsecond->get()
-            ),
-
-            keyValuePair(
-                    "RTC Year", 
-                    dbc::telemetryRtcDate::rtcYear->get()
-            ),
-
-            keyValuePair(
-                    "RTC Month", 
-                    dbc::telemetryRtcDate::rtcMonth->get()
-            ),
-
-            keyValuePair(
-                    "RTC Day", 
-                    dbc::telemetryRtcDate::rtcDay->get()
-            ),
-
-            keyValuePair(
-                    "RTC Weekday", 
-                    dbc::telemetryRtcDate::rtcWeekday->get()
-            ),
-
-            keyValuePair(
-                    "Miles Driven", 
-                    dbc::telemetryOdometer::milesDriven->get()
-            ),
-
-            keyValuePair(
-                    "Log File", 
-                    dbc::telemetryStatus::logFile->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("PDM"),
-            keyValuePair(
-                    "Gen Amps", 
-                    dbc::pdmCurrent::genAmps->get()
-            ),
-
-            keyValuePair(
-                    "Front Fan Amps", 
-                    dbc::pdmCurrent::frontFanAmps->get()
-            ),
-
-            keyValuePair(
-                    "Rear Fan Amps", 
-                    dbc::pdmCurrent::rearFanAmps->get()
-            ),
-
-            keyValuePair(
-                    "Front Pump Amps", 
-                    dbc::pdmCurrent::frontPumpAmps->get()
-            ),
-
-            keyValuePair(
-                    "Rear Pump Amps", 
-                    dbc::pdmCurrent::rearPumpAmps->get()
-            ),
-
-            keyValuePair(
-                    "Bat Volt", 
-                    dbc::pdmBatVolt::batVolt->get()
-            ),
-
-            keyValuePair(
-                    "Low Bat Volt Warning", 
-                    dbc::pdmBatVolt::lowBatVoltWarning->get()
-            ),
-
-            keyValuePair(
-                    "Danger Bat Volt Warning", 
-                    dbc::pdmBatVolt::dangerBatVoltWarning->get()
-            ),
-
-            keyValuePair(
-                    "Coolant 1 Volt", 
-                    dbc::pdmCoolant::coolant1Volt->get()
-            ),
-
-            keyValuePair(
-                    "Coolant 2 Volt", 
-                    dbc::pdmCoolant::coolant2Volt->get()
-            ),
-
-            keyValuePair(
-                    "Coolant 3 Volt", 
-                    dbc::pdmCoolant::coolant3Volt->get()
-            )
-        );
-        // clang-format on
-    }
+    } 
 
     template <typename T>
     inline okay::UIElement keyValuePair(const std::string& key, const T& value) {

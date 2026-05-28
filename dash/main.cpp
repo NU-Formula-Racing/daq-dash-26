@@ -3,7 +3,8 @@
 #include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
 #include "ui/error_page.hpp"
-#include "ui/daq_debug_page.hpp"
+#include "ui/brokers_debug_page.hpp"
+#include "ui/imu_pdm_tlm_debug_page.hpp"
 #include "ui/page.hpp"
 
 #include <okay/okay.hpp>
@@ -56,9 +57,12 @@ int main() {
                 return s_debugPageActive || dash::CarState::hardFaultPresent();
             })
             .withPriority(1),
-        dash::PageEntry::create(std::make_unique<dash::DAQDebugPage>())
+        dash::PageEntry::create(std::make_unique<dash::BrokersDebugPage>())
             .activeWhen([]() { return true; })
-            .withPriority(100)
+            .withPriority(100),
+        dash::PageEntry::create(std::make_unique<dash::IMUPDMTLMDebugPage>())
+            .activeWhen([]() { return true; })
+            .withPriority(1000)
         );
 
     // attach an interrupt to exit the program on ctrl c
@@ -76,8 +80,6 @@ int main() {
     okay::registerBuiltinComponentsAndSystems();
     okay::ecs::registerComponent<dash::RotateComponent>();
     okay::ecs::registerSystem(std::make_unique<dash::RotateSystem>());
-
-    dbc::bmsStatus::imdState->set(1);
 
     game.run();
 

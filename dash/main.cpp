@@ -5,6 +5,7 @@
 #include "ui/drive_page.hpp"
 #include "ui/error_page.hpp"
 #include "ui/page.hpp"
+#include "ui/inverter_page.hpp"
 #include "ui/shared_elements.hpp"
 
 #include <okay/okay.hpp>
@@ -68,7 +69,13 @@ int main() {
             .activeWhen([]() {
                 return s_debugPageActive || dash::CarState::hardFaultPresent();
             })
-            .withPriority(1));
+            .withPriority(1),
+        dash::PageEntry::create(std::make_unique<dash::InverterPage>())
+            .activeWhen(
+                []() { return true; }
+            )
+            .withPriority(100)
+        );
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);

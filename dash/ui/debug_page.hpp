@@ -1,5 +1,6 @@
 #ifndef __DEBUG_PAGE_H__
 #define __DEBUG_PAGE_H__
+
 #include "okay/core/ui/builder.hpp"
 #include "okay/core/ui/element.hpp"
 #include "page.hpp"

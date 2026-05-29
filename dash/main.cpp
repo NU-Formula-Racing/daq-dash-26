@@ -1,3 +1,4 @@
+#include "okay/core/ecs/ecs.hpp"
 #include "ui/car_state.hpp"
 #include "ui/components/rotate.hpp"
 #include "ui/debug_page.hpp"
@@ -6,6 +7,7 @@
 #include "ui/brokers_debug_page.hpp"
 #include "ui/imu_pdm_tlm_debug_page.hpp"
 #include "ui/page.hpp"
+#include "ui/shared_elements.hpp"
 
 #include <okay/okay.hpp>
 
@@ -22,8 +24,11 @@
 static void __exitSignal(int sig);
 
 static bool s_debugPageActive{false};
+static okay::ECSEntity s_performanceUIEntity;
 
 static dash::Button downButton{20};
+inline dash::Button leftButton{16};
+inline dash::Button rightButton{12};
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
@@ -39,6 +44,15 @@ int main() {
 
     downButton.onDown([]() {
         s_debugPageActive = !s_debugPageActive;
+    });
+
+    leftButton.onDown([]() {
+        if (s_performanceUIEntity.isValid()) {
+            s_performanceUIEntity.destroy();
+        } else {
+            s_performanceUIEntity =
+                okay::ecs::uiEntity(LAMBDA_WRAP(dash::SharedElements::get().buildPerformanceUI), 4);
+        }
     });
 
     std::unique_ptr<dash::PageManager> pageManager = std::make_unique<dash::PageManager>(

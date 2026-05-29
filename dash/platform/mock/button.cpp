@@ -10,7 +10,7 @@
 namespace dash {
 
 static std::unordered_map<int, int> s_gpioKeyMap = {
-    {20, GLFW_KEY_W} {16, GLFW_KEY_A}, {20, GLFW_KEY_S}, {12, GLFW_KEY_D}, {23, GLFW_KEY_SPACE}};
+    {20, GLFW_KEY_W}, {16, GLFW_KEY_A}, {20, GLFW_KEY_S}, {12, GLFW_KEY_D}, {23, GLFW_KEY_SPACE}};
 
 struct ButtonContext {
     bool isDown = false;

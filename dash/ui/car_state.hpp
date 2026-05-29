@@ -12,12 +12,12 @@ class CarState {
    public:
     enum class ECUState { IDLE, PRECHARGE, NEUTRAL, DRIVE };
 
-    static bool driveFaultPresent(){
-        const int errorCode = 0x03;   
+    static bool driveFaultPresent() {
+        const int errorCode = 0x03;
         bool driveFaultError = dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode ||
-                              dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode ||
-                              dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
-        
+                               dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode ||
+                               dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
+
         return driveFaultError;
     }
 

@@ -14,14 +14,12 @@
 
 namespace ui = okay::ui;
 
-
 #ifndef BIND_TO_THIS
 #define BIND_TO_THIS(fnName)   \
     [this]() {                 \
         return this->fnName(); \
     }
 #endif
-
 
 namespace dash {
 
@@ -417,7 +415,6 @@ class BrokersDebugPage : public IPage {
 
    private:
     std::vector<okay::ECSEntity> _entities;
-
 };
 
 }  // namespace dash

@@ -1,9 +1,8 @@
+#include "ui/brokers_debug_page.hpp"
 #include "ui/car_state.hpp"
 #include "ui/components/rotate.hpp"
 #include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
-#include "ui/error_page.hpp"
-#include "ui/brokers_debug_page.hpp"
 #include "ui/imu_pdm_tlm_debug_page.hpp"
 #include "ui/inputs.hpp"
 #include "ui/page.hpp"
@@ -37,13 +36,21 @@ int main() {
     };
 
     std::unique_ptr<PageManager> pageManager = std::make_unique<PageManager>(
+        // Drive Page
         PageEntry::create(std::make_unique<DrivePage>()).withPriority(0).withPageNumber(0),
+        // Debug/Error Page
         PageEntry::create(std::make_unique<DebugPage>())
             .forceOverrideWhen([]() {
                 return CarState::hardFaultPresent();
             })
             .withPriority(1)
-            .withPageNumber(1));
+            .withPageNumber(1),
+        // Brokers Page
+        PageEntry::create(std::make_unique<BrokersDebugPage>()).withPriority(0).withPageNumber(2),
+        // Misc LV Page
+        PageEntry::create(std::make_unique<IMUPDMTLMDebugPage>())
+            .withPriority(0)
+            .withPageNumber(3));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);

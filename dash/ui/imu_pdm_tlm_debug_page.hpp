@@ -14,14 +14,12 @@
 
 namespace ui = okay::ui;
 
-
 #ifndef BIND_TO_THIS
 #define BIND_TO_THIS(fnName)   \
     [this]() {                 \
         return this->fnName(); \
     }
 #endif
-
 
 namespace dash {
 
@@ -61,7 +59,7 @@ class IMUPDMTLMDebugPage : public IPage {
                             buildIMU1()
                         ),
                         buildContainer()(
-                            ui::h1("IMU (cont'd)"), // both back brokers
+                            ui::h1("IMU (CONT.)"), // both back brokers
                             buildIMU2()
                         ),
                         buildContainer()(
@@ -94,99 +92,99 @@ class IMUPDMTLMDebugPage : public IPage {
     okay::UIElement buildIMU1() {
         // clang-format off
         return ui::growbox(okay::UIAxis::Vertical) (
-        ui::h2("IMU"),  
+        ui::h2("IMU"),
         keyValuePair(
-                    "X Axis Acceleration", 
+                    "X Axis Acceleration",
                     dbc::imuAcceleration::xAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "Y Axis Acceleration", 
+                    "Y Axis Acceleration",
                     dbc::imuAcceleration::yAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "Z Axis Acceleration", 
+                    "Z Axis Acceleration",
                     dbc::imuAcceleration::zAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "Yaw", 
+                    "Yaw",
                     dbc::imuYawPitchRoll::yaw->get()
             ),
 
             keyValuePair(
-                    "Pitch", 
+                    "Pitch",
                     dbc::imuYawPitchRoll::pitch->get()
             ),
 
             keyValuePair(
-                    "Roll", 
+                    "Roll",
                     dbc::imuYawPitchRoll::roll->get()
             ),
 
             keyValuePair(
-                    "X Axis Angular Rate", 
+                    "X Axis Angular Rate",
                     dbc::imuAngularRate::xAxisAngularRate->get()
             ),
 
             keyValuePair(
-                    "Y Axis Angular Rate", 
+                    "Y Axis Angular Rate",
                     dbc::imuAngularRate::yAxisAngularRate->get()
             ),
 
             keyValuePair(
-                    "Z Axis Angular Rate", 
+                    "Z Axis Angular Rate",
                     dbc::imuAngularRate::zAxisAngularRate->get()
             ),
 
             keyValuePair(
-                    "Position Latitude", 
+                    "Position Latitude",
                     dbc::imuPositionIns::positionLatitude->get()
             ),
 
             keyValuePair(
-                    "Position Longitude", 
+                    "Position Longitude",
                     dbc::imuPositionIns::positionLongitude->get()
             ),
 
             keyValuePair(
-                    "Position Altutude", 
+                    "Position Altutude",
                     dbc::imuPositionIns::positionAltutude->get()
             ),
 
             keyValuePair(
-                    "X Axis Velocity", 
+                    "X Axis Velocity",
                     dbc::imuVelocity::xAxisVelocity->get()
             ),
 
             keyValuePair(
-                    "Y Axis Velocity", 
+                    "Y Axis Velocity",
                     dbc::imuVelocity::yAxisVelocity->get()
             ),
 
             keyValuePair(
-                    "Z Axis Velocity", 
+                    "Z Axis Velocity",
                     dbc::imuVelocity::zAxisVelocity->get()
             ),
 
             keyValuePair(
-                    "X Axis Magnetometer", 
+                    "X Axis Magnetometer",
                     dbc::imuMag::xAxisMagnetometer->get()
             ),
 
             keyValuePair(
-                    "Y Axis Magnetometer", 
+                    "Y Axis Magnetometer",
                     dbc::imuMag::yAxisMagnetometer->get()
             ),
 
             keyValuePair(
-                    "Z Axis Magnetometer", 
+                    "Z Axis Magnetometer",
                     dbc::imuMag::zAxisMagnetometer->get()
             ),
 
             keyValuePair(
-                    "Temperature", 
+                    "Temperature",
                     dbc::imuPresTemp::temperature->get()
             )
         );
@@ -198,221 +196,221 @@ class IMUPDMTLMDebugPage : public IPage {
         return ui::growbox(okay::UIAxis::Vertical) (
         ui::h2("IMU (cont'd)"),
         keyValuePair(
-                    "Pressure", 
+                    "Pressure",
                     dbc::imuPresTemp::pressure->get()
             ),
 
             keyValuePair(
-                    "No G X Axis Acceleration", 
+                    "No G X Axis Acceleration",
                     dbc::imuAccelerationNoG::noGXAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "No G Y Axis Acceleration", 
+                    "No G Y Axis Acceleration",
                     dbc::imuAccelerationNoG::noGYAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "No G Z Axis Acceleration", 
+                    "No G Z Axis Acceleration",
                     dbc::imuAccelerationNoG::noGZAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "INS Mode", 
+                    "INS Mode",
                     dbc::imuInsStatus::insMode->get()
             ),
 
             keyValuePair(
-                    "GNSS Fix", 
+                    "GNSS Fix",
                     dbc::imuInsStatus::gnssFix->get()
             ),
 
             keyValuePair(
-                    "INS Error", 
+                    "INS Error",
                     dbc::imuInsStatus::insError->get()
             ),
 
             keyValuePair(
-                    "GNSS Heading INS", 
+                    "GNSS Heading INS",
                     dbc::imuInsStatus::gnssHeadingIns->get()
             ),
 
             keyValuePair(
-                    "GNSS Compass", 
+                    "GNSS Compass",
                     dbc::imuInsStatus::gnssCompass->get()
             ),
 
             keyValuePair(
-                    "UTC Year", 
+                    "UTC Year",
                     dbc::imuUtcTime::utcYear->get()
             ),
 
             keyValuePair(
-                    "UTC Month", 
+                    "UTC Month",
                     dbc::imuUtcTime::utcMonth->get()
             ),
 
             keyValuePair(
-                    "UTC Day", 
+                    "UTC Day",
                     dbc::imuUtcTime::utcDay->get()
             ),
 
             keyValuePair(
-                    "UTC Hour", 
+                    "UTC Hour",
                     dbc::imuUtcTime::utcHour->get()
             ),
 
             keyValuePair(
-                    "UTC Minutes", 
+                    "UTC Minutes",
                     dbc::imuUtcTime::utcMinutes->get()
             ),
 
             keyValuePair(
-                    "UTC Seconds", 
+                    "UTC Seconds",
                     dbc::imuUtcTime::utcSeconds->get()
             ),
 
             keyValuePair(
-                    "UTC Milliseconds", 
+                    "UTC Milliseconds",
                     dbc::imuUtcTime::utcMilliseconds->get()
             ),
 
             keyValuePair(
-                    "X Axis Delta Velocity", 
+                    "X Axis Delta Velocity",
                     dbc::imuDeltaVel::xAxisDeltaVelocity->get()
             ),
 
             keyValuePair(
-                    "Y Axis Delta Velocity", 
+                    "Y Axis Delta Velocity",
                     dbc::imuDeltaVel::yAxisDeltaVelocity->get()
             ),
 
             keyValuePair(
-                    "Z Axis Delta Velocity", 
+                    "Z Axis Delta Velocity",
                     dbc::imuDeltaVel::zAxisDeltaVelocity->get()
             )
         );
         // clang-format off
-    } 
+    }
 
     okay::UIElement buildTelemetry() {
         // clang-format off
         return ui::growbox(okay::UIAxis::Vertical) (
         ui::h2("Telemetry"),
         keyValuePair(
-                    "RTC Hour", 
+                    "RTC Hour",
                     dbc::telemetryRtcTime::rtcHour->get()
             ),
 
             keyValuePair(
-                    "RTC Minute", 
+                    "RTC Minute",
                     dbc::telemetryRtcTime::rtcMinute->get()
             ),
 
             keyValuePair(
-                    "RTC Second", 
+                    "RTC Second",
                     dbc::telemetryRtcTime::rtcSecond->get()
             ),
 
             keyValuePair(
-                    "RTC Subsecond", 
+                    "RTC Subsecond",
                     dbc::telemetryRtcTime::rtcSubsecond->get()
             ),
 
             keyValuePair(
-                    "RTC Year", 
+                    "RTC Year",
                     dbc::telemetryRtcDate::rtcYear->get()
             ),
 
             keyValuePair(
-                    "RTC Month", 
+                    "RTC Month",
                     dbc::telemetryRtcDate::rtcMonth->get()
             ),
 
             keyValuePair(
-                    "RTC Day", 
+                    "RTC Day",
                     dbc::telemetryRtcDate::rtcDay->get()
             ),
 
             keyValuePair(
-                    "RTC Weekday", 
+                    "RTC Weekday",
                     dbc::telemetryRtcDate::rtcWeekday->get()
             ),
 
             keyValuePair(
-                    "Miles Driven", 
+                    "Miles Driven",
                     dbc::telemetryOdometer::milesDriven->get()
             ),
 
             keyValuePair(
-                    "Log File", 
+                    "Log File",
                     dbc::telemetryStatus::logFile->get()
             )
         );
         // clang-format off
-    } 
+    }
 
     okay::UIElement buildPDM() {
         // clang-format off
         return ui::growbox(okay::UIAxis::Vertical) (
         ui::h2("PDM"),
         keyValuePair(
-                "Gen Amps", 
+                "Gen Amps",
                 dbc::pdmCurrent::genAmps->get()
         ),
 
         keyValuePair(
-                "Front Fan Amps", 
+                "Front Fan Amps",
                 dbc::pdmCurrent::frontFanAmps->get()
         ),
 
         keyValuePair(
-                "Rear Fan Amps", 
+                "Rear Fan Amps",
                 dbc::pdmCurrent::rearFanAmps->get()
         ),
 
         keyValuePair(
-                "Front Pump Amps", 
+                "Front Pump Amps",
                 dbc::pdmCurrent::frontPumpAmps->get()
         ),
 
         keyValuePair(
-                "Rear Pump Amps", 
+                "Rear Pump Amps",
                 dbc::pdmCurrent::rearPumpAmps->get()
         ),
 
         keyValuePair(
-                "Bat Volt", 
+                "Bat Volt",
                 dbc::pdmBatVolt::batVolt->get()
         ),
 
         keyValuePair(
-                "Low Bat Volt Warning", 
+                "Low Bat Volt Warning",
                 dbc::pdmBatVolt::lowBatVoltWarning->get()
         ),
 
         keyValuePair(
-                "Danger Bat Volt Warning", 
+                "Danger Bat Volt Warning",
                 dbc::pdmBatVolt::dangerBatVoltWarning->get()
         ),
 
         keyValuePair(
-                "Coolant 1 Volt", 
+                "Coolant 1 Volt",
                 dbc::pdmCoolant::coolant1Volt->get()
         ),
 
         keyValuePair(
-                "Coolant 2 Volt", 
+                "Coolant 2 Volt",
                 dbc::pdmCoolant::coolant2Volt->get()
         ),
 
         keyValuePair(
-                "Coolant 3 Volt", 
+                "Coolant 3 Volt",
                 dbc::pdmCoolant::coolant3Volt->get()
         )
         );
         // clang-format off
-    } 
+    }
 
     template <typename T>
     inline okay::UIElement keyValuePair(const std::string& key, const T& value) {
@@ -451,7 +449,6 @@ class IMUPDMTLMDebugPage : public IPage {
 
    private:
     std::vector<okay::ECSEntity> _entities;
-
 };
 
 }  // namespace dash

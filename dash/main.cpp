@@ -1,6 +1,7 @@
 #include "ui/brokers_debug_page.hpp"
 #include "ui/car_state.hpp"
 #include "ui/components/rotate.hpp"
+#include "ui/config_page.hpp"
 #include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
 #include "ui/imu_pdm_tlm_debug_page.hpp"
@@ -36,6 +37,8 @@ int main() {
     };
 
     std::unique_ptr<PageManager> pageManager = std::make_unique<PageManager>(
+        // Config page
+        PageEntry::create(std::make_unique<ConfigPage>()).withPriority(1).withPageNumber(0),
         // Drive Page
         PageEntry::create(std::make_unique<DrivePage>()).withPriority(0).withPageNumber(0),
         // Debug/Error Page

@@ -1,6 +1,7 @@
 #ifndef __CONFIG_PAGE_H__
 #define __CONFIG_PAGE_H__
 
+#include "okay/core/ui/builder.hpp"
 #include "page.hpp"
 #include "shared_elements.hpp"
 #include "style.hpp"
@@ -25,6 +26,14 @@ class ConfigPage : public IPage {
    public:
     ConfigPage() {}
 
+    struct SliderSettings {
+        const std::string& sliderName;
+        uint64_t minValue;
+        uint64_t maxValue;
+        uint64_t currentValue;
+        std::function<void(uint64_t)> setValue;
+    };
+
     void initializePage() {
         okay::Engine.logger.debug("Creating entities for Error page!");
 
@@ -36,359 +45,52 @@ class ConfigPage : public IPage {
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildDebug), 3),
+            okay::ecs::uiEntity(BIND_TO_THIS(buildConfig), 3),
         };
     }
 
-    okay::UIElement buildDebug() {
+    okay::UIElement buildConfig() {
         // clang-format off
         return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)
-            .axisSet(okay::UIAxis::Vertical)(
+            .axisSet(okay::UIAxis::Vertical)
+            .leftMarginSet(40)
+            .rightMarginSet(40)
+            .childSpacingSet(10) (
                 ui::spacer(),
-                ui::box()
-                    .axisSet(okay::UIAxis::Horizontal)
-                    .childSpacingSet(10)
-                    .widthGrow()
-                    .marginSet(10)
-                    .bottomMarginSet(20) (
-                        ui::spacer(),
-                        buildContainer()(
-                            ui::h1("Configuration Page!"),
-                            buildVCU()
-                        ),
-                        buildContainer()(
-                            ui::h1("BMS"),
-                            buildBMS()
-                        ),
-                        buildContainer()(
-                            ui::h1("INVERTER"),
-                            buildInverter()
-                        ),
-                        buildContainer()(
-                            ui::h1("FAULTS"),
-                            buildFaults()
-                        ),
-                        ui::spacer()
-                    ),
+                // Max current request
+                buildSlider(SliderSettings {
+                   .sliderName = "Max Current Request",
+                   .minValue = 0,
+                   .maxValue = 360,
+                   .currentValue = 10,
+                   .setValue = [](uint64_t value) {
+                       okay::Engine.logger.debug("Setting value to {}", value);
+                   }
+                }, true),
+
+                // Misc
+                buildSlider(SliderSettings {
+                   .sliderName = "Misc",
+                   .minValue = 0,
+                   .maxValue = 360,
+                   .currentValue = 10,
+                   .setValue = [](uint64_t value) {
+                       okay::Engine.logger.debug("Setting value to {}", value);
+                   }
+                }, true),
+
                 ui::spacer()
             );
         // clang-format on
     }
 
-    okay::UIElement buildContainer() {
-        return ui::slot()
-            .widthFixed(180)
-            .heightFixed(350)
-            .axisSet(okay::UIAxis::Vertical)
-            .borderColorSet(colors::northwesternPurple)
-            .borderRadiusSet(10)
-            .borderWidthSet(5)
-            .paddingSet(10)
-            .backgroundColorSet(glm::vec4(0.0f, 0.0f, 0.0f, 0.5f));
-    }
+    okay::UIElement buildSlider(SliderSettings settings, bool isActive) {
+        return ui::box()
+            .backgroundImageSet(*sliderBg)
+            .backgroundColorSet(colors::white)
+            .axisSet(okay::UIAxis::Vertical)(
 
-    okay::UIElement buildVCU() {
-        // clang-format off
-        return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("Drive/Driver Interface"),
-            keyValuePair(
-                "Drive Status",
-                dbc::ecuDriveStatus::driveState->get()
-            ),
-            keyValuePair(
-                "APPS1",
-                dbc::ecuThrottle::apps1Throttle->get()
-            ),
-            keyValuePair(
-                "APPS2",
-                dbc::ecuThrottle::apps2Throttle->get()
-            ),
-            keyValuePair(
-                "Font Brake Pressure",
-                dbc::ecuBrake::frontBrakePressure->get()
-            ),
-            keyValuePair(
-                "Rear Brake Pressure",
-                dbc::ecuBrake::rearBrakePressure->get()
-            ),
-            keyValuePair(
-                "Brake Pressed",
-                dbc::ecuBrake::brakePressed->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("Commands"),
-            keyValuePair(
-                "Set Current (Rear)",
-                dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get()
-            ),
-            keyValuePair(
-                "Set Current (Left)",
-                dbc::ecuSetCurrentFrontLeftInverter::setCurrentFrontLeftInverter->get()
-            ),
-            keyValuePair(
-                "Set Current (Right)",
-                dbc::ecuSetCurrentBrakeFrontRightInverter::setCurrentBrakeFrontRightInverter->get()
-            ),
-            keyValuePair(
-                "BMS Command",
-                dbc::ecuBmsCommandMessage::bmsCommand->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("VCU Implausibilities"),
-            keyErrorValuePair(
-                "Implausibility Present",
-                dbc::ecuImplausibility::implausibilityPresent->get()
-            ),
-            keyErrorValuePair(
-                "APPS Disagreement",
-                dbc::ecuImplausibility::appssDisagreementImp->get()
-            ),
-            keyErrorValuePair(
-                "BPPC Implausibility",
-                dbc::ecuImplausibility::bppcImp->get()
-            ),
-            keyErrorValuePair(
-                "Brake Invalid",
-                dbc::ecuImplausibility::brakeInvalidImp->get()
-            ),
-            keyErrorValuePair(
-                "APPS Invalid",
-                dbc::ecuImplausibility::appssInvalidImp->get()
-            )
-        );
-        // clang-format off
-    }
-
-    okay::UIElement buildBMS() {
-        // clang-format off
-        return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("Packboard"),
-            keyValuePair(
-                "Battery Current",
-                dbc::bmsPackboard::batteryCurrent->get()
-            ),
-            keyValuePair(
-                "Packboard Voltage",
-                dbc::bmsPackboard::packboardVoltage->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("Daughterboard"),
-            keyValuePair(
-                "Battery Voltage",
-                dbc::bmsDaughterboard::batteryVoltage->get()
-            ),
-            keyValuePair(
-                "Max Cell Voltage",
-                dbc::bmsDaughterboard::maxCellVoltage->get()
-            ),
-            keyValuePair(
-                "Min Cell Voltage",
-                dbc::bmsDaughterboard::minCellVoltage->get()
-            ),
-            keyValuePair(
-                "Battery Temperature",
-                dbc::bmsDaughterboard::batteryTemperature->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("Status"),
-            keyValuePair(
-                "SOC",
-                dbc::bmsStatus::soc->get()
-            ),
-            keyValuePair(
-                "BMS State",
-                dbc::bmsStatus::bmsState->get()
-            ),
-            keyValuePair(
-                "IMD State",
-                dbc::bmsStatus::imdState->get()
-            ),
-            keyValuePair(
-                "Total PEC Failures",
-                dbc::bmsStatus::totalPecFailures->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("Timeouts"),
-            keyErrorValuePair(
-                "VCU Timeout",
-                dbc::bmsStatus::vcuTimeout->get()
-            ),
-            keyErrorValuePair(
-                "Inverter Timeout",
-                dbc::bmsStatus::inverterTimeout->get()
-            ),
-            keyErrorValuePair(
-                "Charger Timeout",
-                dbc::bmsStatus::chargerTimeout->get()
-            )
-        );
-        // clang-format on
-    }
-
-    okay::UIElement buildInverter() {
-        // clang-format off
-        return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("Rear Motor Status"),
-            keyValuePair(
-                "RPM",
-                dbc::rearInverterMotorStatus::rpm->get()
-            ),
-            keyValuePair(
-                "Motor Current",
-                dbc::rearInverterMotorStatus::motorCurrent->get()
-            ),
-            keyValuePair(
-                "DC Voltage",
-                dbc::rearInverterMotorStatus::dcVoltage->get()
-            ),
-            keyValuePair(
-                "DC Current",
-                dbc::rearInverterMotorStatus::dcCurrent->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("Rear Temperature"),
-            keyValuePair(
-                "IGBT Temp",
-                dbc::rearInverterTempStatus::igbtTemp->get()
-            ),
-            keyValuePair(
-                "Motor Temp",
-                dbc::rearInverterTempStatus::motorTemp->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("Rear Power"),
-            keyValuePair(
-                "Ah Drawn",
-                dbc::rearInverterCurrentDraw::ahDrawn->get()
-            ),
-            keyValuePair(
-                "Ah Charged",
-                dbc::rearInverterCurrentDraw::ahCharged->get()
-            ),
-            keyValuePair(
-                "Wh Drawn",
-                dbc::rearInverterPowerDraw::whDrawn->get()
-            ),
-            keyValuePair(
-                "Wh Charged",
-                dbc::rearInverterPowerDraw::whCharged->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("Rear Inverter"),
-            keyValuePair(
-                "Fault Code",
-                dbc::rearInverterFaultStatus::faultCode->get()
-            )
-        );
-        // clang-format on
-    }
-
-    okay::UIElement buildFaults() {
-        // clang-format off
-        return ui::growbox(okay::UIAxis::Vertical) (
-            ui::h2("BMS Faults"),
-            keyErrorValuePair(
-                "Internal Fault Summary",
-                dbc::bmsStatus::internalfaultSummary->get()
-            ),
-            keyErrorValuePair(
-                "Undervoltage Fault",
-                dbc::bmsStatus::undervoltageFault->get()
-            ),
-            keyErrorValuePair(
-                "Overvoltage Fault",
-                dbc::bmsStatus::overvoltageFault->get()
-            ),
-            keyErrorValuePair(
-                "Undertemperature Fault",
-                dbc::bmsStatus::undertemperatureFault->get()
-            ),
-            keyErrorValuePair(
-                "Overtemperature Fault",
-                dbc::bmsStatus::overtemperatureFault->get()
-            ),
-            keyErrorValuePair(
-                "Open Wire Fault",
-                dbc::bmsStatus::openWireFault->get()
-            ),
-            keyErrorValuePair(
-                "Open Wire Temp Fault",
-                dbc::bmsStatus::openWireTempFault->get()
-            ),
-            keyErrorValuePair(
-                "PEC Fault",
-                dbc::bmsStatus::pecFault->get()
-            ),
-            keyErrorValuePair(
-                "Shutdown Open",
-                dbc::bmsStatus::shutdownOpen->get()
-            ),
-
-            ui::vspacer(10),
-            ui::h2("BSPD"),
-            keyErrorValuePair(
-                "High Current",
-                dbc::ecuBspdStatus::highCurrent->get()
-            ),
-            keyErrorValuePair(
-                "Hard Brake",
-                dbc::ecuBspdStatus::hardBrake->get()
-            ),
-            keyErrorValuePair(
-                "Brake Error",
-                dbc::ecuBspdStatus::brakeError->get()
-            ),
-            keyErrorValuePair(
-                "Current Error",
-                dbc::ecuBspdStatus::currentError->get()
-            ),
-            keyErrorValuePair(
-                "BSPD Error",
-                dbc::ecuBspdStatus::bspdErrorB->get()
-            ),
-            keyErrorValuePair(
-                "BSPD Sensor Error",
-                dbc::ecuBspdStatus::bspdSensErrorB->get()
-            )
-        );
-        // clang-format on
-    }
-
-    template <typename T>
-    inline okay::UIElement keyValuePair(const std::string& key, const T& value) {
-        // clang-format off
-        return ui::slot(okay::UIAxis::Horizontal)
-            .widthGrow() (
-                ui::h3(key),
-                ui::spacer(),
-                ui::h3(std::format("{}", value))
             );
-        // clang-format on
-    }
-
-    inline okay::UIElement keyErrorValuePair(const std::string& key, bool value) {
-        if (value == true) {
-            // clang-format off
-            return ui::slot(okay::UIAxis::Horizontal)
-                .widthGrow() (
-                    ui::h3(key)
-                        .textColorSet(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-                    ui::spacer(),
-                    ui::h3(std::format("{}", value))
-                        .textColorSet(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
-                );
-            // clang-format on
-        }
-
-        return keyValuePair(key, value);
     }
 
     void closePage() {
@@ -399,10 +101,9 @@ class ConfigPage : public IPage {
 
    private:
     std::vector<okay::ECSEntity> _entities;
-
-    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> bgTexture{
-        "textures/bg_pattern.png"};
-    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> tempFull{"textures/temp_full.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> sliderBg{"textures/slider_bg.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> sliderTop{
+        "textures/slider_top.png"};
 };
 
 }  // namespace dash

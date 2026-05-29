@@ -22,9 +22,7 @@ class CarState {
     }
 
     static bool hardFaultPresent() {
-
         bool hardFaultError = dbc::bmsStatus::internalfaultSummary->get() != 0;
-                        
 
         bool imdError = !(dbc::bmsStatus::imdState->get());
 

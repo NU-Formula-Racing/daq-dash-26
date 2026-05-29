@@ -164,7 +164,7 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 0x20C,ECU_Torque_Status,ECU,Torque_Status,0,8,1,0,0,2,"0: ZERO
 1: ACCEL
 2: REGEN",100,uint8_t
-0x20D,ECU_BSPD_Status,ECU,high_current,0,1,1,0,0,1,"0: Absent
+0x211,ECU_BSPD_Status,ECU,high_current,0,1,1,0,0,1,"0: Absent
 1: Present",,uint8_t
 ,ECU_BSPD_Status,ECU,hard_brake,1,1,1,0,0,1,"0: Absent
 1: Present",,uint8_t
@@ -489,12 +489,14 @@ Protocol violation error locations (data[3]):
 ,BR_Broker_Temp2,DAQ-BR-Wheel,BR_Tire_Temp_5,16,16,0.01,0,0,60,Celcius,1000,float
 ,BR_Broker_Temp2,DAQ-BR-Wheel,BR_Tire_Temp_6,32,16,0.01,0,0,60,Celcius,1000,float
 ,BR_Broker_Temp2,DAQ-BR-Wheel,BR_Tire_Temp_7,48,16,0.01,0,0,60,Celcius,1000,float
-0x538,BR_Broker_Sus,DAQ-BR-Wheel,BR_Strain_Gauge,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t
-,BR_Broker_Sus,DAQ-BR-Wheel,BR_Sus_Pot,32,32,1,0,0,4095,ADC Values,10,uint32_t
+0x538,BR_Broker_Sus_Uncalibrated,DAQ-BR-Wheel,BR_Strain_Gauge_Uncalibrated,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t
+,BR_Broker_Sus_Uncalibrated,DAQ-BR-Wheel,BR_Sus_Pot_Uncalibrated,32,32,1,0,0,4095,ADC Values,10,uint32_t
 0x540,BR_Broker_CAN_Error_Msg,DAQ-BR-Wheel,BR_Strain_Gauge_Error,0,16,1,0,0,1,Bool,1000,int16_t
 ,BR_Broker_CAN_Error_Msg,DAQ-BR-Wheel,BR_Sus_Pot_Error,16,16,1,0,0,1,Bool,1000,int16_t
 ,BR_Broker_CAN_Error_Msg,DAQ-BR-Wheel,BR_Tire_Temp_Error,32,16,1,0,0,1,Bool,1000,int16_t
 ,BR_Broker_CAN_Error_Msg,DAQ-BR-Wheel,BR_Heartbeat_Count,48,16,1,0,0,65536,HAL Tick,1000,int16_t
+0x570,BR_Broker_Sus_Calibrated,DAQ-BR-Wheel,BR_Strain_Gauge_Calibrated,0,32,1,0,-8388608,8388607,lbs,10,float
+,BR_Broker_Sus_Calibrated,DAQ-BR-Wheel,BR_Sus_Pot_Calibrated,32,32,1,0,0,4095,ADC Values,10,float
 0x532,BL_Broker_Temp1,DAQ-BL-Wheel,BL_Tire_Temp_0,0,16,0.01,0,0,60,Celcius,1000,float
 ,BL_Broker_Temp1,DAQ-BL-Wheel,BL_Tire_Temp_1,16,16,0.01,0,0,60,Celcius,1000,float
 ,BL_Broker_Temp1,DAQ-BL-Wheel,BL_Tire_Temp_2,32,16,0.01,0,0,60,Celcius,1000,float
@@ -503,12 +505,14 @@ Protocol violation error locations (data[3]):
 ,BL_Broker_Temp2,DAQ-BL-Wheel,BL_Tire_Temp_5,16,16,0.01,0,0,60,Celcius,1000,float
 ,BL_Broker_Temp2,DAQ-BL-Wheel,BL_Tire_Temp_6,32,16,0.01,0,0,60,Celcius,1000,float
 ,BL_Broker_Temp2,DAQ-BL-Wheel,BL_Tire_Temp_7,48,16,0.01,0,0,60,Celcius,1000,float
-0x53A,BL_Broker_Sus,DAQ-BL-Wheel,BL_Strain_Gauge,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t
-,BL_Broker_Sus,DAQ-BL-Wheel,BL_Sus_Pot,32,32,1,0,0,4095,ADC Values,10,uint32_t
+0x53A,BL_Broker_Sus_Uncalibrated,DAQ-BL-Wheel,BL_Strain_Gauge_Uncalibrated,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t
+,BL_Broker_Sus_Uncalibrated,DAQ-BL-Wheel,BL_Sus_Pot_Uncalibrated,32,32,1,0,0,4095,ADC Values,10,uint32_t
 0x541,BL_Broker_CAN_Error_Msg,DAQ-BL-Wheel,BL_Strain_Gauge_Error,0,16,1,0,0,1,Bool,1000,int16_t
 ,BL_Broker_CAN_Error_Msg,DAQ-BL-Wheel,BL_Sus_Pot_Error,16,16,1,0,0,1,Bool,1000,int16_t
 ,BL_Broker_CAN_Error_Msg,DAQ-BL-Wheel,BL_Tire_Temp_Error,32,16,1,0,0,1,Bool,1000,int16_t
 ,BL_Broker_CAN_Error_Msg,DAQ-BL-Wheel,BL_Heartbeat_Count,48,16,1,0,0,65536,HAL Tick,1000,int16_t
+0x571,BL_Broker_Sus_Calibrated,DAQ-BL-Wheel,BL_Strain_Gauge_Calibrated,0,32,1,0,-8388608,8388607,lbs,10,float
+,BL_Broker_Sus_Calibrated,DAQ-BL-Wheel,BL_Sus_Pot_Calibrated,32,32,1,0,0,4095,ADC Values,10,float
 0x534,FR_Broker_Temp1,DAQ-FR-Wheel,FR_Tire_Temp_0,0,16,0.01,0,0,60,Celcius,1000,float
 ,FR_Broker_Temp1,DAQ-FR-Wheel,FR_Tire_Temp_1,16,16,0.01,0,0,60,Celcius,1000,float
 ,FR_Broker_Temp1,DAQ-FR-Wheel,FR_Tire_Temp_2,32,16,0.01,0,0,60,Celcius,1000,float
@@ -517,12 +521,14 @@ Protocol violation error locations (data[3]):
 ,FR_Broker_Temp2,DAQ-FR-Wheel,FR_Tire_Temp_5,16,16,0.01,0,0,60,Celcius,1000,float
 ,FR_Broker_Temp2,DAQ-FR-Wheel,FR_Tire_Temp_6,32,16,0.01,0,0,60,Celcius,1000,float
 ,FR_Broker_Temp2,DAQ-FR-Wheel,FR_Tire_Temp_7,48,16,0.01,0,0,60,Celcius,1000,float
-0x53C,FR_Broker_Sus,DAQ-FR-Wheel,FR_Strain_Gauge,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t
-,FR_Broker_Sus,DAQ-FR-Wheel,FR_Sus_Pot,32,32,1,0,0,4095,ADC Values,10,uint32_t
+0x53C,FR_Broker_Sus_Uncalibrated,DAQ-FR-Wheel,FR_Strain_Gauge_Uncalibrated,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t
+,FR_Broker_Sus_Uncalibrated,DAQ-FR-Wheel,FR_Sus_Pot_Uncalibrated,32,32,1,0,0,4095,ADC Values,10,uint32_t
 0x542,FR_Broker_CAN_Error_Msg,DAQ-FR-Wheel,FR_Strain_Gauge_Error,0,16,1,0,0,1,Bool,1000,int16_t
 ,FR_Broker_CAN_Error_Msg,DAQ-FR-Wheel,FR_Sus_Pot_Error,16,16,1,0,0,1,Bool,1000,int16_t
 ,FR_Broker_CAN_Error_Msg,DAQ-FR-Wheel,FR_Tire_Temp_Error,32,16,1,0,0,1,Bool,1000,int16_t
 ,FR_Broker_CAN_Error_Msg,DAQ-FR-Wheel,FR_Heartbeat_Count,48,16,1,0,0,65536,HAL Tick,1000,int16_t
+0x572,FR_Broker_Sus_Calibrated,DAQ-FR-Wheel,FR_Strain_Gauge_Calibrated,0,32,1,0,-8388608,8388607,lbs,10,float
+,FR_Broker_Sus_Calibrated,DAQ-FR-Wheel,FR_Sus_Pot_Calibrated,32,32,1,0,0,4095,ADC Values,10,float
 0x536,FL_Broker_Temp1,DAQ-FL-Wheel,FL_Tire_Temp_0,0,16,0.01,0,0,60,Celcius,1000,float
 ,FL_Broker_Temp1,DAQ-FL-Wheel,FL_Tire_Temp_1,16,16,0.01,0,0,60,Celcius,1000,float
 ,FL_Broker_Temp1,DAQ-FL-Wheel,FL_Tire_Temp_2,32,16,0.01,0,0,60,Celcius,1000,float
@@ -531,56 +537,53 @@ Protocol violation error locations (data[3]):
 ,FL_Broker_Temp2,DAQ-FL-Wheel,FL_Tire_Temp_5,16,16,0.01,0,0,60,Celcius,1000,float
 ,FL_Broker_Temp2,DAQ-FL-Wheel,FL_Tire_Temp_6,32,16,0.01,0,0,60,Celcius,1000,float
 ,FL_Broker_Temp2,DAQ-FL-Wheel,FL_Tire_Temp_7,48,16,0.01,0,0,60,Celcius,1000,float
-0x53E,FL_Broker_Sus,DAQ-FL-Wheel,FL_Strain_Gauge,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t
-,FL_Broker_Sus,DAQ-FL-Wheel,FL_Sus_Pot,32,32,1,0,0,4095,ADC Values,10,uint32_t
+0x53E,FL_Broker_Sus_Uncalibrated,DAQ-FL-Wheel,FL_Strain_Gauge_Uncalibrated,0,32,1,0,-8388608,8388607,ADC Values,10,int32_t
+,FL_Broker_Sus_Uncalibrated,DAQ-FL-Wheel,FL_Sus_Pot_Uncalibrated,32,32,1,0,0,4095,ADC Values,10,uint32_t
 0x543,FL_Broker_CAN_Error_Msg,DAQ-FL-Wheel,FL_Strain_Gauge_Error,0,16,1,0,0,1,Bool,1000,int16_t
 ,FL_Broker_CAN_Error_Msg,DAQ-FL-Wheel,FL_Sus_Pot_Error,16,16,1,0,0,1,Bool,1000,int16_t
 ,FL_Broker_CAN_Error_Msg,DAQ-FL-Wheel,FL_Tire_Temp_Error,32,16,1,0,0,1,Bool,1000,int16_t
 ,FL_Broker_CAN_Error_Msg,DAQ-FL-Wheel,FL_Heartbeat_Count,48,16,1,0,0,65536,HAL Tick,1000,int16_t
-0x550,IMU_Acceleration,DAQ-IMU,X_Axis_Acceleration,0,21,0.0002,0,-160,160,m/s^2,10,float
-,IMU_Acceleration,DAQ-IMU,Y_Axis_Acceleration,21,21,0.0002,0,-160,160,m/s^2,10,float
-,IMU_Acceleration,DAQ-IMU,Z_Axis_Acceleration,42,21,0.0002,0,-160,160,m/s^2,10,float
-0x551,IMU_Yaw_Pitch_Roll,DAQ-IMU,Yaw,0,21,0.0002,0,-180,180,deg,200,float
-,IMU_Yaw_Pitch_Roll,DAQ-IMU,Pitch,21,21,0.00009,0,-90,90,deg,200,float
-,IMU_Yaw_Pitch_Roll,DAQ-IMU,Roll,42,21,0.0002,0,-180,180,deg,200,float
-0x552,IMU_Angular_Rate,DAQ-IMU,X_Axis_Angular_Rate,0,21,0.00004,0,-35,35,rad/s,200,float
-,IMU_Angular_Rate,DAQ-IMU,Y_Axis_Angular_Rate,21,21,0.00004,0,-35,35,rad/s,200,float
-,IMU_Angular_Rate,DAQ-IMU,Z_Axis_Angular_Rate,42,21,0.00004,0,-35,35,rad/s,200,float
-0x553,IMU_Position_INS,DAQ-IMU,Position_Latitude,0,21,0.00009,0,-90,90,deg,200,double
-,IMU_Position_INS,DAQ-IMU,Position_Longitude,21,21,0.00009,0,-90,-90,deg,200,double
-,IMU_Position_INS,DAQ-IMU,Position_Altutude,42,21,0.005,0,-430,10000,m,200,double
-0x554,IMU_Velocity,DAQ-IMU,X_Axis_Velocity,0,21,0.0005,0,-500,500,m/s,200,float
-,IMU_Velocity,DAQ-IMU,Y_Axis_Velocity,21,21,0.0005,0,-500,500,m/s,200,float
-,IMU_Velocity,DAQ-IMU,Z_Axis_Velocity,42,21,0.0005,0,-500,500,m/s,200,float
-0x555,IMU_Mag,DAQ-IMU,X_Axis_Magnetometer,0,21,0.0001,0,-2.5,2.5,Gauss,200,float
-,IMU_Mag,DAQ-IMU,Y_Axis_Magnetometer,21,21,0.0001,0,-2.5,2.5,Gauss,200,float
-,IMU_Mag,DAQ-IMU,Z_Axis_Magnetometer,42,21,0.0001,0,-2.5,2.5,Gauss,200,float
-0x556,IMU_Pres_Temp_DeltaTime,DAQ-IMU,Temperature,0,21,0.00007,0,-40,85,degC,200,float
-,IMU_Pres_Temp_DeltaTime,DAQ-IMU,Pressure,21,21,0.00006,0,0,120,kPa,200,float
-,IMU_Pres_Temp_DeltaTime,DAQ-IMU,Delta_Time,42,21,0.0001,0,0,5,sec,200,float
-0x557,IMU_Delta_Theta,DAQ-IMU,X_Axis_Delta_Theta,0,21,0.00009,0,-90,90,deg,200,float
-,IMU_Delta_Theta,DAQ-IMU,Y_Axis_Delta_Theta,21,21,0.00009,0,-90,90,deg,200,float
-,IMU_Delta_Theta,DAQ-IMU,Z_Axis_Delta_Theta,42,21,0.00009,0,-90,-90,deg,200,float
-0x558,IMU_Delta_Vel,DAQ-IMU,X_Axis_Delta_Velocity,0,21,0.0005,0,-500,500,m/s,200,float
+0x573,FL_Broker_Sus_Calibrated,DAQ-FL-Wheel,FL_Strain_Gauge_Calibrated,0,32,1,0,-8388608,8388607,lbs,10,float
+,FL_Broker_Sus_Calibrated,DAQ-FL-Wheel,FL_Sus_Pot_Calibrated,32,32,1,0,0,4095,ADC Values,10,float
+0x550,IMU_Acceleration,DAQ-IMU,X_Axis_Acceleration,0,21,0.00012208,0,-160,160,m/s^2,200,float
+,IMU_Acceleration,DAQ-IMU,Y_Axis_Acceleration,21,21,0.00012208,0,-160,160,m/s^2,200,float
+,IMU_Acceleration,DAQ-IMU,Z_Axis_Acceleration,42,21,0.00012208,0,-160,160,m/s^2,200,float
+0x551,IMU_Yaw_Pitch_Roll,DAQ-IMU,Yaw,0,21,0.00024416,0,-180,180,deg,200,float
+,IMU_Yaw_Pitch_Roll,DAQ-IMU,Pitch,21,21,0.00012208,0,-90,90,deg,200,float
+,IMU_Yaw_Pitch_Roll,DAQ-IMU,Roll,42,21,0.00024416,0,-180,180,deg,200,float
+0x552,IMU_Angular_Rate,DAQ-IMU,X_Axis_Angular_Rate,0,21,0.00012208,0,-35,35,rad/s,200,float
+,IMU_Angular_Rate,DAQ-IMU,Y_Axis_Angular_Rate,21,21,0.00012208,0,-35,35,rad/s,200,float
+,IMU_Angular_Rate,DAQ-IMU,Z_Axis_Angular_Rate,42,21,0.00012208,0,-35,35,rad/s,200,float
+0x553,IMU_Position_INS,DAQ-IMU,Position_Latitude,0,21,0.00012208,0,-90,90,deg,200,double
+,IMU_Position_INS,DAQ-IMU,Position_Longitude,21,21,0.00012208,0,-90,-90,deg,200,double
+,IMU_Position_INS,DAQ-IMU,Position_Altutude,42,21,0.00781312,0,-430,10000,m,200,double
+0x554,IMU_Velocity,DAQ-IMU,X_Axis_Velocity,0,21,0.00048832,0,-500,500,m/s,200,float
+,IMU_Velocity,DAQ-IMU,Y_Axis_Velocity,21,21,0.00048832,0,-500,500,m/s,200,float
+,IMU_Velocity,DAQ-IMU,Z_Axis_Velocity,42,21,0.00048832,0,-500,500,m/s,200,float
+0x555,IMU_Mag,DAQ-IMU,X_Axis_Magnetometer,0,21,0.00012208,0,-2.5,2.5,Gauss,200,float
+,IMU_Mag,DAQ-IMU,Y_Axis_Magnetometer,21,21,0.00012208,0,-2.5,2.5,Gauss,200,float
+,IMU_Mag,DAQ-IMU,Z_Axis_Magnetometer,42,21,0.00012208,0,-2.5,2.5,Gauss,200,float
+0x556,IMU_Pres_Temp,DAQ-IMU,Temperature,0,21,0.00012208,0,-40,85,degC,200,float
+,IMU_Pres_Temp,DAQ-IMU,Pressure,21,21,0.00012208,0,0,120,kPa,200,float
+0x557,IMU_Acceleration_No_G,DAQ-IMU,No_G_X_Axis_Acceleration,0,21,0.00012208,0,-160,160,m/s^2,10,float
+,IMU_Acceleration_No_G,DAQ-IMU,No_G_Y_Axis_Acceleration,21,21,0.00012208,0,-160,160,m/s^2,10,float
+,IMU_Acceleration_No_G,DAQ-IMU,No_G_Z_Axis_Acceleration,42,21,0.00012208,0,-160,160,m/s^2,10,float
+0x558,IMU_INS_Status,DAQ-IMU,INS_Mode,0,8,1,0,0,3,"0 = Not tracking, 1 = Aligning, 2 = Tracking, 3 = Loss of GNSS",200,uint8_t
+,IMU_INS_Status,DAQ-IMU,GNSS_Fix,8,8,1,0,0,1,Refer to pg 162 of VN-300 Extended,200,uint8_t
+,IMU_INS_Status,DAQ-IMU,INS_Error,16,8,1,0,0,15,Refer to pg 162 of VN-300 Extended,200,uint8_t
+,IMU_INS_Status,DAQ-IMU,GNSS_Heading_INS,24,8,1,0,0,1,Refer to pg 162 of VN-300 Extended,200,uint8_t
+,IMU_INS_Status,DAQ-IMU,GNSS_Compass,32,8,1,0,0,1,Refer to pg 162 of VN-300 Extended,200,uint8_t
+0x559,IMU_UTC_Time,DAQ-IMU,UTC_Year,0,8,1,0,2000,255,years,50,int8_t
+,IMU_UTC_Time,DAQ-IMU,UTC_Month,8,8,1,0,0,12,months,50,uint8_t
+,IMU_UTC_Time,DAQ-IMU,UTC_Day,16,8,1,0,0,31,days,50,uint8_t
+,IMU_UTC_Time,DAQ-IMU,UTC_Hour,24,8,1,0,0,23,hours,50,uint8_t
+,IMU_UTC_Time,DAQ-IMU,UTC_Minutes,32,8,1,0,0,59,minutes,50,uint8_t
+,IMU_UTC_Time,DAQ-IMU,UTC_Seconds,40,8,1,0,0,59,seconds,50,uint8_t
+,IMU_UTC_Time,DAQ-IMU,UTC_Milliseconds,48,16,1,0,0,999,milliseconds ,50,uint16_t
+0x55A,IMU_Delta_Vel,DAQ-IMU,X_Axis_Delta_Velocity,0,21,0.0005,0,-500,500,m/s,200,float
 ,IMU_Delta_Vel,DAQ-IMU,Y_Axis_Delta_Velocity,21,21,0.0005,0,-500,500,m/s,200,float
 ,IMU_Delta_Vel,DAQ-IMU,Z_Axis_Delta_Velocity,42,21,0.0005,0,-500,500,m/s,200,float
-0x559,IMU_UTC_Time,DAQ-IMU,UTC_Year,0,8,1,0,2000,255,years,200,uint8_t
-,IMU_UTC_Time,DAQ-IMU,UTC_Month,8,8,1,0,0,12,months,200,uint8_t
-,IMU_UTC_Time,DAQ-IMU,UTC_Day,16,8,1,0,0,31,days,200,uint8_t
-,IMU_UTC_Time,DAQ-IMU,UTC_Hour,24,8,1,0,0,23,hours,200,uint8_t
-,IMU_UTC_Time,DAQ-IMU,UTC_Minutes,32,8,1,0,0,59,minutes,200,uint8_t
-,IMU_UTC_Time,DAQ-IMU,UTC_Seconds,40,8,1,0,0,59,seconds,200,uint8_t
-,IMU_UTC_Time,DAQ-IMU,UTC_Milliseconds,48,16,1,0,0,999,milliseconds ,200,uint16_t
-0x55A,IMU_Fix_NumSats_INS_Status,DAQ-IMU,Num_Sats,0,8,1,0,0,256,"no unit, integers",200,uint8_t
-,IMU_Fix_NumSats_INS_Status,DAQ-IMU,Fix,8,8,1,0,0,3,"no unit, integers",200,uint8_t
-,IMU_Fix_NumSats_INS_Status,DAQ-IMU,INS_Status,16,16,1,0,0,65536,Refer to pg 162 • INS Subsystem VN-300 Extended,200,uint16_t
-0x55B,IMU_Position_GNSS,DAQ-IMU,Position_Latitude,0,21,0.00009,0,-90,90,deg,200,double
-,IMU_Position_GNSS,DAQ-IMU,Position_Longitude,21,21,0.00009,0,-90,-90,deg,200,double
-,IMU_Position_GNSS,DAQ-IMU,Position_Altutude,42,21,0.005,0,-430,10000,m,200,double
-0x55C,IMU_Position_U,DAQ-IMU,Position_Uncertainty_North,0,21,0.0005,0,0,1000,m,200,float
-,IMU_Position_U,DAQ-IMU,Position_Uncertainty_East,21,21,0.0005,0,0,1000,m,200,float
-,IMU_Position_U,DAQ-IMU,Position_Uncertainty_Down,42,21,0.0005,0,0,1000,m,200,float
-0x520,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Hour,0,8,1,0,0,23,hours,1000,uint8_t
+0x520,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Hour,0,8,1,0,0,23,m/s,1000,uint8_t
 ,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Minute,8,8,1,0,0,59,minutes,1000,uint8_t
 ,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Second,16,8,1,0,0,59,seconds,1000,uint8_t
 ,Telemetry_RTC_Time,DAQ-Telemetry,RTC_Subsecond,24,32,1,0,0,999,millisconds,1000,uint32_t
@@ -590,18 +593,253 @@ Protocol violation error locations (data[3]):
 ,Telemetry_RTC_Date,DAQ-Telemetry,RTC_Weekday,24,8,1,0,1,7,,1000,uint8_t
 0x522,Telemetry_Odometer,DAQ-Telemetry,Miles_Driven,0,32,1,0,0,,mi,100,float
 0x523,Telemetry_Status,DAQ-Telemetry,Log_File,0,16,1,0,0,9999,,1000,uint16_t
-,Telemetry_Status,DAQ-Telemetry,Logging_Status,16,8,1,0,0,1,"0x00: OK/Logging
-0x01: Card Not Detected
-0x02: Mount/Filesystem Error
-0x03: Card Full
-0x04: SDIO Comms Error",1000,uint8_t
-,Telemetry_Status,DAQ-Telemetry,Wireless_Status,24,8,1,0,0,1,"0x00: OK/Connected
-0x01: Handshake Pending
-0x02: Handshake Failed
-0x03: SPI Comms Error",1000,uint8_t
+,Telemetry_Status,DAQ-Telemetry,Logging_Status,16,8,1,0,0,4,"0x00: OK
+0x01: CARD_NOT_DETECTED
+0x02: MOUNT_ERROR
+0x03: CARD_FULL
+0x04: SDIO_COMMS_ERROR",1000,uint8_t
+,Telemetry_Status,DAQ-Telemetry,Wireless_Hardware_Status,24,8,1,0,0,3,"0x00: OK
+0x01: INIT_FAILED
+0x02: SPI_ERROR
+0x03: FAULT",,uint8_t
+,Telemetry_Status,DAQ-Telemetry,Wireless_Protocol_State,32,8,1,0,0,2,"0x00: UNCONNECTED
+0x01: HANDSHAKE_PENDING
+0x02: CONNECTED",1000,uint8_t
+0x524,Telemetry_Active_Aero,DAQ-Telemetry,Servo_Angle,0,8,1,0,0,180,degrees,,uint8_t
 0x560,Aero_Strain_Gauge1,DAQ-Strain-Gauge,Strain_Gauge_1,0,32,0.0001,0,-100,100,Newtons,10,float
 ,Aero_Strain_Gauge1,DAQ-Strain-Gauge,Strain_Gauge_2,32,32,0.0001,0,-100,100,Newtons,10,float
 0x561,Aero_Strain_Gauge2,DAQ-Strain-Gauge,Strain_Gauge_3,0,32,0.0001,0,-100,100,Newtons,10,float
 ,Aero_Strain_Gauge2,DAQ-Strain-Gauge,Strain_Gauge_4,32,32,0.0001,0,-100,100,Newtons,10,float
 0x562,Aero_Strain_Gauge3,DAQ-Strain-Gauge,Strain_Gauge_5,0,32,0.0001,0,-100,100,Newtons,10,float
 ,Aero_Strain_Gauge3,DAQ-Strain-Gauge,Strain_Gauge_6,32,32,0.0001,0,-100,100,Newtons,10,float
+0x140,BMS_OWC_C_1,BMS,OWC_Cell_1,0,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_2,1,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_3,2,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_4,3,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_5,4,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_6,5,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_7,6,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_8,7,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_9,8,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_10,9,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_11,10,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_12,11,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_13,12,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_14,13,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_15,14,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_16,15,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_17,16,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_18,17,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_19,18,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_20,19,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_21,20,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_22,21,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_23,22,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_24,23,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_25,24,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_26,25,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_27,26,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_28,27,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_29,28,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_30,29,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_31,30,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_32,31,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_33,32,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_34,33,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_35,34,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_36,35,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_37,36,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_38,37,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_39,38,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_40,39,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_41,40,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_42,41,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_43,42,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_44,43,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_45,44,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_46,45,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_47,46,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_48,47,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_49,48,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_50,49,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_51,50,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_52,51,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_53,52,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_54,53,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_55,54,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_56,55,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_57,56,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_58,57,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_59,58,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_60,59,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_61,60,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_62,61,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_63,62,1,1,0,,,,30000,bool
+,BMS_OWC_C_1,BMS,OWC_Cell_64,63,1,1,0,,,,30000,bool
+0x141,BMS_OWC_C_2,BMS,OWC_Cell_65,0,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_66,1,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_67,2,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_68,3,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_69,4,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_70,5,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_71,6,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_72,7,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_73,8,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_74,9,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_75,10,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_76,11,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_77,12,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_78,13,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_79,14,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_80,15,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_81,16,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_82,17,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_83,18,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_84,19,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_85,20,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_86,21,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_87,22,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_88,23,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_89,24,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_90,25,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_91,26,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_92,27,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_93,28,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_94,29,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_95,30,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_96,31,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_97,32,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_98,33,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_99,34,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_100,35,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_101,36,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_102,37,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_103,38,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_104,39,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_105,40,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_106,41,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_107,42,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_108,43,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_109,44,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_110,45,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_111,46,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_112,47,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_113,48,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_114,49,1,1,0,,,,30000,bool
+,BMS_OWC_C_2,BMS,OWC_Cell_115,50,1,1,0,,,,30000,bool
+0x142,BMS_OWC_S_1,BMS,OWC_Cell_1,0,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_2,1,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_3,2,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_4,3,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_5,4,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_6,5,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_7,6,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_8,7,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_9,8,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_10,9,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_11,10,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_12,11,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_13,12,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_14,13,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_15,14,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_16,15,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_17,16,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_18,17,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_19,18,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_20,19,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_21,20,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_22,21,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_23,22,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_24,23,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_25,24,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_26,25,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_27,26,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_28,27,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_29,28,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_30,29,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_31,30,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_32,31,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_33,32,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_34,33,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_35,34,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_36,35,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_37,36,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_38,37,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_39,38,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_40,39,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_41,40,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_42,41,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_43,42,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_44,43,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_45,44,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_46,45,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_47,46,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_48,47,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_49,48,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_50,49,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_51,50,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_52,51,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_53,52,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_54,53,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_55,54,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_56,55,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_57,56,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_58,57,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_59,58,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_60,59,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_61,60,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_62,61,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_63,62,1,1,0,,,,30000,bool
+,BMS_OWC_S_1,BMS,OWC_Cell_64,63,1,1,0,,,,30000,bool
+0x143,BMS_OWC_S_2,BMS,OWC_Cell_65,0,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_66,1,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_67,2,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_68,3,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_69,4,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_70,5,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_71,6,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_72,7,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_73,8,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_74,9,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_75,10,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_76,11,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_77,12,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_78,13,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_79,14,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_80,15,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_81,16,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_82,17,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_83,18,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_84,19,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_85,20,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_86,21,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_87,22,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_88,23,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_89,24,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_90,25,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_91,26,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_92,27,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_93,28,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_94,29,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_95,30,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_96,31,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_97,32,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_98,33,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_99,34,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_100,35,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_101,36,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_102,37,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_103,38,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_104,39,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_105,40,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_106,41,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_107,42,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_108,43,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_109,44,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_110,45,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_111,46,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_112,47,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_113,48,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_114,49,1,1,0,,,,30000,bool
+,BMS_OWC_S_2,BMS,OWC_Cell_115,50,1,1,0,,,,30000,bool
+0x130,BMS_Charger_Current,BMS,Charger_Current_Set,0,16,1,0,0,20,,30000,uint16_t

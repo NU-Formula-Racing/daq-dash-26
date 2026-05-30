@@ -31,10 +31,212 @@ class InverterPage : public dash::IPage {
         };
     }
 
-    okay::UIElement buildFrontInverter1() {
+    okay::UIElement buildFrontRightInverter() {
         return ui::growbox(okay::UIAxis::Vertical)(
+            ui::h2("Front-Right Motor Status"),
+            keyValuePair(
+                "RPM",
+                dbc::rearInverterMotorStatus::rpm->get()
+            ),
+            keyValuePair(
+                "Motor Current", 
+                dbc::frontRightInverterMotorStatus::motorCurrent->get()
+            ),
+            keyValuePair(
+                "DC Voltage", 
+                dbc::frontRightInverterMotorStatus::dcVoltage->get()
+            ),
+            keyValuePair(
+                "DC Current",
+                dbc::frontRightInverterMotorStaus::dcCurrent->get()
+            ),
 
+            ui::vspacer(10),
+            ui::h2("Front Right Inverter Temperature"),
+            keyValuePair(
+                "IGBT Temp",
+                dbc::frontRightInverterTempStatus::igbtTemp->get()
+            ),
+            keyValuePair(
+                "Motor Temp", 
+                dbc::frontRightInverterTempStatus::motorTemp->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("Front Right Inverter Power"),
+            keyValuePair(
+                "Ah Drawn", 
+                dbc::frontRightInverterCurrentDraw::ahDrawn->get()
+            ),
+            keyValuePair(
+                "Ah Charged", 
+                dbc::frontRightInverterCurrentDraw::ahCharged->get()
+            ),
+            keyValuePair(
+                "Wh Drawn", 
+                dbc::frontRightInverterPowerDraw::whDrawn->get()
+            ),
+            keyValuePair(
+                "Wh Charged", 
+                dbc::frontRightInverterPowerDraw::whCharged->get()
+            ),
+            keyValuePair(
+                "Fault Code", 
+                dbc::frontRightInverterFaultStatus::faultCode->get()
+            ),
         );
+    }
+
+    okay::UIElement buildFrontLeftInverter() {
+        return ui::growbox(okay::UIAxis::Vertical)(
+            ui::h2("Front-Left Motor Status"),
+            keyValuePair(
+                "Motor Current", 
+                dbc::frontLeftInverterMotorStatus::motorCurrent->get()
+            ),
+            keyValuePair(
+                "DC Voltage", 
+                dbc::frontLeftInverterMotorStatus::dcVoltage->get()
+            ),
+            keyValuePair(
+                "DC Current", 
+                dbc::frontLeftInverterMotorStatus::dcCurrent->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("Front Left Inverter Temperature"),
+            keyValuePair(
+                "IGBT Temp", 
+                dbc::frontLeftInverterTempStatus::igbtTemp->get()
+            ),
+            keyValuePair(
+                "Motor Temp", 
+                dbc::frontLeftInverterTempStatus::motorTemp->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("Front Left Power"),
+            keyValuePair(
+                "Ah Drawn", 
+                dbc::frontLeftInverterCurrentDraw::ahDrawn->get()
+            ),
+            keyValuePair(
+                "Ah Charged", 
+                dbc::frontLeftInverterCurrentDraw::ahCharged->get()
+            ),
+            keyValuePair(
+                "Wh Drawn", 
+                dbc::frontLeftInverterPowerDraw::whDrawn->get()
+            ),
+            keyValuePair(
+                "Wh Charged", 
+                dbc::frontLeftInverterPowerDraw::whCharged->get()
+            ),
+            keyValuePair(
+                "Fault Code", 
+                dbc::frontLeftInverterFaultStatus::faultCode->get()
+            ),
+        );
+    }
+
+    okay::UIElement buildRearInverter() {
+        return ui::growbox(okay::UIAxis::Vertical)(
+            ui::h2("Rear Motor Status"),
+            keyValuePair(
+                "Motor Current", 
+                dbc::rearInverterMotorStatus::motorCurrent->get()
+            ),
+            keyValuePair(
+                "DC Voltage", 
+                dbc::rearInverterMotorStatus::dcVoltage->get()
+            ),
+            keyValuePair(
+                "DC Current", 
+                dbc::rearInverterMotorStatus::dcCurrent->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("Rear Temperature"),
+            keyValuePair(
+                "IGBT Temp", 
+                dbc::rearInverterTempStatus::igbtTemp->get()
+            ),
+            keyValuePair(
+                "Motor Temp", 
+                dbc::rearInverterTempStatus::motorTemp->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("Rear Power"),
+            keyValuePair(
+                "Ah Drawn", 
+                dbc::rearInverterCurrentDraw::ahDrawn->get()
+            ),
+            keyValuePair(
+                "Ah Charged", 
+                dbc::rearInverterCurrentDraw::ahCharged->get()
+            ),
+            keyValuePair(
+                "Wh Drawn", 
+                dbc::rearInverterPowerDraw::whDrawn->get()
+            ),
+            keyValuePair(
+                "Wh Charged", 
+                dbc::rearInverterPowerDraw::whCharged->get()
+            ),
+            keyValuePair(
+                "Fault Code", 
+                dbc::rearInverterFaultStatus::faultCode->get()
+            ),
+        );
+    }
+
+    okay::UIElement buildVCUInverter() {
+        return ui::growbox(okay::UIAxis::Vertical)(
+            ui::h2("VCU Front Left Current"),
+            keyValuePair(
+                "Set Current Front Left Inverter", 
+                dbc::ecuSetCurrentFrontLeftInverter::setCurrentFrontLeftInverter->get()
+            ),
+            keyValuePair(
+                "Set Current Brake Front Left Inverter", 
+                dbc::ecuSetCurrentBrakeFrontLeftInverter::setCurrentBrakeFrontLeftInverter->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("VCU Front Right Inverter Current"),
+            keyValuePair(
+                "Set Current Front Right Inverter", 
+                dbc::ecuSetCurrentFrontRightInverter::setCurrentFrontRightInverter->get()
+            ),
+            keyValuePair(
+                "Set Current Brake Front Right Inverter", 
+                dbc::ecuSetCurrentBrakeFrontRightInverter::setCurrentBrakeFrontRightInverter->get()
+            ),
+
+            ui::vspacer(10),
+            ui::h2("VCU Rear Inverter Current"),
+            keyValuePair(
+                "Set Current Rear Inverter", 
+                dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get()
+            ),
+            keyValuePair(
+                "Set Current Brake Rear Inverter", 
+                dbc::ecuSetCurrentBrakeRearInverter::setCurrentBrakeRearInverter->get()
+            ),
+        )
+    }
+
+    template <typename T>
+    inline okay::UIElement keyValuePair(const std::string& key, const T& value) {
+        // clang-format off
+        return ui::slot(okay::UIAxis::Horizontal)
+            .widthGrow() (
+                ui::h3(key),
+                ui::spacer(),
+                ui::h3(std::format("{}", value))
+            );
+        // clang-format on
     }
 
     void closePage() {
@@ -42,6 +244,8 @@ class InverterPage : public dash::IPage {
             entity.destroy();
         }
     }
+
+    
 
    private:
     std::vector<okay::ECSEntity> _entities;

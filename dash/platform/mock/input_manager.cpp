@@ -1,4 +1,6 @@
+#include "glfw_input.hpp"
 #include <platform/input_manager.hpp>
+#include "GLFW/glfw3.h"
 
 namespace dash {
 
@@ -60,6 +62,8 @@ bool InputManager::isIdle(uint16_t encoderID) const {
     return true;
 }
 
-void InputManager::tick() {}
+void InputManager::tick(void* windowHandle) {
+    GlfwInput::update(static_cast<GLFWwindow*>(windowHandle));
+}
 
 };  // namespace dash

@@ -17,6 +17,7 @@
 #include <platform/can.hpp>
 #include <platform/interfaces.hpp>
 #include <platform/neopixel_manager.hpp>
+#include <platform/input_manager.hpp>
 #include <sstream>
 
 static void __exitSignal(int sig);
@@ -28,11 +29,14 @@ static dash::Button downButton{20};
 inline dash::Button leftButton{16};
 inline dash::Button rightButton{12};
 
+static void* g_windowHandle = nullptr;
+
 int main() {
     okay::SurfaceConfig surfaceConfig;
     surfaceConfig.width = 800;
     surfaceConfig.height = 480;
     okay::Surface surface(surfaceConfig);
+    g_windowHandle = surface.getWindow();
 
     okay::RendererSettings rendererSettings{
         .surfaceConfig = surfaceConfig,
@@ -91,6 +95,10 @@ int main() {
     game.run();
 
     return 0;
+}
+
+static void __gameUpdate() {
+    dash::InputManager::instance().tick(g_windowHandle);
 }
 
 static void __exitSignal(int sig) {

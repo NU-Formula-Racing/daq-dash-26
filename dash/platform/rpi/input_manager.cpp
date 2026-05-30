@@ -134,7 +134,7 @@ void InputManager::onEncoderEdge(uint16_t encoderID) {
     }
 }
 
-void InputManager::tick() {
+void InputManager::tick(void* windowHandle) {
     for (auto& [buttonID, eventIndicator] : _buttonEventHappened) {
         if (eventIndicator && _buttonStates[buttonID] == Button::ButtonState::UP) {
             _buttonStates[buttonID] = Button::ButtonState::DOWN_THIS_FRAME;

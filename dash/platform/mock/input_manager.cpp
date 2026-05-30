@@ -16,13 +16,29 @@ void InputManager::registerButton(uint8_t buttonID) {}
 
 void InputManager::unregisterButton(uint8_t buttonID) {}
 
-void InputManager::attachDownCallback(uint8_t buttonID, std::function<void()> callback) {}
+void InputManager::attachDownCallback(uint8_t buttonID, std::function<void()> callback) {
+    _downCallbacks[buttonID].push_back(callback);
+}
 
-void InputManager::attachUpCallback(uint8_t buttonID, std::function<void()> callback) {}
+void InputManager::attachUpCallback(uint8_t buttonID, std::function<void()> callback) {
+    _upCallbacks[buttonID].push_back(callback);
+}
 
-void InputManager::executeDownCallbacks(uint8_t buttonID) {}
+void InputManager::executeDownCallbacks(uint8_t buttonID) {
+    if (_downCallbacks.find(buttonID) == _downCallbacks.end()) return;
+    
+    for (const auto& callback : _downCallbacks.at(buttonID)) {
+        if (callback) callback();
+    }
+}
 
-void InputManager::executeUpCallbacks(uint8_t buttonID) {}
+void InputManager::executeUpCallbacks(uint8_t buttonID) {
+    if (_upCallbacks.find(buttonID) == _upCallbacks.end()) return;
+    
+    for (const auto& callback : _upCallbacks.at(buttonID)) {
+        if (callback) callback();
+    }
+}
 
 void InputManager::registerEncoder(uint16_t encoderID, uint8_t leftPin, uint8_t rightPin) {}
 
@@ -62,8 +78,14 @@ bool InputManager::isIdle(uint16_t encoderID) const {
     return true;
 }
 
-void InputManager::tick(void* windowHandle) {
-    GlfwInput::update(static_cast<GLFWwindow*>(windowHandle));
+void InputManager::tick() {
+    GlfwInput::update(glfwGetCurrentContext());
+
+    if (GlfwInput::isKeyDownThisFrame(GLFW_KEY_DOWN)) executeDownCallbacks(20);
+    if (GlfwInput::isKeyUpThisFrame(GLFW_KEY_DOWN)) executeUpCallbacks(20);
+    
+    if (GlfwInput::isKeyDownThisFrame(GLFW_KEY_LEFT)) executeDownCallbacks(16);
+    if (GlfwInput::isKeyUpThisFrame(GLFW_KEY_LEFT)) executeUpCallbacks(16);
 }
 
 };  // namespace dash

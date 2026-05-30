@@ -1,4 +1,6 @@
 #include <platform/button.hpp>
+#include "glfw_input.hpp"
+#include "GLFW/glfw3.h"
 
 namespace dash {
 
@@ -18,6 +20,12 @@ bool Button::isUpThisFrame() {
     return false;
 }
 bool Button::isDown() {
+    switch (_buttonID) {
+       case 20:
+        return GlfwInput::isKeyDown(GLFW_KEY_DOWN);
+       case 16:
+        return GlfwInput::isKeyDown(GLFW_KEY_LEFT);
+    }
     return false;
 }
 

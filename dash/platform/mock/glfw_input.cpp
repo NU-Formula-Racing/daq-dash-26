@@ -8,6 +8,8 @@ bool GlfwInput::prevKeys[349] = { false };
 bool GlfwInput::currKeys[349] = { false };
 
 void GlfwInput::update(GLFWwindow* window) {
+    if (window == nullptr) return;
+
     std::memcpy(prevKeys, currKeys, sizeof(currKeys));
 
     for (int i {32}; i <= GLFW_KEY_LAST; ++i) {

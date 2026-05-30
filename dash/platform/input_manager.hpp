@@ -44,7 +44,7 @@ class InputManager {
     bool isLeftThisFrame(uint16_t encoderID) const;
     bool isIdle(uint16_t encoderID) const;
 
-    void tick(void* windowHandle);
+    void tick();
 
    private:
     InputManager();

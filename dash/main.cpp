@@ -1,6 +1,7 @@
 #include "okay/core/ecs/ecs.hpp"
 #include "ui/car_state.hpp"
 #include "ui/components/rotate.hpp"
+#include "ui/bms_page.hpp"
 #include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
 #include "ui/error_page.hpp"
@@ -21,6 +22,7 @@
 
 static void __exitSignal(int sig);
 
+static bool s_bmsPageActive{true};
 static bool s_debugPageActive{false};
 static okay::ECSEntity s_performanceUIEntity;
 
@@ -54,11 +56,11 @@ int main() {
     });
 
     std::unique_ptr<dash::PageManager> pageManager = std::make_unique<dash::PageManager>(
-        dash::PageEntry::create(std::make_unique<dash::DrivePage>())
-            .activeWhen([]() {
-                return !s_debugPageActive;
-            })
-            .withPriority(0),
+        // dash::PageEntry::create(std::make_unique<dash::DrivePage>())
+        //     .activeWhen([]() {
+        //         return !s_debugPageActive;
+        //     })
+        //     .withPriority(0),
         dash::PageEntry::create(std::make_unique<dash::ErrorPage>())
             .activeWhen([]() {
                 return false;
@@ -67,6 +69,11 @@ int main() {
         dash::PageEntry::create(std::make_unique<dash::DebugPage>())
             .activeWhen([]() {
                 return s_debugPageActive || dash::CarState::hardFaultPresent();
+            })
+            .withPriority(1),
+        dash::PageEntry::create(std::make_unique<dash::BmsPage>())
+            .activeWhen([]() {
+                return s_bmsPageActive;
             })
             .withPriority(1));
 

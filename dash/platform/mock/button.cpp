@@ -1,5 +1,6 @@
 #include <platform/button.hpp>
 #include "glfw_input.hpp"
+#include "platform/input_manager.hpp"
 #include "GLFW/glfw3.h"
 
 namespace dash {
@@ -9,9 +10,13 @@ Button::Button(uint8_t gpioPin)
 
 Button::~Button() = default;
 
-void Button::onDown(std::function<void()> callback) {}
+void Button::onDown(std::function<void()> callback) {
+    InputManager::instance().attachDownCallback(_buttonID, callback);
+}
 
-void Button::onUp(std::function<void()> callback) {}
+void Button::onUp(std::function<void()> callback) {
+    InputManager::instance().attachUpCallback(_buttonID, callback);
+}
 
 bool Button::isDownThisFrame() {
     return false;

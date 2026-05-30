@@ -8,4 +8,5 @@ target_sources(dash_platform PRIVATE
     button.cpp 
     encoder.cpp 
     input_manager.cpp
+    glfw_input.cpp
 )

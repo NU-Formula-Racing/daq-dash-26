@@ -2,34 +2,18 @@
 #define __GLFW_INPUT_H__
 
 #include <GLFW/glfw3.h>
-#include <cstring>
 
 namespace dash {
 
 class GlfwInput {
    private:
-    static inline bool prevKeys[GLFW_KEY_LAST + 1] = { false };
-    static inline bool currKeys[GLFW_KEY_LAST + 1] = { false };
+    static bool prevKeys[GLFW_KEY_LAST + 1];
+    static bool currKeys[GLFW_KEY_LAST + 1];
    public:
-    static inline void update(GLFWwindow* window) {
-        std::memcpy(prevKeys, currKeys, sizeof(currKeys));
-
-        for (int i {32}; i <= GLFW_KEY_LAST; ++i) {
-            currKeys[i] = glfwGetKey(window, i) == GLFW_PRESS;
-        }
-    };
-    
-    static inline bool getKey(int key) {
-        return currKeys[key];
-    }
-
-    static inline bool getKeyDown(int key) {
-        return !prevKeys[key] && currKeys[key];
-    }
-
-    static inline bool getKeyUp(int key) {
-        return prevKeys[key] && !currKeys[key];
-    }
+    static void update(GLFWwindow* window);
+    static bool getKey(int key);
+    static bool getKeyDown(int key);
+    static bool getKeyUp(int key);
 };
 
 }  // namespace dash

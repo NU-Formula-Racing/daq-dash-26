@@ -11,9 +11,11 @@ class GlfwInput {
     static bool currKeys[GLFW_KEY_LAST + 1];
    public:
     static void update(GLFWwindow* window);
-    static bool getKey(int key);
-    static bool getKeyDown(int key);
-    static bool getKeyUp(int key);
+
+    static bool isKeyDown(int key);
+
+    static bool isKeyDownThisFrame(int key);
+    static bool isKeyUpThisFrame(int key);
 };
 
 }  // namespace dash

@@ -15,15 +15,15 @@ void GlfwInput::update(GLFWwindow* window) {
     }
 };
 
-bool GlfwInput::getKey(int key) {
+bool GlfwInput::isKeyDown(int key) {
     return currKeys[key];
 }
 
-bool GlfwInput::getKeyDown(int key) {
+bool GlfwInput::isKeyDownThisFrame(int key) {
     return !prevKeys[key] && currKeys[key];
 }
 
-bool GlfwInput::getKeyUp(int key) {
+bool GlfwInput::isKeyUpThisFrame(int key) {
     return prevKeys[key] && !currKeys[key];
 }
 

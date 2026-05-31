@@ -10,14 +10,24 @@
 namespace dash {
 
 static std::unordered_map<int, int> s_gpioKeyMap = {
-    {20, GLFW_KEY_W}, {16, GLFW_KEY_A}, {20, GLFW_KEY_S}, {12, GLFW_KEY_D}, {23, GLFW_KEY_SPACE}};
+    {21, GLFW_KEY_W}, {16, GLFW_KEY_A}, {20, GLFW_KEY_S}, {12, GLFW_KEY_D}, {23, GLFW_KEY_SPACE}};
 
 struct ButtonContext {
     bool isDown = false;
     bool wasDown = false;
 
-    std::function<void()> onDown;
-    std::function<void()> onUp;
+    std::vector<std::function<void()>> onDownList;
+    std::vector<std::function<void()>> onUpList;
+
+    void onDown() {
+        for (auto cb : onDownList)
+            cb();
+    }
+
+    void onUp() {
+        for (auto cb : onUpList)
+            cb();
+    }
 };
 
 static std::unordered_map<int, ButtonContext> s_buttonContexts;
@@ -44,16 +54,11 @@ static void buttonKeyCallback(GLFWwindow* window, int key, int scancode, int act
             context.wasDown = context.isDown;
             context.isDown = true;
 
-            if (context.onDown) {
-                context.onDown();
-            }
+            context.onDown();
         } else if (action == GLFW_RELEASE) {
             context.wasDown = context.isDown;
             context.isDown = false;
-
-            if (context.onUp) {
-                context.onUp();
-            }
+            context.onUp();
         }
 
         break;
@@ -78,12 +83,12 @@ Button::~Button() = default;
 
 void Button::onDown(std::function<void()> callback) {
     ensureButtonKeyCallbackInstalled();
-    s_buttonContexts[_buttonID].onDown = std::move(callback);
+    s_buttonContexts[_buttonID].onDownList.push_back(std::move(callback));
 }
 
 void Button::onUp(std::function<void()> callback) {
     ensureButtonKeyCallbackInstalled();
-    s_buttonContexts[_buttonID].onUp = std::move(callback);
+    s_buttonContexts[_buttonID].onUpList.push_back(std::move(callback));
 }
 
 bool Button::isDownThisFrame() {

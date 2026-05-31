@@ -30,12 +30,9 @@ void main() {
     vec4 barRegionColor = mix(u_bgColor, u_barColor, filled);
 
     vec4 maskedBarColor = vec4(
-            barRegionColor.rgb,
-            barRegionColor.a * whiteMask
+            barRegionColor.rgb * texColor.rgb,
+            texColor.a
         );
 
-    vec4 color = vec4(0.0);
-    color = alphaOver(color, maskedBarColor);
-
-    FragColor = color;
+    FragColor = maskedBarColor;
 }

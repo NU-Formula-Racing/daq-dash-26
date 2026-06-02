@@ -483,7 +483,7 @@ inline CAN_Signal_BOOL shutdownOpen = MakeSignalSigned(bool, 33, 1, 1.0, 0.0, fa
 inline CAN_Signal_BOOL vcuTimeout = MakeSignalSigned(bool, 34, 1, 1.0, 0.0, false);
 inline CAN_Signal_BOOL inverterTimeout = MakeSignalSigned(bool, 35, 1, 1.0, 0.0, false);
 inline CAN_Signal_BOOL chargerTimeout = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL PecWarning2950 = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL pecWarning = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
 inline CAN_Signal_UINT16 totalPecFailures = MakeSignalExp(uint16_t, 38, 16, 1.0, 0.0);
 inline RX_CAN_Message(17) message{driveBus,
     0x152,
@@ -504,7 +504,7 @@ inline RX_CAN_Message(17) message{driveBus,
     vcuTimeout,
     inverterTimeout,
     chargerTimeout,
-    PecWarning2950,
+    pecWarning,
     totalPecFailures};
 
 static constexpr float socMin{0.0};
@@ -1419,16 +1419,18 @@ static constexpr float brTireTemp7Min{0.0};
 
 };  // namespace brBrokerTemp2
 
-namespace brBrokerSus {
+namespace brBrokerSusUncalibrated {
 
-inline CAN_Signal_INT32 brStrainGauge = MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
-inline CAN_Signal_UINT32 brSusPot = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x538, false, 8, brStrainGauge, brSusPot};
+inline CAN_Signal_INT32 brStrainGaugeUncalibrated =
+    MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_UINT32 brSusPotUncalibrated = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
+inline RX_CAN_Message(2) message{
+    driveBus, 0x538, false, 8, brStrainGaugeUncalibrated, brSusPotUncalibrated};
 
-static constexpr int32_t brStrainGaugeMin{-8388608};
-static constexpr uint32_t brSusPotMin{0};
+static constexpr int32_t brStrainGaugeUncalibratedMin{-8388608};
+static constexpr uint32_t brSusPotUncalibratedMin{0};
 
-};  // namespace brBrokerSus
+};  // namespace brBrokerSusUncalibrated
 
 namespace brBrokerCanErrorMsg {
 
@@ -1451,6 +1453,18 @@ static constexpr int16_t brTireTempErrorMin{0};
 static constexpr int16_t brHeartbeatCountMin{0};
 
 };  // namespace brBrokerCanErrorMsg
+
+namespace brBrokerSusCalibrated {
+
+inline CAN_Signal_FLOAT brStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT brSusPotCalibrated = MakeSignalSigned(float, 32, 32, 1.0, 0.0, false);
+inline RX_CAN_Message(2) message{
+    driveBus, 0x570, false, 8, brStrainGaugeCalibrated, brSusPotCalibrated};
+
+static constexpr float brStrainGaugeCalibratedMin{-8388608.0};
+static constexpr float brSusPotCalibratedMin{0.0};
+
+};  // namespace brBrokerSusCalibrated
 
 namespace blBrokerTemp1 {
 
@@ -1484,16 +1498,18 @@ static constexpr float blTireTemp7Min{0.0};
 
 };  // namespace blBrokerTemp2
 
-namespace blBrokerSus {
+namespace blBrokerSusUncalibrated {
 
-inline CAN_Signal_INT32 blStrainGauge = MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
-inline CAN_Signal_UINT32 blSusPot = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x53A, false, 8, blStrainGauge, blSusPot};
+inline CAN_Signal_INT32 blStrainGaugeUncalibrated =
+    MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_UINT32 blSusPotUncalibrated = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
+inline RX_CAN_Message(2) message{
+    driveBus, 0x53A, false, 8, blStrainGaugeUncalibrated, blSusPotUncalibrated};
 
-static constexpr int32_t blStrainGaugeMin{-8388608};
-static constexpr uint32_t blSusPotMin{0};
+static constexpr int32_t blStrainGaugeUncalibratedMin{-8388608};
+static constexpr uint32_t blSusPotUncalibratedMin{0};
 
-};  // namespace blBrokerSus
+};  // namespace blBrokerSusUncalibrated
 
 namespace blBrokerCanErrorMsg {
 
@@ -1516,6 +1532,18 @@ static constexpr int16_t blTireTempErrorMin{0};
 static constexpr int16_t blHeartbeatCountMin{0};
 
 };  // namespace blBrokerCanErrorMsg
+
+namespace blBrokerSusCalibrated {
+
+inline CAN_Signal_FLOAT blStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT blSusPotCalibrated = MakeSignalSigned(float, 32, 32, 1.0, 0.0, false);
+inline RX_CAN_Message(2) message{
+    driveBus, 0x571, false, 8, blStrainGaugeCalibrated, blSusPotCalibrated};
+
+static constexpr float blStrainGaugeCalibratedMin{-8388608.0};
+static constexpr float blSusPotCalibratedMin{0.0};
+
+};  // namespace blBrokerSusCalibrated
 
 namespace frBrokerTemp1 {
 
@@ -1549,16 +1577,18 @@ static constexpr float frTireTemp7Min{0.0};
 
 };  // namespace frBrokerTemp2
 
-namespace frBrokerSus {
+namespace frBrokerSusUncalibrated {
 
-inline CAN_Signal_INT32 frStrainGauge = MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
-inline CAN_Signal_UINT32 frSusPot = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x53C, false, 8, frStrainGauge, frSusPot};
+inline CAN_Signal_INT32 frStrainGaugeUncalibrated =
+    MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_UINT32 frSusPotUncalibrated = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
+inline RX_CAN_Message(2) message{
+    driveBus, 0x53C, false, 8, frStrainGaugeUncalibrated, frSusPotUncalibrated};
 
-static constexpr int32_t frStrainGaugeMin{-8388608};
-static constexpr uint32_t frSusPotMin{0};
+static constexpr int32_t frStrainGaugeUncalibratedMin{-8388608};
+static constexpr uint32_t frSusPotUncalibratedMin{0};
 
-};  // namespace frBrokerSus
+};  // namespace frBrokerSusUncalibrated
 
 namespace frBrokerCanErrorMsg {
 
@@ -1581,6 +1611,18 @@ static constexpr int16_t frTireTempErrorMin{0};
 static constexpr int16_t frHeartbeatCountMin{0};
 
 };  // namespace frBrokerCanErrorMsg
+
+namespace frBrokerSusCalibrated {
+
+inline CAN_Signal_FLOAT frStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT frSusPotCalibrated = MakeSignalSigned(float, 32, 32, 1.0, 0.0, false);
+inline RX_CAN_Message(2) message{
+    driveBus, 0x572, false, 8, frStrainGaugeCalibrated, frSusPotCalibrated};
+
+static constexpr float frStrainGaugeCalibratedMin{-8388608.0};
+static constexpr float frSusPotCalibratedMin{0.0};
+
+};  // namespace frBrokerSusCalibrated
 
 namespace flBrokerTemp1 {
 
@@ -1614,16 +1656,18 @@ static constexpr float flTireTemp7Min{0.0};
 
 };  // namespace flBrokerTemp2
 
-namespace flBrokerSus {
+namespace flBrokerSusUncalibrated {
 
-inline CAN_Signal_INT32 flStrainGauge = MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
-inline CAN_Signal_UINT32 flSusPot = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x53E, false, 8, flStrainGauge, flSusPot};
+inline CAN_Signal_INT32 flStrainGaugeUncalibrated =
+    MakeSignalSigned(int32_t, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_UINT32 flSusPotUncalibrated = MakeSignalExp(uint32_t, 32, 32, 1.0, 0.0);
+inline RX_CAN_Message(2) message{
+    driveBus, 0x53E, false, 8, flStrainGaugeUncalibrated, flSusPotUncalibrated};
 
-static constexpr int32_t flStrainGaugeMin{-8388608};
-static constexpr uint32_t flSusPotMin{0};
+static constexpr int32_t flStrainGaugeUncalibratedMin{-8388608};
+static constexpr uint32_t flSusPotUncalibratedMin{0};
 
-};  // namespace flBrokerSus
+};  // namespace flBrokerSusUncalibrated
 
 namespace flBrokerCanErrorMsg {
 
@@ -1647,11 +1691,23 @@ static constexpr int16_t flHeartbeatCountMin{0};
 
 };  // namespace flBrokerCanErrorMsg
 
+namespace flBrokerSusCalibrated {
+
+inline CAN_Signal_FLOAT flStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT flSusPotCalibrated = MakeSignalSigned(float, 32, 32, 1.0, 0.0, false);
+inline RX_CAN_Message(2) message{
+    driveBus, 0x573, false, 8, flStrainGaugeCalibrated, flSusPotCalibrated};
+
+static constexpr float flStrainGaugeCalibratedMin{-8388608.0};
+static constexpr float flSusPotCalibratedMin{0.0};
+
+};  // namespace flBrokerSusCalibrated
+
 namespace imuAcceleration {
 
-inline CAN_Signal_FLOAT xAxisAcceleration = MakeSignalSigned(float, 0, 21, 0.0002, 0.0, false);
-inline CAN_Signal_FLOAT yAxisAcceleration = MakeSignalSigned(float, 21, 21, 0.0002, 0.0, false);
-inline CAN_Signal_FLOAT zAxisAcceleration = MakeSignalSigned(float, 42, 21, 0.0002, 0.0, false);
+inline CAN_Signal_FLOAT xAxisAcceleration = MakeSignalSigned(float, 0, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT yAxisAcceleration = MakeSignalSigned(float, 21, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT zAxisAcceleration = MakeSignalSigned(float, 42, 21, 0.00012208, 0.0, false);
 inline RX_CAN_Message(3) message{
     driveBus, 0x550, false, 8, xAxisAcceleration, yAxisAcceleration, zAxisAcceleration};
 
@@ -1663,9 +1719,9 @@ static constexpr float zAxisAccelerationMin{-160.0};
 
 namespace imuYawPitchRoll {
 
-inline CAN_Signal_FLOAT yaw = MakeSignalSigned(float, 0, 21, 0.0002, 0.0, false);
-inline CAN_Signal_FLOAT pitch = MakeSignalSigned(float, 21, 21, 9e-05, 0.0, false);
-inline CAN_Signal_FLOAT roll = MakeSignalSigned(float, 42, 21, 0.0002, 0.0, false);
+inline CAN_Signal_FLOAT yaw = MakeSignalSigned(float, 0, 21, 0.00024416, 0.0, false);
+inline CAN_Signal_FLOAT pitch = MakeSignalSigned(float, 21, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT roll = MakeSignalSigned(float, 42, 21, 0.00024416, 0.0, false);
 inline RX_CAN_Message(3) message{driveBus, 0x551, false, 8, yaw, pitch, roll};
 
 static constexpr float yawMin{-180.0};
@@ -1676,9 +1732,9 @@ static constexpr float rollMin{-180.0};
 
 namespace imuAngularRate {
 
-inline CAN_Signal_FLOAT xAxisAngularRate = MakeSignalSigned(float, 0, 21, 4e-05, 0.0, false);
-inline CAN_Signal_FLOAT yAxisAngularRate = MakeSignalSigned(float, 21, 21, 4e-05, 0.0, false);
-inline CAN_Signal_FLOAT zAxisAngularRate = MakeSignalSigned(float, 42, 21, 4e-05, 0.0, false);
+inline CAN_Signal_FLOAT xAxisAngularRate = MakeSignalSigned(float, 0, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT yAxisAngularRate = MakeSignalSigned(float, 21, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT zAxisAngularRate = MakeSignalSigned(float, 42, 21, 0.00012208, 0.0, false);
 inline RX_CAN_Message(3) message{
     driveBus, 0x552, false, 8, xAxisAngularRate, yAxisAngularRate, zAxisAngularRate};
 
@@ -1690,9 +1746,11 @@ static constexpr float zAxisAngularRateMin{-35.0};
 
 namespace imuPositionIns {
 
-inline CAN_Signal_DOUBLE positionLatitude = MakeSignalSigned(double, 0, 21, 9e-05, 0.0, false);
-inline CAN_Signal_DOUBLE positionLongitude = MakeSignalSigned(double, 21, 21, 9e-05, 0.0, false);
-inline CAN_Signal_DOUBLE positionAltutude = MakeSignalSigned(double, 42, 21, 0.005, 0.0, false);
+inline CAN_Signal_DOUBLE positionLatitude = MakeSignalSigned(double, 0, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_DOUBLE positionLongitude =
+    MakeSignalSigned(double, 21, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_DOUBLE positionAltutude =
+    MakeSignalSigned(double, 42, 21, 0.00781312, 0.0, false);
 inline RX_CAN_Message(3) message{
     driveBus, 0x553, false, 8, positionLatitude, positionLongitude, positionAltutude};
 
@@ -1704,9 +1762,9 @@ static constexpr double positionAltutudeMin{-430.0};
 
 namespace imuVelocity {
 
-inline CAN_Signal_FLOAT xAxisVelocity = MakeSignalSigned(float, 0, 21, 0.0005, 0.0, false);
-inline CAN_Signal_FLOAT yAxisVelocity = MakeSignalSigned(float, 21, 21, 0.0005, 0.0, false);
-inline CAN_Signal_FLOAT zAxisVelocity = MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT xAxisVelocity = MakeSignalSigned(float, 0, 21, 0.00048832, 0.0, false);
+inline CAN_Signal_FLOAT yAxisVelocity = MakeSignalSigned(float, 21, 21, 0.00048832, 0.0, false);
+inline CAN_Signal_FLOAT zAxisVelocity = MakeSignalSigned(float, 42, 21, 0.00048832, 0.0, false);
 inline RX_CAN_Message(3) message{
     driveBus, 0x554, false, 8, xAxisVelocity, yAxisVelocity, zAxisVelocity};
 
@@ -1718,9 +1776,9 @@ static constexpr float zAxisVelocityMin{-500.0};
 
 namespace imuMag {
 
-inline CAN_Signal_FLOAT xAxisMagnetometer = MakeSignalSigned(float, 0, 21, 0.0001, 0.0, false);
-inline CAN_Signal_FLOAT yAxisMagnetometer = MakeSignalSigned(float, 21, 21, 0.0001, 0.0, false);
-inline CAN_Signal_FLOAT zAxisMagnetometer = MakeSignalSigned(float, 42, 21, 0.0001, 0.0, false);
+inline CAN_Signal_FLOAT xAxisMagnetometer = MakeSignalSigned(float, 0, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT yAxisMagnetometer = MakeSignalSigned(float, 21, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT zAxisMagnetometer = MakeSignalSigned(float, 42, 21, 0.00012208, 0.0, false);
 inline RX_CAN_Message(3) message{
     driveBus, 0x555, false, 8, xAxisMagnetometer, yAxisMagnetometer, zAxisMagnetometer};
 
@@ -1730,50 +1788,55 @@ static constexpr float zAxisMagnetometerMin{-2.5};
 
 };  // namespace imuMag
 
-namespace imuPresTempDeltatime {
+namespace imuPresTemp {
 
-inline CAN_Signal_FLOAT temperature = MakeSignalSigned(float, 0, 21, 7e-05, 0.0, false);
-inline CAN_Signal_FLOAT pressure = MakeSignalSigned(float, 21, 21, 6e-05, 0.0, false);
-inline CAN_Signal_FLOAT deltaTime = MakeSignalSigned(float, 42, 21, 0.0001, 0.0, false);
-inline RX_CAN_Message(3) message{driveBus, 0x556, false, 8, temperature, pressure, deltaTime};
+inline CAN_Signal_FLOAT temperature = MakeSignalSigned(float, 0, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT pressure = MakeSignalSigned(float, 21, 21, 0.00012208, 0.0, false);
+inline RX_CAN_Message(2) message{driveBus, 0x556, false, 6, temperature, pressure};
 
 static constexpr float temperatureMin{-40.0};
 static constexpr float pressureMin{0.0};
-static constexpr float deltaTimeMin{0.0};
 
-};  // namespace imuPresTempDeltatime
+};  // namespace imuPresTemp
 
-namespace imuDeltaTheta {
+namespace imuAccelerationNoG {
 
-inline CAN_Signal_FLOAT xAxisDeltaTheta = MakeSignalSigned(float, 0, 21, 9e-05, 0.0, false);
-inline CAN_Signal_FLOAT yAxisDeltaTheta = MakeSignalSigned(float, 21, 21, 9e-05, 0.0, false);
-inline CAN_Signal_FLOAT zAxisDeltaTheta = MakeSignalSigned(float, 42, 21, 9e-05, 0.0, false);
+inline CAN_Signal_FLOAT noGXAxisAcceleration =
+    MakeSignalSigned(float, 0, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT noGYAxisAcceleration =
+    MakeSignalSigned(float, 21, 21, 0.00012208, 0.0, false);
+inline CAN_Signal_FLOAT noGZAxisAcceleration =
+    MakeSignalSigned(float, 42, 21, 0.00012208, 0.0, false);
 inline RX_CAN_Message(3) message{
-    driveBus, 0x557, false, 8, xAxisDeltaTheta, yAxisDeltaTheta, zAxisDeltaTheta};
+    driveBus, 0x557, false, 8, noGXAxisAcceleration, noGYAxisAcceleration, noGZAxisAcceleration};
 
-static constexpr float xAxisDeltaThetaMin{-90.0};
-static constexpr float yAxisDeltaThetaMin{-90.0};
-static constexpr float zAxisDeltaThetaMin{-90.0};
+static constexpr float noGXAxisAccelerationMin{-160.0};
+static constexpr float noGYAxisAccelerationMin{-160.0};
+static constexpr float noGZAxisAccelerationMin{-160.0};
 
-};  // namespace imuDeltaTheta
+};  // namespace imuAccelerationNoG
 
-namespace imuDeltaVel {
+namespace imuInsStatus {
 
-inline CAN_Signal_FLOAT xAxisDeltaVelocity = MakeSignalSigned(float, 0, 21, 0.0005, 0.0, false);
-inline CAN_Signal_FLOAT yAxisDeltaVelocity = MakeSignalSigned(float, 21, 21, 0.0005, 0.0, false);
-inline CAN_Signal_FLOAT zAxisDeltaVelocity = MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
-inline RX_CAN_Message(3) message{
-    driveBus, 0x558, false, 8, xAxisDeltaVelocity, yAxisDeltaVelocity, zAxisDeltaVelocity};
+inline CAN_Signal_UINT8 insMode = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 gnssFix = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 insError = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 gnssHeadingIns = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 gnssCompass = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
+inline RX_CAN_Message(5) message{
+    driveBus, 0x558, false, 5, insMode, gnssFix, insError, gnssHeadingIns, gnssCompass};
 
-static constexpr float xAxisDeltaVelocityMin{-500.0};
-static constexpr float yAxisDeltaVelocityMin{-500.0};
-static constexpr float zAxisDeltaVelocityMin{-500.0};
+static constexpr uint8_t insModeMin{0};
+static constexpr uint8_t gnssFixMin{0};
+static constexpr uint8_t insErrorMin{0};
+static constexpr uint8_t gnssHeadingInsMin{0};
+static constexpr uint8_t gnssCompassMin{0};
 
-};  // namespace imuDeltaVel
+};  // namespace imuInsStatus
 
 namespace imuUtcTime {
 
-inline CAN_Signal_UINT8 utcYear = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline CAN_Signal_INT8 utcYear = MakeSignalSigned(int8_t, 0, 8, 1.0, 0.0, false);
 inline CAN_Signal_UINT8 utcMonth = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
 inline CAN_Signal_UINT8 utcDay = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
 inline CAN_Signal_UINT8 utcHour = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
@@ -1801,54 +1864,19 @@ static constexpr uint16_t utcMillisecondsMin{0};
 
 };  // namespace imuUtcTime
 
-namespace imuFixNumsatsInsStatus {
+namespace imuDeltaVel {
 
-inline CAN_Signal_UINT8 numSats = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
-inline CAN_Signal_UINT8 fix = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
-inline CAN_Signal_UINT16 insStatus = MakeSignalExp(uint16_t, 16, 16, 1.0, 0.0);
-inline RX_CAN_Message(3) message{driveBus, 0x55A, false, 4, numSats, fix, insStatus};
-
-static constexpr uint8_t numSatsMin{0};
-static constexpr uint8_t fixMin{0};
-static constexpr uint16_t insStatusMin{0};
-
-};  // namespace imuFixNumsatsInsStatus
-
-namespace imuPositionGnss {
-
-inline CAN_Signal_DOUBLE positionLatitude = MakeSignalSigned(double, 0, 21, 9e-05, 0.0, false);
-inline CAN_Signal_DOUBLE positionLongitude = MakeSignalSigned(double, 21, 21, 9e-05, 0.0, false);
-inline CAN_Signal_DOUBLE positionAltutude = MakeSignalSigned(double, 42, 21, 0.005, 0.0, false);
+inline CAN_Signal_FLOAT xAxisDeltaVelocity = MakeSignalSigned(float, 0, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT yAxisDeltaVelocity = MakeSignalSigned(float, 21, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT zAxisDeltaVelocity = MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
 inline RX_CAN_Message(3) message{
-    driveBus, 0x55B, false, 8, positionLatitude, positionLongitude, positionAltutude};
+    driveBus, 0x55A, false, 8, xAxisDeltaVelocity, yAxisDeltaVelocity, zAxisDeltaVelocity};
 
-static constexpr double positionLatitudeMin{-90.0};
-static constexpr double positionLongitudeMin{-90.0};
-static constexpr double positionAltutudeMin{-430.0};
+static constexpr float xAxisDeltaVelocityMin{-500.0};
+static constexpr float yAxisDeltaVelocityMin{-500.0};
+static constexpr float zAxisDeltaVelocityMin{-500.0};
 
-};  // namespace imuPositionGnss
-
-namespace imuPositionU {
-
-inline CAN_Signal_FLOAT positionUncertaintyNorth =
-    MakeSignalSigned(float, 0, 21, 0.0005, 0.0, false);
-inline CAN_Signal_FLOAT positionUncertaintyEast =
-    MakeSignalSigned(float, 21, 21, 0.0005, 0.0, false);
-inline CAN_Signal_FLOAT positionUncertaintyDown =
-    MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
-inline RX_CAN_Message(3) message{driveBus,
-    0x55C,
-    false,
-    8,
-    positionUncertaintyNorth,
-    positionUncertaintyEast,
-    positionUncertaintyDown};
-
-static constexpr float positionUncertaintyNorthMin{0.0};
-static constexpr float positionUncertaintyEastMin{0.0};
-static constexpr float positionUncertaintyDownMin{0.0};
-
-};  // namespace imuPositionU
+};  // namespace imuDeltaVel
 
 namespace telemetryRtcTime {
 
@@ -1894,14 +1922,32 @@ namespace telemetryStatus {
 
 inline CAN_Signal_UINT16 logFile = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
 inline CAN_Signal_UINT8 loggingStatus = MakeSignalExp(uint8_t, 16, 8, 1.0, 0.0);
-inline CAN_Signal_UINT8 wirelessStatus = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
-inline RX_CAN_Message(3) message{driveBus, 0x523, false, 4, logFile, loggingStatus, wirelessStatus};
+inline CAN_Signal_UINT8 wirelessHardwareStatus = MakeSignalExp(uint8_t, 24, 8, 1.0, 0.0);
+inline CAN_Signal_UINT8 wirelessProtocolState = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
+inline RX_CAN_Message(4) message{driveBus,
+    0x523,
+    false,
+    5,
+    logFile,
+    loggingStatus,
+    wirelessHardwareStatus,
+    wirelessProtocolState};
 
 static constexpr uint16_t logFileMin{0};
 static constexpr uint8_t loggingStatusMin{0};
-static constexpr uint8_t wirelessStatusMin{0};
+static constexpr uint8_t wirelessHardwareStatusMin{0};
+static constexpr uint8_t wirelessProtocolStateMin{0};
 
 };  // namespace telemetryStatus
+
+namespace telemetryActiveAero {
+
+inline CAN_Signal_UINT8 servoAngle = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline RX_CAN_Message(1) message{driveBus, 0x524, false, 1, servoAngle};
+
+static constexpr uint8_t servoAngleMin{0};
+
+};  // namespace telemetryActiveAero
 
 namespace aeroStrainGauge1 {
 
@@ -1935,6 +1981,511 @@ static constexpr float strainGauge5Min{-100.0};
 static constexpr float strainGauge6Min{-100.0};
 
 };  // namespace aeroStrainGauge3
+
+namespace bmsOwcC1 {
+
+inline CAN_Signal_BOOL owcCell1 = MakeSignalSigned(bool, 0, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell2 = MakeSignalSigned(bool, 1, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell3 = MakeSignalSigned(bool, 2, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell4 = MakeSignalSigned(bool, 3, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell5 = MakeSignalSigned(bool, 4, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell6 = MakeSignalSigned(bool, 5, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell7 = MakeSignalSigned(bool, 6, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell8 = MakeSignalSigned(bool, 7, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell9 = MakeSignalSigned(bool, 8, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell10 = MakeSignalSigned(bool, 9, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell11 = MakeSignalSigned(bool, 10, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell12 = MakeSignalSigned(bool, 11, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell13 = MakeSignalSigned(bool, 12, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell14 = MakeSignalSigned(bool, 13, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell15 = MakeSignalSigned(bool, 14, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell16 = MakeSignalSigned(bool, 15, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell17 = MakeSignalSigned(bool, 16, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell18 = MakeSignalSigned(bool, 17, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell19 = MakeSignalSigned(bool, 18, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell20 = MakeSignalSigned(bool, 19, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell21 = MakeSignalSigned(bool, 20, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell22 = MakeSignalSigned(bool, 21, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell23 = MakeSignalSigned(bool, 22, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell24 = MakeSignalSigned(bool, 23, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell25 = MakeSignalSigned(bool, 24, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell26 = MakeSignalSigned(bool, 25, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell27 = MakeSignalSigned(bool, 26, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell28 = MakeSignalSigned(bool, 27, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell29 = MakeSignalSigned(bool, 28, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell30 = MakeSignalSigned(bool, 29, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell31 = MakeSignalSigned(bool, 30, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell32 = MakeSignalSigned(bool, 31, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell33 = MakeSignalSigned(bool, 32, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell34 = MakeSignalSigned(bool, 33, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell35 = MakeSignalSigned(bool, 34, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell36 = MakeSignalSigned(bool, 35, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell37 = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell38 = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell39 = MakeSignalSigned(bool, 38, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell40 = MakeSignalSigned(bool, 39, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell41 = MakeSignalSigned(bool, 40, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell42 = MakeSignalSigned(bool, 41, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell43 = MakeSignalSigned(bool, 42, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell44 = MakeSignalSigned(bool, 43, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell45 = MakeSignalSigned(bool, 44, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell46 = MakeSignalSigned(bool, 45, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell47 = MakeSignalSigned(bool, 46, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell48 = MakeSignalSigned(bool, 47, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell49 = MakeSignalSigned(bool, 48, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell50 = MakeSignalSigned(bool, 49, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell51 = MakeSignalSigned(bool, 50, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell52 = MakeSignalSigned(bool, 51, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell53 = MakeSignalSigned(bool, 52, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell54 = MakeSignalSigned(bool, 53, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell55 = MakeSignalSigned(bool, 54, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell56 = MakeSignalSigned(bool, 55, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell57 = MakeSignalSigned(bool, 56, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell58 = MakeSignalSigned(bool, 57, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell59 = MakeSignalSigned(bool, 58, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell60 = MakeSignalSigned(bool, 59, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell61 = MakeSignalSigned(bool, 60, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell62 = MakeSignalSigned(bool, 61, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell63 = MakeSignalSigned(bool, 62, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell64 = MakeSignalSigned(bool, 63, 1, 1.0, 0.0, false);
+inline RX_CAN_Message(64) message{driveBus,
+    0x140,
+    false,
+    8,
+    owcCell1,
+    owcCell2,
+    owcCell3,
+    owcCell4,
+    owcCell5,
+    owcCell6,
+    owcCell7,
+    owcCell8,
+    owcCell9,
+    owcCell10,
+    owcCell11,
+    owcCell12,
+    owcCell13,
+    owcCell14,
+    owcCell15,
+    owcCell16,
+    owcCell17,
+    owcCell18,
+    owcCell19,
+    owcCell20,
+    owcCell21,
+    owcCell22,
+    owcCell23,
+    owcCell24,
+    owcCell25,
+    owcCell26,
+    owcCell27,
+    owcCell28,
+    owcCell29,
+    owcCell30,
+    owcCell31,
+    owcCell32,
+    owcCell33,
+    owcCell34,
+    owcCell35,
+    owcCell36,
+    owcCell37,
+    owcCell38,
+    owcCell39,
+    owcCell40,
+    owcCell41,
+    owcCell42,
+    owcCell43,
+    owcCell44,
+    owcCell45,
+    owcCell46,
+    owcCell47,
+    owcCell48,
+    owcCell49,
+    owcCell50,
+    owcCell51,
+    owcCell52,
+    owcCell53,
+    owcCell54,
+    owcCell55,
+    owcCell56,
+    owcCell57,
+    owcCell58,
+    owcCell59,
+    owcCell60,
+    owcCell61,
+    owcCell62,
+    owcCell63,
+    owcCell64};
+
+};  // namespace bmsOwcC1
+
+namespace bmsOwcC2 {
+
+inline CAN_Signal_BOOL owcCell65 = MakeSignalSigned(bool, 0, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell66 = MakeSignalSigned(bool, 1, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell67 = MakeSignalSigned(bool, 2, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell68 = MakeSignalSigned(bool, 3, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell69 = MakeSignalSigned(bool, 4, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell70 = MakeSignalSigned(bool, 5, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell71 = MakeSignalSigned(bool, 6, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell72 = MakeSignalSigned(bool, 7, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell73 = MakeSignalSigned(bool, 8, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell74 = MakeSignalSigned(bool, 9, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell75 = MakeSignalSigned(bool, 10, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell76 = MakeSignalSigned(bool, 11, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell77 = MakeSignalSigned(bool, 12, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell78 = MakeSignalSigned(bool, 13, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell79 = MakeSignalSigned(bool, 14, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell80 = MakeSignalSigned(bool, 15, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell81 = MakeSignalSigned(bool, 16, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell82 = MakeSignalSigned(bool, 17, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell83 = MakeSignalSigned(bool, 18, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell84 = MakeSignalSigned(bool, 19, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell85 = MakeSignalSigned(bool, 20, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell86 = MakeSignalSigned(bool, 21, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell87 = MakeSignalSigned(bool, 22, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell88 = MakeSignalSigned(bool, 23, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell89 = MakeSignalSigned(bool, 24, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell90 = MakeSignalSigned(bool, 25, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell91 = MakeSignalSigned(bool, 26, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell92 = MakeSignalSigned(bool, 27, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell93 = MakeSignalSigned(bool, 28, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell94 = MakeSignalSigned(bool, 29, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell95 = MakeSignalSigned(bool, 30, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell96 = MakeSignalSigned(bool, 31, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell97 = MakeSignalSigned(bool, 32, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell98 = MakeSignalSigned(bool, 33, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell99 = MakeSignalSigned(bool, 34, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell100 = MakeSignalSigned(bool, 35, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell101 = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell102 = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell103 = MakeSignalSigned(bool, 38, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell104 = MakeSignalSigned(bool, 39, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell105 = MakeSignalSigned(bool, 40, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell106 = MakeSignalSigned(bool, 41, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell107 = MakeSignalSigned(bool, 42, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell108 = MakeSignalSigned(bool, 43, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell109 = MakeSignalSigned(bool, 44, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell110 = MakeSignalSigned(bool, 45, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell111 = MakeSignalSigned(bool, 46, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell112 = MakeSignalSigned(bool, 47, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell113 = MakeSignalSigned(bool, 48, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell114 = MakeSignalSigned(bool, 49, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell115 = MakeSignalSigned(bool, 50, 1, 1.0, 0.0, false);
+inline RX_CAN_Message(51) message{driveBus,
+    0x141,
+    false,
+    7,
+    owcCell65,
+    owcCell66,
+    owcCell67,
+    owcCell68,
+    owcCell69,
+    owcCell70,
+    owcCell71,
+    owcCell72,
+    owcCell73,
+    owcCell74,
+    owcCell75,
+    owcCell76,
+    owcCell77,
+    owcCell78,
+    owcCell79,
+    owcCell80,
+    owcCell81,
+    owcCell82,
+    owcCell83,
+    owcCell84,
+    owcCell85,
+    owcCell86,
+    owcCell87,
+    owcCell88,
+    owcCell89,
+    owcCell90,
+    owcCell91,
+    owcCell92,
+    owcCell93,
+    owcCell94,
+    owcCell95,
+    owcCell96,
+    owcCell97,
+    owcCell98,
+    owcCell99,
+    owcCell100,
+    owcCell101,
+    owcCell102,
+    owcCell103,
+    owcCell104,
+    owcCell105,
+    owcCell106,
+    owcCell107,
+    owcCell108,
+    owcCell109,
+    owcCell110,
+    owcCell111,
+    owcCell112,
+    owcCell113,
+    owcCell114,
+    owcCell115};
+
+};  // namespace bmsOwcC2
+
+namespace bmsOwcS1 {
+
+inline CAN_Signal_BOOL owcCell1 = MakeSignalSigned(bool, 0, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell2 = MakeSignalSigned(bool, 1, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell3 = MakeSignalSigned(bool, 2, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell4 = MakeSignalSigned(bool, 3, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell5 = MakeSignalSigned(bool, 4, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell6 = MakeSignalSigned(bool, 5, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell7 = MakeSignalSigned(bool, 6, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell8 = MakeSignalSigned(bool, 7, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell9 = MakeSignalSigned(bool, 8, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell10 = MakeSignalSigned(bool, 9, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell11 = MakeSignalSigned(bool, 10, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell12 = MakeSignalSigned(bool, 11, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell13 = MakeSignalSigned(bool, 12, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell14 = MakeSignalSigned(bool, 13, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell15 = MakeSignalSigned(bool, 14, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell16 = MakeSignalSigned(bool, 15, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell17 = MakeSignalSigned(bool, 16, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell18 = MakeSignalSigned(bool, 17, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell19 = MakeSignalSigned(bool, 18, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell20 = MakeSignalSigned(bool, 19, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell21 = MakeSignalSigned(bool, 20, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell22 = MakeSignalSigned(bool, 21, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell23 = MakeSignalSigned(bool, 22, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell24 = MakeSignalSigned(bool, 23, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell25 = MakeSignalSigned(bool, 24, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell26 = MakeSignalSigned(bool, 25, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell27 = MakeSignalSigned(bool, 26, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell28 = MakeSignalSigned(bool, 27, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell29 = MakeSignalSigned(bool, 28, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell30 = MakeSignalSigned(bool, 29, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell31 = MakeSignalSigned(bool, 30, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell32 = MakeSignalSigned(bool, 31, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell33 = MakeSignalSigned(bool, 32, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell34 = MakeSignalSigned(bool, 33, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell35 = MakeSignalSigned(bool, 34, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell36 = MakeSignalSigned(bool, 35, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell37 = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell38 = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell39 = MakeSignalSigned(bool, 38, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell40 = MakeSignalSigned(bool, 39, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell41 = MakeSignalSigned(bool, 40, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell42 = MakeSignalSigned(bool, 41, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell43 = MakeSignalSigned(bool, 42, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell44 = MakeSignalSigned(bool, 43, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell45 = MakeSignalSigned(bool, 44, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell46 = MakeSignalSigned(bool, 45, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell47 = MakeSignalSigned(bool, 46, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell48 = MakeSignalSigned(bool, 47, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell49 = MakeSignalSigned(bool, 48, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell50 = MakeSignalSigned(bool, 49, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell51 = MakeSignalSigned(bool, 50, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell52 = MakeSignalSigned(bool, 51, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell53 = MakeSignalSigned(bool, 52, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell54 = MakeSignalSigned(bool, 53, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell55 = MakeSignalSigned(bool, 54, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell56 = MakeSignalSigned(bool, 55, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell57 = MakeSignalSigned(bool, 56, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell58 = MakeSignalSigned(bool, 57, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell59 = MakeSignalSigned(bool, 58, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell60 = MakeSignalSigned(bool, 59, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell61 = MakeSignalSigned(bool, 60, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell62 = MakeSignalSigned(bool, 61, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell63 = MakeSignalSigned(bool, 62, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell64 = MakeSignalSigned(bool, 63, 1, 1.0, 0.0, false);
+inline RX_CAN_Message(64) message{driveBus,
+    0x142,
+    false,
+    8,
+    owcCell1,
+    owcCell2,
+    owcCell3,
+    owcCell4,
+    owcCell5,
+    owcCell6,
+    owcCell7,
+    owcCell8,
+    owcCell9,
+    owcCell10,
+    owcCell11,
+    owcCell12,
+    owcCell13,
+    owcCell14,
+    owcCell15,
+    owcCell16,
+    owcCell17,
+    owcCell18,
+    owcCell19,
+    owcCell20,
+    owcCell21,
+    owcCell22,
+    owcCell23,
+    owcCell24,
+    owcCell25,
+    owcCell26,
+    owcCell27,
+    owcCell28,
+    owcCell29,
+    owcCell30,
+    owcCell31,
+    owcCell32,
+    owcCell33,
+    owcCell34,
+    owcCell35,
+    owcCell36,
+    owcCell37,
+    owcCell38,
+    owcCell39,
+    owcCell40,
+    owcCell41,
+    owcCell42,
+    owcCell43,
+    owcCell44,
+    owcCell45,
+    owcCell46,
+    owcCell47,
+    owcCell48,
+    owcCell49,
+    owcCell50,
+    owcCell51,
+    owcCell52,
+    owcCell53,
+    owcCell54,
+    owcCell55,
+    owcCell56,
+    owcCell57,
+    owcCell58,
+    owcCell59,
+    owcCell60,
+    owcCell61,
+    owcCell62,
+    owcCell63,
+    owcCell64};
+
+};  // namespace bmsOwcS1
+
+namespace bmsOwcS2 {
+
+inline CAN_Signal_BOOL owcCell65 = MakeSignalSigned(bool, 0, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell66 = MakeSignalSigned(bool, 1, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell67 = MakeSignalSigned(bool, 2, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell68 = MakeSignalSigned(bool, 3, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell69 = MakeSignalSigned(bool, 4, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell70 = MakeSignalSigned(bool, 5, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell71 = MakeSignalSigned(bool, 6, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell72 = MakeSignalSigned(bool, 7, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell73 = MakeSignalSigned(bool, 8, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell74 = MakeSignalSigned(bool, 9, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell75 = MakeSignalSigned(bool, 10, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell76 = MakeSignalSigned(bool, 11, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell77 = MakeSignalSigned(bool, 12, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell78 = MakeSignalSigned(bool, 13, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell79 = MakeSignalSigned(bool, 14, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell80 = MakeSignalSigned(bool, 15, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell81 = MakeSignalSigned(bool, 16, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell82 = MakeSignalSigned(bool, 17, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell83 = MakeSignalSigned(bool, 18, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell84 = MakeSignalSigned(bool, 19, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell85 = MakeSignalSigned(bool, 20, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell86 = MakeSignalSigned(bool, 21, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell87 = MakeSignalSigned(bool, 22, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell88 = MakeSignalSigned(bool, 23, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell89 = MakeSignalSigned(bool, 24, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell90 = MakeSignalSigned(bool, 25, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell91 = MakeSignalSigned(bool, 26, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell92 = MakeSignalSigned(bool, 27, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell93 = MakeSignalSigned(bool, 28, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell94 = MakeSignalSigned(bool, 29, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell95 = MakeSignalSigned(bool, 30, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell96 = MakeSignalSigned(bool, 31, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell97 = MakeSignalSigned(bool, 32, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell98 = MakeSignalSigned(bool, 33, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell99 = MakeSignalSigned(bool, 34, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell100 = MakeSignalSigned(bool, 35, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell101 = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell102 = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell103 = MakeSignalSigned(bool, 38, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell104 = MakeSignalSigned(bool, 39, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell105 = MakeSignalSigned(bool, 40, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell106 = MakeSignalSigned(bool, 41, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell107 = MakeSignalSigned(bool, 42, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell108 = MakeSignalSigned(bool, 43, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell109 = MakeSignalSigned(bool, 44, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell110 = MakeSignalSigned(bool, 45, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell111 = MakeSignalSigned(bool, 46, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell112 = MakeSignalSigned(bool, 47, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell113 = MakeSignalSigned(bool, 48, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell114 = MakeSignalSigned(bool, 49, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL owcCell115 = MakeSignalSigned(bool, 50, 1, 1.0, 0.0, false);
+inline RX_CAN_Message(51) message{driveBus,
+    0x143,
+    false,
+    7,
+    owcCell65,
+    owcCell66,
+    owcCell67,
+    owcCell68,
+    owcCell69,
+    owcCell70,
+    owcCell71,
+    owcCell72,
+    owcCell73,
+    owcCell74,
+    owcCell75,
+    owcCell76,
+    owcCell77,
+    owcCell78,
+    owcCell79,
+    owcCell80,
+    owcCell81,
+    owcCell82,
+    owcCell83,
+    owcCell84,
+    owcCell85,
+    owcCell86,
+    owcCell87,
+    owcCell88,
+    owcCell89,
+    owcCell90,
+    owcCell91,
+    owcCell92,
+    owcCell93,
+    owcCell94,
+    owcCell95,
+    owcCell96,
+    owcCell97,
+    owcCell98,
+    owcCell99,
+    owcCell100,
+    owcCell101,
+    owcCell102,
+    owcCell103,
+    owcCell104,
+    owcCell105,
+    owcCell106,
+    owcCell107,
+    owcCell108,
+    owcCell109,
+    owcCell110,
+    owcCell111,
+    owcCell112,
+    owcCell113,
+    owcCell114,
+    owcCell115};
+
+};  // namespace bmsOwcS2
+
+namespace bmsChargerCurrent {
+
+inline CAN_Signal_UINT16 chargerCurrentSet = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
+inline RX_CAN_Message(1) message{driveBus, 0x130, false, 2, chargerCurrentSet};
+
+static constexpr uint16_t chargerCurrentSetMin{0};
+
+};  // namespace bmsChargerCurrent
 
 namespace meta {
 
@@ -2024,40 +2575,48 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x00C, "CAN2USB_Controller_Error_Protocol_Violation"},
     {0x530, "BR_Broker_Temp1"},
     {0x531, "BR_Broker_Temp2"},
-    {0x538, "BR_Broker_Sus"},
+    {0x538, "BR_Broker_Sus_Uncalibrated"},
     {0x540, "BR_Broker_CAN_Error_Msg"},
+    {0x570, "BR_Broker_Sus_Calibrated"},
     {0x532, "BL_Broker_Temp1"},
     {0x533, "BL_Broker_Temp2"},
-    {0x53A, "BL_Broker_Sus"},
+    {0x53A, "BL_Broker_Sus_Uncalibrated"},
     {0x541, "BL_Broker_CAN_Error_Msg"},
+    {0x571, "BL_Broker_Sus_Calibrated"},
     {0x534, "FR_Broker_Temp1"},
     {0x535, "FR_Broker_Temp2"},
-    {0x53C, "FR_Broker_Sus"},
+    {0x53C, "FR_Broker_Sus_Uncalibrated"},
     {0x542, "FR_Broker_CAN_Error_Msg"},
+    {0x572, "FR_Broker_Sus_Calibrated"},
     {0x536, "FL_Broker_Temp1"},
     {0x537, "FL_Broker_Temp2"},
-    {0x53E, "FL_Broker_Sus"},
+    {0x53E, "FL_Broker_Sus_Uncalibrated"},
     {0x543, "FL_Broker_CAN_Error_Msg"},
+    {0x573, "FL_Broker_Sus_Calibrated"},
     {0x550, "IMU_Acceleration"},
     {0x551, "IMU_Yaw_Pitch_Roll"},
     {0x552, "IMU_Angular_Rate"},
     {0x553, "IMU_Position_INS"},
     {0x554, "IMU_Velocity"},
     {0x555, "IMU_Mag"},
-    {0x556, "IMU_Pres_Temp_DeltaTime"},
-    {0x557, "IMU_Delta_Theta"},
-    {0x558, "IMU_Delta_Vel"},
+    {0x556, "IMU_Pres_Temp"},
+    {0x557, "IMU_Acceleration_No_G"},
+    {0x558, "IMU_INS_Status"},
     {0x559, "IMU_UTC_Time"},
-    {0x55A, "IMU_Fix_NumSats_INS_Status"},
-    {0x55B, "IMU_Position_GNSS"},
-    {0x55C, "IMU_Position_U"},
+    {0x55A, "IMU_Delta_Vel"},
     {0x520, "Telemetry_RTC_Time"},
     {0x521, "Telemetry_RTC_Date"},
     {0x522, "Telemetry_Odometer"},
     {0x523, "Telemetry_Status"},
+    {0x524, "Telemetry_Active_Aero"},
     {0x560, "Aero_Strain_Gauge1"},
     {0x561, "Aero_Strain_Gauge2"},
     {0x562, "Aero_Strain_Gauge3"},
+    {0x140, "BMS_OWC_C_1"},
+    {0x141, "BMS_OWC_C_2"},
+    {0x142, "BMS_OWC_S_1"},
+    {0x143, "BMS_OWC_S_2"},
+    {0x130, "BMS_Charger_Current"},
 };
 
 static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName = {
@@ -2390,12 +2949,14 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x531, 1}, "BR_Tire_Temp_5"},
     {{0x531, 2}, "BR_Tire_Temp_6"},
     {{0x531, 3}, "BR_Tire_Temp_7"},
-    {{0x538, 0}, "BR_Strain_Gauge"},
-    {{0x538, 1}, "BR_Sus_Pot"},
+    {{0x538, 0}, "BR_Strain_Gauge_Uncalibrated"},
+    {{0x538, 1}, "BR_Sus_Pot_Uncalibrated"},
     {{0x540, 0}, "BR_Strain_Gauge_Error"},
     {{0x540, 1}, "BR_Sus_Pot_Error"},
     {{0x540, 2}, "BR_Tire_Temp_Error"},
     {{0x540, 3}, "BR_Heartbeat_Count"},
+    {{0x570, 0}, "BR_Strain_Gauge_Calibrated"},
+    {{0x570, 1}, "BR_Sus_Pot_Calibrated"},
     {{0x532, 0}, "BL_Tire_Temp_0"},
     {{0x532, 1}, "BL_Tire_Temp_1"},
     {{0x532, 2}, "BL_Tire_Temp_2"},
@@ -2404,12 +2965,14 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x533, 1}, "BL_Tire_Temp_5"},
     {{0x533, 2}, "BL_Tire_Temp_6"},
     {{0x533, 3}, "BL_Tire_Temp_7"},
-    {{0x53A, 0}, "BL_Strain_Gauge"},
-    {{0x53A, 1}, "BL_Sus_Pot"},
+    {{0x53A, 0}, "BL_Strain_Gauge_Uncalibrated"},
+    {{0x53A, 1}, "BL_Sus_Pot_Uncalibrated"},
     {{0x541, 0}, "BL_Strain_Gauge_Error"},
     {{0x541, 1}, "BL_Sus_Pot_Error"},
     {{0x541, 2}, "BL_Tire_Temp_Error"},
     {{0x541, 3}, "BL_Heartbeat_Count"},
+    {{0x571, 0}, "BL_Strain_Gauge_Calibrated"},
+    {{0x571, 1}, "BL_Sus_Pot_Calibrated"},
     {{0x534, 0}, "FR_Tire_Temp_0"},
     {{0x534, 1}, "FR_Tire_Temp_1"},
     {{0x534, 2}, "FR_Tire_Temp_2"},
@@ -2418,12 +2981,14 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x535, 1}, "FR_Tire_Temp_5"},
     {{0x535, 2}, "FR_Tire_Temp_6"},
     {{0x535, 3}, "FR_Tire_Temp_7"},
-    {{0x53C, 0}, "FR_Strain_Gauge"},
-    {{0x53C, 1}, "FR_Sus_Pot"},
+    {{0x53C, 0}, "FR_Strain_Gauge_Uncalibrated"},
+    {{0x53C, 1}, "FR_Sus_Pot_Uncalibrated"},
     {{0x542, 0}, "FR_Strain_Gauge_Error"},
     {{0x542, 1}, "FR_Sus_Pot_Error"},
     {{0x542, 2}, "FR_Tire_Temp_Error"},
     {{0x542, 3}, "FR_Heartbeat_Count"},
+    {{0x572, 0}, "FR_Strain_Gauge_Calibrated"},
+    {{0x572, 1}, "FR_Sus_Pot_Calibrated"},
     {{0x536, 0}, "FL_Tire_Temp_0"},
     {{0x536, 1}, "FL_Tire_Temp_1"},
     {{0x536, 2}, "FL_Tire_Temp_2"},
@@ -2432,12 +2997,14 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x537, 1}, "FL_Tire_Temp_5"},
     {{0x537, 2}, "FL_Tire_Temp_6"},
     {{0x537, 3}, "FL_Tire_Temp_7"},
-    {{0x53E, 0}, "FL_Strain_Gauge"},
-    {{0x53E, 1}, "FL_Sus_Pot"},
+    {{0x53E, 0}, "FL_Strain_Gauge_Uncalibrated"},
+    {{0x53E, 1}, "FL_Sus_Pot_Uncalibrated"},
     {{0x543, 0}, "FL_Strain_Gauge_Error"},
     {{0x543, 1}, "FL_Sus_Pot_Error"},
     {{0x543, 2}, "FL_Tire_Temp_Error"},
     {{0x543, 3}, "FL_Heartbeat_Count"},
+    {{0x573, 0}, "FL_Strain_Gauge_Calibrated"},
+    {{0x573, 1}, "FL_Sus_Pot_Calibrated"},
     {{0x550, 0}, "X_Axis_Acceleration"},
     {{0x550, 1}, "Y_Axis_Acceleration"},
     {{0x550, 2}, "Z_Axis_Acceleration"},
@@ -2458,13 +3025,14 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x555, 2}, "Z_Axis_Magnetometer"},
     {{0x556, 0}, "Temperature"},
     {{0x556, 1}, "Pressure"},
-    {{0x556, 2}, "Delta_Time"},
-    {{0x557, 0}, "X_Axis_Delta_Theta"},
-    {{0x557, 1}, "Y_Axis_Delta_Theta"},
-    {{0x557, 2}, "Z_Axis_Delta_Theta"},
-    {{0x558, 0}, "X_Axis_Delta_Velocity"},
-    {{0x558, 1}, "Y_Axis_Delta_Velocity"},
-    {{0x558, 2}, "Z_Axis_Delta_Velocity"},
+    {{0x557, 0}, "No_G_X_Axis_Acceleration"},
+    {{0x557, 1}, "No_G_Y_Axis_Acceleration"},
+    {{0x557, 2}, "No_G_Z_Axis_Acceleration"},
+    {{0x558, 0}, "INS_Mode"},
+    {{0x558, 1}, "GNSS_Fix"},
+    {{0x558, 2}, "INS_Error"},
+    {{0x558, 3}, "GNSS_Heading_INS"},
+    {{0x558, 4}, "GNSS_Compass"},
     {{0x559, 0}, "UTC_Year"},
     {{0x559, 1}, "UTC_Month"},
     {{0x559, 2}, "UTC_Day"},
@@ -2472,15 +3040,9 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x559, 4}, "UTC_Minutes"},
     {{0x559, 5}, "UTC_Seconds"},
     {{0x559, 6}, "UTC_Milliseconds"},
-    {{0x55A, 0}, "Num_Sats"},
-    {{0x55A, 1}, "Fix"},
-    {{0x55A, 2}, "INS_Status"},
-    {{0x55B, 0}, "Position_Latitude"},
-    {{0x55B, 1}, "Position_Longitude"},
-    {{0x55B, 2}, "Position_Altutude"},
-    {{0x55C, 0}, "Position_Uncertainty_North"},
-    {{0x55C, 1}, "Position_Uncertainty_East"},
-    {{0x55C, 2}, "Position_Uncertainty_Down"},
+    {{0x55A, 0}, "X_Axis_Delta_Velocity"},
+    {{0x55A, 1}, "Y_Axis_Delta_Velocity"},
+    {{0x55A, 2}, "Z_Axis_Delta_Velocity"},
     {{0x520, 0}, "RTC_Hour"},
     {{0x520, 1}, "RTC_Minute"},
     {{0x520, 2}, "RTC_Second"},
@@ -2492,13 +3054,246 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x522, 0}, "Miles_Driven"},
     {{0x523, 0}, "Log_File"},
     {{0x523, 1}, "Logging_Status"},
-    {{0x523, 2}, "Wireless_Status"},
+    {{0x523, 2}, "Wireless_Hardware_Status"},
+    {{0x523, 3}, "Wireless_Protocol_State"},
+    {{0x524, 0}, "Servo_Angle"},
     {{0x560, 0}, "Strain_Gauge_1"},
     {{0x560, 1}, "Strain_Gauge_2"},
     {{0x561, 0}, "Strain_Gauge_3"},
     {{0x561, 1}, "Strain_Gauge_4"},
     {{0x562, 0}, "Strain_Gauge_5"},
     {{0x562, 1}, "Strain_Gauge_6"},
+    {{0x140, 0}, "OWC_Cell_1"},
+    {{0x140, 1}, "OWC_Cell_2"},
+    {{0x140, 2}, "OWC_Cell_3"},
+    {{0x140, 3}, "OWC_Cell_4"},
+    {{0x140, 4}, "OWC_Cell_5"},
+    {{0x140, 5}, "OWC_Cell_6"},
+    {{0x140, 6}, "OWC_Cell_7"},
+    {{0x140, 7}, "OWC_Cell_8"},
+    {{0x140, 8}, "OWC_Cell_9"},
+    {{0x140, 9}, "OWC_Cell_10"},
+    {{0x140, 10}, "OWC_Cell_11"},
+    {{0x140, 11}, "OWC_Cell_12"},
+    {{0x140, 12}, "OWC_Cell_13"},
+    {{0x140, 13}, "OWC_Cell_14"},
+    {{0x140, 14}, "OWC_Cell_15"},
+    {{0x140, 15}, "OWC_Cell_16"},
+    {{0x140, 16}, "OWC_Cell_17"},
+    {{0x140, 17}, "OWC_Cell_18"},
+    {{0x140, 18}, "OWC_Cell_19"},
+    {{0x140, 19}, "OWC_Cell_20"},
+    {{0x140, 20}, "OWC_Cell_21"},
+    {{0x140, 21}, "OWC_Cell_22"},
+    {{0x140, 22}, "OWC_Cell_23"},
+    {{0x140, 23}, "OWC_Cell_24"},
+    {{0x140, 24}, "OWC_Cell_25"},
+    {{0x140, 25}, "OWC_Cell_26"},
+    {{0x140, 26}, "OWC_Cell_27"},
+    {{0x140, 27}, "OWC_Cell_28"},
+    {{0x140, 28}, "OWC_Cell_29"},
+    {{0x140, 29}, "OWC_Cell_30"},
+    {{0x140, 30}, "OWC_Cell_31"},
+    {{0x140, 31}, "OWC_Cell_32"},
+    {{0x140, 32}, "OWC_Cell_33"},
+    {{0x140, 33}, "OWC_Cell_34"},
+    {{0x140, 34}, "OWC_Cell_35"},
+    {{0x140, 35}, "OWC_Cell_36"},
+    {{0x140, 36}, "OWC_Cell_37"},
+    {{0x140, 37}, "OWC_Cell_38"},
+    {{0x140, 38}, "OWC_Cell_39"},
+    {{0x140, 39}, "OWC_Cell_40"},
+    {{0x140, 40}, "OWC_Cell_41"},
+    {{0x140, 41}, "OWC_Cell_42"},
+    {{0x140, 42}, "OWC_Cell_43"},
+    {{0x140, 43}, "OWC_Cell_44"},
+    {{0x140, 44}, "OWC_Cell_45"},
+    {{0x140, 45}, "OWC_Cell_46"},
+    {{0x140, 46}, "OWC_Cell_47"},
+    {{0x140, 47}, "OWC_Cell_48"},
+    {{0x140, 48}, "OWC_Cell_49"},
+    {{0x140, 49}, "OWC_Cell_50"},
+    {{0x140, 50}, "OWC_Cell_51"},
+    {{0x140, 51}, "OWC_Cell_52"},
+    {{0x140, 52}, "OWC_Cell_53"},
+    {{0x140, 53}, "OWC_Cell_54"},
+    {{0x140, 54}, "OWC_Cell_55"},
+    {{0x140, 55}, "OWC_Cell_56"},
+    {{0x140, 56}, "OWC_Cell_57"},
+    {{0x140, 57}, "OWC_Cell_58"},
+    {{0x140, 58}, "OWC_Cell_59"},
+    {{0x140, 59}, "OWC_Cell_60"},
+    {{0x140, 60}, "OWC_Cell_61"},
+    {{0x140, 61}, "OWC_Cell_62"},
+    {{0x140, 62}, "OWC_Cell_63"},
+    {{0x140, 63}, "OWC_Cell_64"},
+    {{0x141, 0}, "OWC_Cell_65"},
+    {{0x141, 1}, "OWC_Cell_66"},
+    {{0x141, 2}, "OWC_Cell_67"},
+    {{0x141, 3}, "OWC_Cell_68"},
+    {{0x141, 4}, "OWC_Cell_69"},
+    {{0x141, 5}, "OWC_Cell_70"},
+    {{0x141, 6}, "OWC_Cell_71"},
+    {{0x141, 7}, "OWC_Cell_72"},
+    {{0x141, 8}, "OWC_Cell_73"},
+    {{0x141, 9}, "OWC_Cell_74"},
+    {{0x141, 10}, "OWC_Cell_75"},
+    {{0x141, 11}, "OWC_Cell_76"},
+    {{0x141, 12}, "OWC_Cell_77"},
+    {{0x141, 13}, "OWC_Cell_78"},
+    {{0x141, 14}, "OWC_Cell_79"},
+    {{0x141, 15}, "OWC_Cell_80"},
+    {{0x141, 16}, "OWC_Cell_81"},
+    {{0x141, 17}, "OWC_Cell_82"},
+    {{0x141, 18}, "OWC_Cell_83"},
+    {{0x141, 19}, "OWC_Cell_84"},
+    {{0x141, 20}, "OWC_Cell_85"},
+    {{0x141, 21}, "OWC_Cell_86"},
+    {{0x141, 22}, "OWC_Cell_87"},
+    {{0x141, 23}, "OWC_Cell_88"},
+    {{0x141, 24}, "OWC_Cell_89"},
+    {{0x141, 25}, "OWC_Cell_90"},
+    {{0x141, 26}, "OWC_Cell_91"},
+    {{0x141, 27}, "OWC_Cell_92"},
+    {{0x141, 28}, "OWC_Cell_93"},
+    {{0x141, 29}, "OWC_Cell_94"},
+    {{0x141, 30}, "OWC_Cell_95"},
+    {{0x141, 31}, "OWC_Cell_96"},
+    {{0x141, 32}, "OWC_Cell_97"},
+    {{0x141, 33}, "OWC_Cell_98"},
+    {{0x141, 34}, "OWC_Cell_99"},
+    {{0x141, 35}, "OWC_Cell_100"},
+    {{0x141, 36}, "OWC_Cell_101"},
+    {{0x141, 37}, "OWC_Cell_102"},
+    {{0x141, 38}, "OWC_Cell_103"},
+    {{0x141, 39}, "OWC_Cell_104"},
+    {{0x141, 40}, "OWC_Cell_105"},
+    {{0x141, 41}, "OWC_Cell_106"},
+    {{0x141, 42}, "OWC_Cell_107"},
+    {{0x141, 43}, "OWC_Cell_108"},
+    {{0x141, 44}, "OWC_Cell_109"},
+    {{0x141, 45}, "OWC_Cell_110"},
+    {{0x141, 46}, "OWC_Cell_111"},
+    {{0x141, 47}, "OWC_Cell_112"},
+    {{0x141, 48}, "OWC_Cell_113"},
+    {{0x141, 49}, "OWC_Cell_114"},
+    {{0x141, 50}, "OWC_Cell_115"},
+    {{0x142, 0}, "OWC_Cell_1"},
+    {{0x142, 1}, "OWC_Cell_2"},
+    {{0x142, 2}, "OWC_Cell_3"},
+    {{0x142, 3}, "OWC_Cell_4"},
+    {{0x142, 4}, "OWC_Cell_5"},
+    {{0x142, 5}, "OWC_Cell_6"},
+    {{0x142, 6}, "OWC_Cell_7"},
+    {{0x142, 7}, "OWC_Cell_8"},
+    {{0x142, 8}, "OWC_Cell_9"},
+    {{0x142, 9}, "OWC_Cell_10"},
+    {{0x142, 10}, "OWC_Cell_11"},
+    {{0x142, 11}, "OWC_Cell_12"},
+    {{0x142, 12}, "OWC_Cell_13"},
+    {{0x142, 13}, "OWC_Cell_14"},
+    {{0x142, 14}, "OWC_Cell_15"},
+    {{0x142, 15}, "OWC_Cell_16"},
+    {{0x142, 16}, "OWC_Cell_17"},
+    {{0x142, 17}, "OWC_Cell_18"},
+    {{0x142, 18}, "OWC_Cell_19"},
+    {{0x142, 19}, "OWC_Cell_20"},
+    {{0x142, 20}, "OWC_Cell_21"},
+    {{0x142, 21}, "OWC_Cell_22"},
+    {{0x142, 22}, "OWC_Cell_23"},
+    {{0x142, 23}, "OWC_Cell_24"},
+    {{0x142, 24}, "OWC_Cell_25"},
+    {{0x142, 25}, "OWC_Cell_26"},
+    {{0x142, 26}, "OWC_Cell_27"},
+    {{0x142, 27}, "OWC_Cell_28"},
+    {{0x142, 28}, "OWC_Cell_29"},
+    {{0x142, 29}, "OWC_Cell_30"},
+    {{0x142, 30}, "OWC_Cell_31"},
+    {{0x142, 31}, "OWC_Cell_32"},
+    {{0x142, 32}, "OWC_Cell_33"},
+    {{0x142, 33}, "OWC_Cell_34"},
+    {{0x142, 34}, "OWC_Cell_35"},
+    {{0x142, 35}, "OWC_Cell_36"},
+    {{0x142, 36}, "OWC_Cell_37"},
+    {{0x142, 37}, "OWC_Cell_38"},
+    {{0x142, 38}, "OWC_Cell_39"},
+    {{0x142, 39}, "OWC_Cell_40"},
+    {{0x142, 40}, "OWC_Cell_41"},
+    {{0x142, 41}, "OWC_Cell_42"},
+    {{0x142, 42}, "OWC_Cell_43"},
+    {{0x142, 43}, "OWC_Cell_44"},
+    {{0x142, 44}, "OWC_Cell_45"},
+    {{0x142, 45}, "OWC_Cell_46"},
+    {{0x142, 46}, "OWC_Cell_47"},
+    {{0x142, 47}, "OWC_Cell_48"},
+    {{0x142, 48}, "OWC_Cell_49"},
+    {{0x142, 49}, "OWC_Cell_50"},
+    {{0x142, 50}, "OWC_Cell_51"},
+    {{0x142, 51}, "OWC_Cell_52"},
+    {{0x142, 52}, "OWC_Cell_53"},
+    {{0x142, 53}, "OWC_Cell_54"},
+    {{0x142, 54}, "OWC_Cell_55"},
+    {{0x142, 55}, "OWC_Cell_56"},
+    {{0x142, 56}, "OWC_Cell_57"},
+    {{0x142, 57}, "OWC_Cell_58"},
+    {{0x142, 58}, "OWC_Cell_59"},
+    {{0x142, 59}, "OWC_Cell_60"},
+    {{0x142, 60}, "OWC_Cell_61"},
+    {{0x142, 61}, "OWC_Cell_62"},
+    {{0x142, 62}, "OWC_Cell_63"},
+    {{0x142, 63}, "OWC_Cell_64"},
+    {{0x143, 0}, "OWC_Cell_65"},
+    {{0x143, 1}, "OWC_Cell_66"},
+    {{0x143, 2}, "OWC_Cell_67"},
+    {{0x143, 3}, "OWC_Cell_68"},
+    {{0x143, 4}, "OWC_Cell_69"},
+    {{0x143, 5}, "OWC_Cell_70"},
+    {{0x143, 6}, "OWC_Cell_71"},
+    {{0x143, 7}, "OWC_Cell_72"},
+    {{0x143, 8}, "OWC_Cell_73"},
+    {{0x143, 9}, "OWC_Cell_74"},
+    {{0x143, 10}, "OWC_Cell_75"},
+    {{0x143, 11}, "OWC_Cell_76"},
+    {{0x143, 12}, "OWC_Cell_77"},
+    {{0x143, 13}, "OWC_Cell_78"},
+    {{0x143, 14}, "OWC_Cell_79"},
+    {{0x143, 15}, "OWC_Cell_80"},
+    {{0x143, 16}, "OWC_Cell_81"},
+    {{0x143, 17}, "OWC_Cell_82"},
+    {{0x143, 18}, "OWC_Cell_83"},
+    {{0x143, 19}, "OWC_Cell_84"},
+    {{0x143, 20}, "OWC_Cell_85"},
+    {{0x143, 21}, "OWC_Cell_86"},
+    {{0x143, 22}, "OWC_Cell_87"},
+    {{0x143, 23}, "OWC_Cell_88"},
+    {{0x143, 24}, "OWC_Cell_89"},
+    {{0x143, 25}, "OWC_Cell_90"},
+    {{0x143, 26}, "OWC_Cell_91"},
+    {{0x143, 27}, "OWC_Cell_92"},
+    {{0x143, 28}, "OWC_Cell_93"},
+    {{0x143, 29}, "OWC_Cell_94"},
+    {{0x143, 30}, "OWC_Cell_95"},
+    {{0x143, 31}, "OWC_Cell_96"},
+    {{0x143, 32}, "OWC_Cell_97"},
+    {{0x143, 33}, "OWC_Cell_98"},
+    {{0x143, 34}, "OWC_Cell_99"},
+    {{0x143, 35}, "OWC_Cell_100"},
+    {{0x143, 36}, "OWC_Cell_101"},
+    {{0x143, 37}, "OWC_Cell_102"},
+    {{0x143, 38}, "OWC_Cell_103"},
+    {{0x143, 39}, "OWC_Cell_104"},
+    {{0x143, 40}, "OWC_Cell_105"},
+    {{0x143, 41}, "OWC_Cell_106"},
+    {{0x143, 42}, "OWC_Cell_107"},
+    {{0x143, 43}, "OWC_Cell_108"},
+    {{0x143, 44}, "OWC_Cell_109"},
+    {{0x143, 45}, "OWC_Cell_110"},
+    {{0x143, 46}, "OWC_Cell_111"},
+    {{0x143, 47}, "OWC_Cell_112"},
+    {{0x143, 48}, "OWC_Cell_113"},
+    {{0x143, 49}, "OWC_Cell_114"},
+    {{0x143, 50}, "OWC_Cell_115"},
+    {{0x130, 0}, "Charger_Current_Set"},
 };
 
 };  // namespace meta

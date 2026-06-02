@@ -52,7 +52,9 @@ int main() {
         // Misc LV Page
         PageEntry::create(std::make_unique<IMUPDMTLMDebugPage>())
             .withPriority(0)
-            .withPageNumber(3));
+            .withPageNumber(3),
+        PageEntry::create(std::make_unique<InverterPage>()).withPriority(0).withPageNumber(4)
+    );
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);

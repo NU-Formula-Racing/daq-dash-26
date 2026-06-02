@@ -27,10 +27,7 @@ class InverterPage : public dash::IPage {
         _entities = {okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
             okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildFrontLeftInverter), 3),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildRearInverter), 3),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildFrontRightInverter), 3),
-            okay::ecs::uiEntity(BIND_TO_THIS(buildVCUInverter), 3)};
+            okay::ecs::uiEntity(BIND_TO_THIS(buildDebug), 3)};
     }
 
     okay::UIElement buildDebug() {

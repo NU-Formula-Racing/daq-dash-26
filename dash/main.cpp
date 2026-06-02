@@ -3,12 +3,11 @@
 #include "ui/components/rotate.hpp"
 #include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
+#include "ui/error_page.hpp"
 #include "ui/imu_pdm_tlm_debug_page.hpp"
 #include "ui/inputs.hpp"
-#include "ui/error_page.hpp"
 #include "ui/inverter_page.hpp"
 #include "ui/page.hpp"
-#include "ui/inputs.hpp"
 
 #include <okay/okay.hpp>
 
@@ -48,14 +47,14 @@ int main() {
             })
             .withPriority(1)
             .withPageNumber(1),
+        // Inveter page
+        PageEntry::create(std::make_unique<InverterPage>()).withPriority(0).withPageNumber(2),
         // Brokers Page
-        PageEntry::create(std::make_unique<BrokersDebugPage>()).withPriority(0).withPageNumber(2),
+        PageEntry::create(std::make_unique<BrokersDebugPage>()).withPriority(0).withPageNumber(3),
         // Misc LV Page
         PageEntry::create(std::make_unique<IMUPDMTLMDebugPage>())
             .withPriority(0)
-            .withPageNumber(3),
-        PageEntry::create(std::make_unique<InverterPage>()).withPriority(0).withPageNumber(4)
-    );
+            .withPageNumber(4));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);

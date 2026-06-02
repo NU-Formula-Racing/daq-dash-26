@@ -3,9 +3,10 @@
 #include "ui/components/rotate.hpp"
 #include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
+#include "ui/imu_pdm_tlm_debug_page.hpp"
+#include "ui/inputs.hpp"
 #include "ui/error_page.hpp"
 #include "ui/inverter_page.hpp"
-#include "ui/imu_pdm_tlm_debug_page.hpp"
 #include "ui/page.hpp"
 #include "ui/inputs.hpp"
 

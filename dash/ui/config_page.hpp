@@ -1,8 +1,6 @@
-#ifndef __DEBUG_PAGE_H__
-#define __DEBUG_PAGE_H__
+#ifndef __CONFIG_PAGE_H__
+#define __CONFIG_PAGE_H__
 
-#include "okay/core/ui/builder.hpp"
-#include "okay/core/ui/element.hpp"
 #include "page.hpp"
 #include "shared_elements.hpp"
 #include "style.hpp"
@@ -23,9 +21,9 @@ namespace dash {
     }
 #endif
 
-class DebugPage : public IPage {
+class ConfigPage : public IPage {
    public:
-    DebugPage() {}
+    ConfigPage() {}
 
     void initializePage() {
         okay::Engine.logger.debug("Creating entities for Error page!");
@@ -55,7 +53,7 @@ class DebugPage : public IPage {
                     .bottomMarginSet(20) (
                         ui::spacer(),
                         buildContainer()(
-                            ui::h1("VCU"),
+                            ui::h1("Configuration Page!"),
                             buildVCU()
                         ),
                         buildContainer()(

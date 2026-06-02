@@ -30,10 +30,17 @@ class IPage {
 
 struct PageEntry {
     std::unique_ptr<IPage> page{nullptr};
+
     std::function<bool()> activeWhenPred{[]() {
+        return true;
+    }};
+
+    std::function<bool()> forceOverrideWhenPred{[]() {
         return false;
     }};
+
     std::size_t priority{0};
+    okay::Option<std::size_t> number;
 
     PageEntry() = default;
 
@@ -48,8 +55,18 @@ struct PageEntry {
         return *this;
     }
 
+    PageEntry& forceOverrideWhen(std::function<bool()> fn) {
+        forceOverrideWhenPred = std::move(fn);
+        return *this;
+    }
+
     PageEntry& withPriority(std::size_t newPriority) {
         priority = newPriority;
+        return *this;
+    }
+
+    PageEntry& withPageNumber(std::size_t num) {
+        number = num;
         return *this;
     }
 
@@ -65,6 +82,7 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
     template <typename... Pages>
     explicit PageManager(Pages&&... pages) {
         (_pages.emplace_back(std::move(pages)), ...);
+        recountNumberedPages();
     }
 
     void initialize() {
@@ -100,31 +118,128 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
         }
     }
 
+    void addPage(PageEntry pe) {
+        const bool isNumbered = pe.number.isSome();
+
+        _pages.push_back(std::move(pe));
+
+        if (isNumbered) {
+            _numNumberedPages++;
+        }
+    }
+
+    void switchPageLeft() {
+        if (_numNumberedPages == 0) {
+            return;
+        }
+
+        if (_currentNumberedPage == 0) {
+            _currentNumberedPage = _numNumberedPages - 1;
+        } else {
+            _currentNumberedPage -= 1;
+        }
+    }
+
+    void switchPageRight() {
+        if (_numNumberedPages == 0) {
+            return;
+        }
+
+        _currentNumberedPage = (_currentNumberedPage + 1) % _numNumberedPages;
+    }
+
+    void setNumberedPage(std::size_t page) {
+        if (_numNumberedPages == 0) {
+            _currentNumberedPage = 0;
+            return;
+        }
+
+        _currentNumberedPage = page % _numNumberedPages;
+    }
+
    private:
     static constexpr std::size_t NO_PAGE = static_cast<std::size_t>(-1);
 
     std::vector<PageEntry> _pages;
     std::size_t _currentPage{NO_PAGE};
+    std::size_t _currentNumberedPage{0};
+    std::size_t _numNumberedPages{0};
+
+    void recountNumberedPages() {
+        _numNumberedPages = 0;
+
+        for (const PageEntry& page : _pages) {
+            if (page.number.isSome()) {
+                _numNumberedPages++;
+            }
+        }
+
+        if (_numNumberedPages == 0) {
+            _currentNumberedPage = 0;
+        } else {
+            _currentNumberedPage %= _numNumberedPages;
+        }
+    }
 
     bool hasCurrentPage() const {
         return _currentPage != NO_PAGE && _currentPage < _pages.size() &&
                _pages[_currentPage].page != nullptr;
     }
 
-    std::size_t findActivePage() const {
+    bool pageActive(const PageEntry& pe) const {
+        if (!pe.activeWhenPred()) {
+            return false;
+        }
+
+        if (pe.number.isSome()) {
+            return *pe.number == _currentNumberedPage;
+        }
+
+        return true;
+    }
+
+    bool pageForceOverrides(const PageEntry& pe) const {
+        return pe.forceOverrideWhenPred();
+    }
+
+    std::size_t findBestActivePage() const {
         std::size_t bestPage = NO_PAGE;
         std::size_t bestPriority = 0;
 
         for (std::size_t i = 0; i < _pages.size(); ++i) {
             const PageEntry& entry = _pages[i];
 
-            if (!entry.activeWhenPred()) {
+            if (!pageActive(entry)) {
                 continue;
             }
 
             if (bestPage == NO_PAGE || entry.priority > bestPriority) {
                 bestPage = i;
                 bestPriority = entry.priority;
+            }
+        }
+
+        return bestPage;
+    }
+
+    std::size_t findActivePage() const {
+        std::size_t bestPage = findBestActivePage();
+
+        std::size_t currentPriority = 0;
+        if (bestPage != NO_PAGE) {
+            currentPriority = _pages[bestPage].priority;
+        }
+
+        for (std::size_t i = 0; i < _pages.size(); ++i) {
+            const PageEntry& entry = _pages[i];
+
+            if (!pageForceOverrides(entry)) {
+                continue;
+            }
+
+            if (entry.priority > currentPriority) {
+                bestPage = i;
+                currentPriority = entry.priority;
             }
         }
 

@@ -1,11 +1,13 @@
-#include "okay/core/ecs/ecs.hpp"
+#include "ui/brokers_debug_page.hpp"
 #include "ui/car_state.hpp"
 #include "ui/components/rotate.hpp"
 #include "ui/debug_page.hpp"
 #include "ui/drive_page.hpp"
 #include "ui/error_page.hpp"
+#include "ui/imu_pdm_tlm_debug_page.hpp"
+#include "ui/inputs.hpp"
+#include "ui/inverter_page.hpp"
 #include "ui/page.hpp"
-#include "ui/shared_elements.hpp"
 
 #include <okay/okay.hpp>
 
@@ -13,26 +15,21 @@
 #include <csignal>
 #include <math.h>
 #include <memory>
-#include <platform/button.hpp>
 #include <platform/can.hpp>
 #include <platform/interfaces.hpp>
 #include <platform/neopixel_manager.hpp>
-#include <sstream>
 
 static void __exitSignal(int sig);
 
-static bool s_debugPageActive{false};
 static okay::ECSEntity s_performanceUIEntity;
 
-static dash::Button downButton{20};
-inline dash::Button leftButton{16};
-inline dash::Button rightButton{12};
+using namespace dash;
 
 int main() {
     okay::SurfaceConfig surfaceConfig;
     surfaceConfig.width = 800;
     surfaceConfig.height = 480;
-    okay::Surface surface(surfaceConfig);
+    surfaceConfig.title = "NFR26 Dashboard";
 
     okay::RendererSettings rendererSettings{
         .surfaceConfig = surfaceConfig,
@@ -40,56 +37,57 @@ int main() {
         .enableIMGUI = true,
     };
 
-    downButton.onDown([]() {
-        s_debugPageActive = !s_debugPageActive;
-    });
-
-    leftButton.onDown([]() {
-        if (s_performanceUIEntity.isValid()) {
-            s_performanceUIEntity.destroy();
-        } else {
-            s_performanceUIEntity =
-                okay::ecs::uiEntity(LAMBDA_WRAP(dash::SharedElements::get().buildPerformanceUI), 4);
-        }
-    });
-
-    std::unique_ptr<dash::PageManager> pageManager = std::make_unique<dash::PageManager>(
-        dash::PageEntry::create(std::make_unique<dash::DrivePage>())
-            .activeWhen([]() {
-                return !s_debugPageActive;
+    std::unique_ptr<PageManager> pageManager = std::make_unique<PageManager>(
+        // Drive Page
+        PageEntry::create(std::make_unique<DrivePage>()).withPriority(0).withPageNumber(0),
+        // Debug/Error Page
+        PageEntry::create(std::make_unique<DebugPage>())
+            .forceOverrideWhen([]() {
+                return CarState::hardFaultPresent();
             })
-            .withPriority(0),
-        dash::PageEntry::create(std::make_unique<dash::ErrorPage>())
-            .activeWhen([]() {
-                return false;
-            })
-            .withPriority(0),
-        dash::PageEntry::create(std::make_unique<dash::DebugPage>())
-            .activeWhen([]() {
-                return s_debugPageActive || dash::CarState::hardFaultPresent();
-            })
-            .withPriority(1));
+            .withPriority(1)
+            .withPageNumber(1),
+        // Inveter page
+        PageEntry::create(std::make_unique<InverterPage>()).withPriority(0).withPageNumber(2),
+        // Brokers Page
+        PageEntry::create(std::make_unique<BrokersDebugPage>()).withPriority(0).withPageNumber(3),
+        // Misc LV Page
+        PageEntry::create(std::make_unique<IMUPDMTLMDebugPage>())
+            .withPriority(0)
+            .withPageNumber(4));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);
 
     auto game = okay::Game::create().addSystems(
         std::make_unique<okay::Renderer>(std::move(rendererSettings)),
-        std::make_unique<dash::NeopixelManager>(),
+        std::make_unique<NeopixelManager>(),
         std::make_unique<okay::AssetManager>(),
         std::make_unique<okay::TweenEngine>(),
-        std::make_unique<dash::CANManager>(),
+        std::make_unique<CANManager>(),
         std::make_unique<okay::ECS>(),
         std::move(pageManager));
 
-    okay::registerBuiltinComponentsAndSystems();
-    okay::ecs::registerComponent<dash::RotateComponent>();
-    okay::ecs::registerSystem(std::make_unique<dash::RotateSystem>());
+    // must happen after first init() because of IMGUI
+    // IMGUI overrides glfwcallbacks in the native build
+    // this is a hack until okay engine get it's own
+    // input system
+    game.onInitialize([]() {
+        input::leftButton.onDown([]() {
+            okay::Engine.systems.getSystemChecked<PageManager>()->switchPageLeft();
+        });
 
+        input::rightButton.onDown([]() {
+            okay::Engine.systems.getSystemChecked<PageManager>()->switchPageRight();
+        });
+    });
+
+    okay::registerBuiltinComponentsAndSystems();
+    okay::ecs::registerComponent<RotateComponent>();
+    okay::ecs::registerSystem(std::make_unique<RotateSystem>());
     dbc::bmsStatus::imdState->set(1);
 
     game.run();
-
     return 0;
 }
 

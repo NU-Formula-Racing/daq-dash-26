@@ -8,6 +8,7 @@
 #include "ui/error_page.hpp"
 #include "ui/inverter_page.hpp"
 #include "ui/page.hpp"
+#include "ui/inputs.hpp"
 
 #include <okay/okay.hpp>
 

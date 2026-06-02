@@ -94,17 +94,17 @@ class IMUPDMTLMDebugPage : public IPage {
         return ui::growbox(okay::UIAxis::Vertical) (
         ui::h2("IMU"),
         keyValuePair(
-                    "X Axis Acceleration",
+                    "X Accel",
                     dbc::imuAcceleration::xAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "Y Axis Acceleration",
+                    "Y Accel",
                     dbc::imuAcceleration::yAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "Z Axis Acceleration",
+                    "Z Accel",
                     dbc::imuAcceleration::zAxisAcceleration->get()
             ),
 
@@ -124,62 +124,62 @@ class IMUPDMTLMDebugPage : public IPage {
             ),
 
             keyValuePair(
-                    "X Axis Angular Rate",
+                    "X Angular Rate",
                     dbc::imuAngularRate::xAxisAngularRate->get()
             ),
 
             keyValuePair(
-                    "Y Axis Angular Rate",
+                    "Y Angular Rate",
                     dbc::imuAngularRate::yAxisAngularRate->get()
             ),
 
             keyValuePair(
-                    "Z Axis Angular Rate",
+                    "Z Angular Rate",
                     dbc::imuAngularRate::zAxisAngularRate->get()
             ),
 
             keyValuePair(
-                    "Position Latitude",
+                    "Pos Latitude",
                     dbc::imuPositionIns::positionLatitude->get()
             ),
 
             keyValuePair(
-                    "Position Longitude",
+                    "Pos Longitude",
                     dbc::imuPositionIns::positionLongitude->get()
             ),
 
             keyValuePair(
-                    "Position Altutude",
+                    "Pos Altutude",
                     dbc::imuPositionIns::positionAltutude->get()
             ),
 
             keyValuePair(
-                    "X Axis Velocity",
+                    "X Velocity",
                     dbc::imuVelocity::xAxisVelocity->get()
             ),
 
             keyValuePair(
-                    "Y Axis Velocity",
+                    "Y Velocity",
                     dbc::imuVelocity::yAxisVelocity->get()
             ),
 
             keyValuePair(
-                    "Z Axis Velocity",
+                    "Z Velocity",
                     dbc::imuVelocity::zAxisVelocity->get()
             ),
 
             keyValuePair(
-                    "X Axis Magnetometer",
+                    "X Magnetometer",
                     dbc::imuMag::xAxisMagnetometer->get()
             ),
 
             keyValuePair(
-                    "Y Axis Magnetometer",
+                    "Y Magnetometer",
                     dbc::imuMag::yAxisMagnetometer->get()
             ),
 
             keyValuePair(
-                    "Z Axis Magnetometer",
+                    "Z Magnetometer",
                     dbc::imuMag::zAxisMagnetometer->get()
             ),
 
@@ -201,17 +201,17 @@ class IMUPDMTLMDebugPage : public IPage {
             ),
 
             keyValuePair(
-                    "No G X Axis Acceleration",
+                    "No G X Accel",
                     dbc::imuAccelerationNoG::noGXAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "No G Y Axis Acceleration",
+                    "No G Y Accel",
                     dbc::imuAccelerationNoG::noGYAxisAcceleration->get()
             ),
 
             keyValuePair(
-                    "No G Z Axis Acceleration",
+                    "No G Z Accel",
                     dbc::imuAccelerationNoG::noGZAxisAcceleration->get()
             ),
 
@@ -271,22 +271,22 @@ class IMUPDMTLMDebugPage : public IPage {
             ),
 
             keyValuePair(
-                    "UTC Milliseconds",
+                    "UTC Millisec",
                     dbc::imuUtcTime::utcMilliseconds->get()
             ),
 
             keyValuePair(
-                    "X Axis Delta Velocity",
+                    "X Delta Velocity",
                     dbc::imuDeltaVel::xAxisDeltaVelocity->get()
             ),
 
             keyValuePair(
-                    "Y Axis Delta Velocity",
+                    "Y Delta Velocity",
                     dbc::imuDeltaVel::yAxisDeltaVelocity->get()
             ),
 
             keyValuePair(
-                    "Z Axis Delta Velocity",
+                    "Z Delta Velocity",
                     dbc::imuDeltaVel::zAxisDeltaVelocity->get()
             )
         );
@@ -385,12 +385,12 @@ class IMUPDMTLMDebugPage : public IPage {
         ),
 
         keyValuePair(
-                "Low Bat Volt Warning",
+                "Low Bat Volt Warn",
                 dbc::pdmBatVolt::lowBatVoltWarning->get()
         ),
 
         keyValuePair(
-                "Danger Bat Volt Warning",
+                "Danger Bat Volt Warn",
                 dbc::pdmBatVolt::dangerBatVoltWarning->get()
         ),
 

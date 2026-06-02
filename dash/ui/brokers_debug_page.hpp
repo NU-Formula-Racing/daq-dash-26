@@ -166,67 +166,67 @@ class BrokersDebugPage : public IPage {
         return ui::growbox(okay::UIAxis::Vertical) (
         ui::h2("Front Right Broker"),
             keyValuePair(
-                "FR Tire Temp 0",
+                "Tire Temp 0",
                 dbc::frBrokerTemp1::frTireTemp0->get()
             ),
             keyValuePair(
-                "FR Tire Temp 1",
+                "Tire Temp 1",
                 dbc::frBrokerTemp1::frTireTemp1->get()
             ),
             keyValuePair(
-                "FR Tire Temp 2",
+                "Tire Temp 2",
                 dbc::frBrokerTemp1::frTireTemp2->get()
             ),
             keyValuePair(
-                "FR Tire Temp 3",
+                "Tire Temp 3",
                 dbc::frBrokerTemp1::frTireTemp3->get()
             ),
             keyValuePair(
-                "FR Tire Temp 4",
+                "Tire Temp 4",
                 dbc::frBrokerTemp2::frTireTemp4->get()
             ),
             keyValuePair(
-                "FR Tire Temp 5",
+                "Tire Temp 5",
                 dbc::frBrokerTemp2::frTireTemp5->get()
             ),
             keyValuePair(
-                "FR Tire Temp 6",
+                "Tire Temp 6",
                 dbc::frBrokerTemp2::frTireTemp6->get()
             ),
             keyValuePair(
-                "FR Tire Temp 7",
+                "Tire Temp 7",
                 dbc::frBrokerTemp2::frTireTemp7->get()
             ),
             keyValuePair(
-                "FR Strain Gauge Uncalibrated",
+                "Str Gauge Uncalibrated",
                 dbc::frBrokerSusUncalibrated::frStrainGaugeUncalibrated->get()
             ),
             keyValuePair(
-                "FR Sus Pot Uncalibrated",
+                "Sus Pot Uncalibrated",
                 dbc::frBrokerSusUncalibrated::frSusPotUncalibrated->get()
             ),
             keyValuePair(
-                "FR Strain Gauge Error",
+                "Str Gauge Error",
                 dbc::frBrokerCanErrorMsg::frStrainGaugeError->get()
             ),
             keyValuePair(
-                "FR Sus Pot Error",
+                "Sus Pot Error",
                 dbc::frBrokerCanErrorMsg::frSusPotError->get()
             ),
             keyValuePair(
-                "FR Tire Temp Error",
+                "Tire Temp Error",
                 dbc::frBrokerCanErrorMsg::frTireTempError->get()
             ),
             keyValuePair(
-                "FR Heartbeat Count",
+                "Heartbeat Count",
                 dbc::frBrokerCanErrorMsg::frHeartbeatCount->get()
             ),
             keyValuePair(
-                "FR Strain Gauge Calibrated",
+                "Str Gauge Calibrated",
                 dbc::frBrokerSusCalibrated::frStrainGaugeCalibrated->get()
             ),
             keyValuePair(
-                "FR Sus Pot Calibrated",
+                "Sus Pot Calibrated",
                 dbc::frBrokerSusCalibrated::frSusPotCalibrated->get()
             )  
         );
@@ -239,67 +239,67 @@ class BrokersDebugPage : public IPage {
         return ui::growbox(okay::UIAxis::Vertical) (
         ui::h2("Back Left Broker"),
             keyValuePair(
-                "BL Tire Temp 0",
+                "Tire Temp 0",
                 dbc::blBrokerTemp1::blTireTemp0->get()
             ),
             keyValuePair(
-                "BL Tire Temp 1",
+                "Tire Temp 1",
                 dbc::blBrokerTemp1::blTireTemp1->get()
             ),
             keyValuePair(
-                "BL Tire Temp 2",
+                "Tire Temp 2",
                 dbc::blBrokerTemp1::blTireTemp2->get()
             ),
             keyValuePair(
-                "BL Tire Temp 3",
+                "Tire Temp 3",
                 dbc::blBrokerTemp1::blTireTemp3->get()
             ),
             keyValuePair(
-                "BL Tire Temp 4",
+                "Tire Temp 4",
                 dbc::blBrokerTemp2::blTireTemp4->get()
             ),
             keyValuePair(
-                "BL Tire Temp 5",
+                "Tire Temp 5",
                 dbc::blBrokerTemp2::blTireTemp5->get()
             ),
             keyValuePair(
-                "BL Tire Temp 6",
+                "Tire Temp 6",
                 dbc::blBrokerTemp2::blTireTemp6->get()
             ),
             keyValuePair(
-                "BL Tire Temp 7",
+                "Tire Temp 7",
                 dbc::blBrokerTemp2::blTireTemp7->get()
             ),
             keyValuePair(
-                "BL Strain Gauge Uncalibrated",
+                "Str Gauge Uncalibrated",
                 dbc::blBrokerSusUncalibrated::blStrainGaugeUncalibrated->get()
             ),
             keyValuePair(
-                "BL Sus Pot Uncalibrated",
+                "Sus Pot Uncalibrated",
                 dbc::blBrokerSusUncalibrated::blSusPotUncalibrated->get()
             ),
             keyValuePair(
-                "BL Strain Gauge Error",
+                "Str Gauge Error",
                 dbc::blBrokerCanErrorMsg::blStrainGaugeError->get()
             ),
             keyValuePair(
-                "BL Sus Pot Error",
+                "Sus Pot Error",
                 dbc::blBrokerCanErrorMsg::blSusPotError->get()
             ),
             keyValuePair(
-                "BL Tire Temp Error",
+                "Tire Temp Error",
                 dbc::blBrokerCanErrorMsg::blTireTempError->get()
             ),
             keyValuePair(
-                "BL Heartbeat Count",
+                "Heartbeat Count",
                 dbc::blBrokerCanErrorMsg::blHeartbeatCount->get()
             ),
             keyValuePair(
-                "BL Strain Gauge Calibrated",
+                "Str Gauge Calibrated",
                 dbc::blBrokerSusCalibrated::blStrainGaugeCalibrated->get()
             ),
             keyValuePair(
-                "BL Sus Pot Calibrated",
+                "Sus Pot Calibrated",
                 dbc::blBrokerSusCalibrated::blSusPotCalibrated->get()
             )  
         );
@@ -311,67 +311,67 @@ class BrokersDebugPage : public IPage {
         return ui::growbox(okay::UIAxis::Vertical) (
             ui::h2("Back Right Broker"),
             keyValuePair(
-                "BR Tire Temp 0",
+                "Tire Temp 0",
                 dbc::brBrokerTemp1::brTireTemp0->get()
             ),
             keyValuePair(
-                "BR Tire Temp 1",
+                "Tire Temp 1",
                 dbc::brBrokerTemp1::brTireTemp1->get()
             ),
             keyValuePair(
-                "BR Tire Temp 2",
+                "Tire Temp 2",
                 dbc::brBrokerTemp1::brTireTemp2->get()
             ),
             keyValuePair(
-                "Br Tire Temp 3",
+                "Tire Temp 3",
                 dbc::brBrokerTemp1::brTireTemp3->get()
             ),
             keyValuePair(
-                "BR Tire Temp 4",
+                "Tire Temp 4",
                 dbc::brBrokerTemp2::brTireTemp4->get()
             ),
             keyValuePair(
-                "BR Tire Temp 5",
+                "Tire Temp 5",
                 dbc::brBrokerTemp2::brTireTemp5->get()
             ),
             keyValuePair(
-                "BR Tire Temp 6",
+                "Tire Temp 6",
                 dbc::brBrokerTemp2::brTireTemp6->get()
             ),
             keyValuePair(
-                "BR Tire Temp 7",
+                "Tire Temp 7",
                 dbc::brBrokerTemp2::brTireTemp7->get()
             ),
             keyValuePair(
-                "Br Strain Gauge Uncalibrated",
+                "Str Gauge Uncalibrated",
                 dbc::brBrokerSusUncalibrated::brStrainGaugeUncalibrated->get()
             ),
             keyValuePair(
-                "BR Sus Pot Uncalibrated",
+                "Sus Pot Uncalibrated",
                 dbc::brBrokerSusUncalibrated::brSusPotUncalibrated->get()
             ),
             keyValuePair(
-                "BR Strain Gauge Error",
+                "Str Gauge Error",
                 dbc::brBrokerCanErrorMsg::brStrainGaugeError->get()
             ),
             keyValuePair(
-                "BR Sus Pot Error",
+                "Sus Pot Error",
                 dbc::brBrokerCanErrorMsg::brSusPotError->get()
             ),
             keyValuePair(
-                "BR Tire Temp Error",
+                "Tire Temp Error",
                 dbc::brBrokerCanErrorMsg::brTireTempError->get()
             ),
             keyValuePair(
-                "BR Heartbeat Count",
+                "Heartbeat Count",
                 dbc::brBrokerCanErrorMsg::brHeartbeatCount->get()
             ),
             keyValuePair(
-                "BR Strain Gauge Calibrated",
+                "Str Gauge Calibrated",
                 dbc::brBrokerSusCalibrated::brStrainGaugeCalibrated->get()
             ),
             keyValuePair(
-                "BR Sus Pot Calibrated",
+                "Sus Pot Calibrated",
                 dbc::brBrokerSusCalibrated::brSusPotCalibrated->get()
             )
         );

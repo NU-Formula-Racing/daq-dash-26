@@ -140,24 +140,24 @@ class InverterPage : public dash::IPage {
 
     okay::UIElement buildVCUInverter() {
         return ui::growbox(okay::UIAxis::Vertical)(ui::h2("Front Left Current"),
-            keyValuePair("Set Current Front Left Inverter",
+            keyValuePair("Set Current",
                 dbc::ecuSetCurrentFrontLeftInverter::setCurrentFrontLeftInverter->get()),
-            keyValuePair("Set Current Brake Front Left Inverter",
+            keyValuePair("Set Current Brake",
                 dbc::ecuSetCurrentBrakeFrontLeftInverter::setCurrentBrakeFrontLeftInverter->get()),
 
             ui::vspacer(10),
             ui::h2("Front Right Current"),
-            keyValuePair("Set Current Front Right Inverter",
+            keyValuePair("Set Current",
                 dbc::ecuSetCurrentFrontRightInverter::setCurrentFrontRightInverter->get()),
-            keyValuePair("Set Current Brake Front Right Inverter",
+            keyValuePair("Set Current Brake",
                 dbc::ecuSetCurrentBrakeFrontRightInverter::setCurrentBrakeFrontRightInverter
                     ->get()),
 
             ui::vspacer(10),
             ui::h2("Rear Current"),
-            keyValuePair("Set Current Rear Inverter",
+            keyValuePair("Set Current",
                 dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get()),
-            keyValuePair("Set Current Brake Rear Inverter",
+            keyValuePair("Set Current Brake",
                 dbc::ecuSetCurrentBrakeRearInverter::setCurrentBrakeRearInverter->get()));
     }
 

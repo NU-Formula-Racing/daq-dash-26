@@ -1,6 +1,7 @@
 #ifndef __INVERTER_PAGE_H__
 #define __INVERTER_PAGE_H__
 
+#include "can/can_dbc.hpp"
 #include "page.hpp"
 #include "shared_elements.hpp"
 #include "style.hpp"
@@ -79,86 +80,87 @@ class InverterPage : public dash::IPage {
 
     okay::UIElement buildFrontRightInverter() {
         return ui::growbox(okay::UIAxis::Vertical)(ui::h2("Status"),
-            keyValuePair("RPM", dbc::rearInverterMotorStatus::rpm->get()),
-            keyValuePair("Motor Current", dbc::frontRightInverterMotorStatus::motorCurrent->get()),
-            keyValuePair("DC Voltage", dbc::frontRightInverterMotorStatus::dcVoltage->get()),
-            keyValuePair("DC Current", dbc::frontRightInverterMotorStatus::dcCurrent->get()),
+            keyValuePair("RPM", dbc::rearInverterMotorStatus::bRpm->get()),
+            keyValuePair(
+                "Motor Current", dbc::frontRightInverterMotorStatus::frMotorCurrent->get()),
+            keyValuePair("DC Voltage", dbc::frontRightInverterMotorStatus::frDcVoltage->get()),
+            keyValuePair("DC Current", dbc::frontRightInverterMotorStatus::frDcCurrent->get()),
 
             ui::vspacer(10),
             ui::h2("Temperature"),
-            keyValuePair("IGBT Temp", dbc::frontRightInverterTempStatus::igbtTemp->get()),
-            keyValuePair("Motor Temp", dbc::frontRightInverterTempStatus::motorTemp->get()),
+            keyValuePair("IGBT Temp", dbc::frontRightInverterTempStatus::frIgbtTemp->get()),
+            keyValuePair("Motor Temp", dbc::frontRightInverterTempStatus::frMotorTemp->get()),
 
             ui::vspacer(10),
             ui::h2("Power"),
-            keyValuePair("Ah Drawn", dbc::frontRightInverterCurrentDraw::ahDrawn->get()),
-            keyValuePair("Ah Charged", dbc::frontRightInverterCurrentDraw::ahCharged->get()),
-            keyValuePair("Wh Drawn", dbc::frontRightInverterPowerDraw::whDrawn->get()),
-            keyValuePair("Wh Charged", dbc::frontRightInverterPowerDraw::whCharged->get()),
-            keyValuePair("Fault Code", dbc::frontRightInverterFaultStatus::faultCode->get()));
+            keyValuePair("Ah Drawn", dbc::frontRightInverterCurrentDraw::frAhDrawn->get()),
+            keyValuePair("Ah Charged", dbc::frontRightInverterCurrentDraw::frAhCharged->get()),
+            keyValuePair("Wh Drawn", dbc::frontRightInverterPowerDraw::frWhDrawn->get()),
+            keyValuePair("Wh Charged", dbc::frontRightInverterPowerDraw::frWhCharged->get()),
+            keyValuePair("Fault Code", dbc::frontRightInverterFaultStatus::frFaultCode->get()));
     }
 
     okay::UIElement buildFrontLeftInverter() {
         return ui::growbox(okay::UIAxis::Vertical)(ui::h2("Status"),
-            keyValuePair("Motor Current", dbc::frontLeftInverterMotorStatus::motorCurrent->get()),
-            keyValuePair("DC Voltage", dbc::frontLeftInverterMotorStatus::dcVoltage->get()),
-            keyValuePair("DC Current", dbc::frontLeftInverterMotorStatus::dcCurrent->get()),
+            keyValuePair("Motor Current", dbc::frontLeftInverterMotorStatus::flMotorCurrent->get()),
+            keyValuePair("DC Voltage", dbc::frontLeftInverterMotorStatus::flDcVoltage->get()),
+            keyValuePair("DC Current", dbc::frontLeftInverterMotorStatus::flDcCurrent->get()),
 
             ui::vspacer(10),
             ui::h2("Temperature"),
-            keyValuePair("IGBT Temp", dbc::frontLeftInverterTempStatus::igbtTemp->get()),
-            keyValuePair("Motor Temp", dbc::frontLeftInverterTempStatus::motorTemp->get()),
+            keyValuePair("IGBT Temp", dbc::frontLeftInverterTempStatus::flIgbtTemp->get()),
+            keyValuePair("Motor Temp", dbc::frontLeftInverterTempStatus::flMotorTemp->get()),
 
             ui::vspacer(10),
             ui::h2("Power"),
-            keyValuePair("Ah Drawn", dbc::frontLeftInverterCurrentDraw::ahDrawn->get()),
-            keyValuePair("Ah Charged", dbc::frontLeftInverterCurrentDraw::ahCharged->get()),
-            keyValuePair("Wh Drawn", dbc::frontLeftInverterPowerDraw::whDrawn->get()),
-            keyValuePair("Wh Charged", dbc::frontLeftInverterPowerDraw::whCharged->get()),
-            keyValuePair("Fault Code", dbc::frontLeftInverterFaultStatus::faultCode->get()));
+            keyValuePair("Ah Drawn", dbc::frontLeftInverterCurrentDraw::flAhDrawn->get()),
+            keyValuePair("Ah Charged", dbc::frontLeftInverterCurrentDraw::flAhCharged->get()),
+            keyValuePair("Wh Drawn", dbc::frontLeftInverterPowerDraw::flWhDrawn->get()),
+            keyValuePair("Wh Charged", dbc::frontLeftInverterPowerDraw::flWhCharged->get()),
+            keyValuePair("Fault Code", dbc::frontLeftInverterFaultStatus::flFaultCode->get()));
     }
 
     okay::UIElement buildRearInverter() {
         return ui::growbox(okay::UIAxis::Vertical)(ui::h2("Status"),
-            keyValuePair("Motor Current", dbc::rearInverterMotorStatus::motorCurrent->get()),
-            keyValuePair("DC Voltage", dbc::rearInverterMotorStatus::dcVoltage->get()),
-            keyValuePair("DC Current", dbc::rearInverterMotorStatus::dcCurrent->get()),
+            keyValuePair("Motor Current", dbc::rearInverterMotorStatus::bMotorCurrent->get()),
+            keyValuePair("DC Voltage", dbc::rearInverterMotorStatus::bDcVoltage->get()),
+            keyValuePair("DC Current", dbc::rearInverterMotorStatus::bDcCurrent->get()),
 
             ui::vspacer(10),
             ui::h2("Temperature"),
-            keyValuePair("IGBT Temp", dbc::rearInverterTempStatus::igbtTemp->get()),
-            keyValuePair("Motor Temp", dbc::rearInverterTempStatus::motorTemp->get()),
+            keyValuePair("IGBT Temp", dbc::rearInverterTempStatus::bIgbtTemp->get()),
+            keyValuePair("Motor Temp", dbc::rearInverterTempStatus::bMotorTemp->get()),
 
             ui::vspacer(10),
             ui::h2("Power"),
-            keyValuePair("Ah Drawn", dbc::rearInverterCurrentDraw::ahDrawn->get()),
-            keyValuePair("Ah Charged", dbc::rearInverterCurrentDraw::ahCharged->get()),
-            keyValuePair("Wh Drawn", dbc::rearInverterPowerDraw::whDrawn->get()),
-            keyValuePair("Wh Charged", dbc::rearInverterPowerDraw::whCharged->get()),
-            keyValuePair("Fault Code", dbc::rearInverterFaultStatus::faultCode->get()));
+            keyValuePair("Ah Drawn", dbc::rearInverterCurrentDraw::bAhDrawn->get()),
+            keyValuePair("Ah Charged", dbc::rearInverterCurrentDraw::bAhCharged->get()),
+            keyValuePair("Wh Drawn", dbc::rearInverterPowerDraw::bWhDrawn->get()),
+            keyValuePair("Wh Charged", dbc::rearInverterPowerDraw::bWhCharged->get()),
+            keyValuePair("Fault Code", dbc::rearInverterFaultStatus::bFaultCode->get()));
     }
 
     okay::UIElement buildVCUInverter() {
         return ui::growbox(okay::UIAxis::Vertical)(ui::h2("Front Left Current"),
             keyValuePair("Set Current",
-                dbc::ecuSetCurrentFrontLeftInverter::setCurrentFrontLeftInverter->get()),
+                dbc::vcuSetCurrentFrontLeftInverter::setCurrentFrontLeftInverter->get()),
             keyValuePair("Set Current Brake",
-                dbc::ecuSetCurrentBrakeFrontLeftInverter::setCurrentBrakeFrontLeftInverter->get()),
+                dbc::vcuSetCurrentBrakeFrontLeftInverter::setCurrentBrakeFrontLeftInverter->get()),
 
             ui::vspacer(10),
             ui::h2("Front Right Current"),
             keyValuePair("Set Current",
-                dbc::ecuSetCurrentFrontRightInverter::setCurrentFrontRightInverter->get()),
+                dbc::vcuSetCurrentFrontRightInverter::setCurrentFrontRightInverter->get()),
             keyValuePair("Set Current Brake",
-                dbc::ecuSetCurrentBrakeFrontRightInverter::setCurrentBrakeFrontRightInverter
+                dbc::vcuSetCurrentBrakeFrontRightInverter::setCurrentBrakeFrontRightInverter
                     ->get()),
 
             ui::vspacer(10),
             ui::h2("Rear Current"),
             keyValuePair(
-                "Set Current", dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get()),
+                "Set Current", dbc::vcuSetCurrentRearInverter::setCurrentRearInverter->get()),
             keyValuePair("Set Current Brake",
-                dbc::ecuSetCurrentBrakeRearInverter::setCurrentBrakeRearInverter->get()));
+                dbc::vcuSetCurrentBrakeRearInverter::setCurrentBrakeRearInverter->get()));
     }
 
     template <typename T>

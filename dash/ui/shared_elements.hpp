@@ -247,7 +247,7 @@ class SharedElements {
                                         .heightFit()
                                         .textSizeSet(smallFontSize)
                                         .alignTextCenter(),
-                                    ui::text(std::format("{} C", dbc::frontLeftInverterTempStatus::igbtTemp->get()))
+                                    ui::text(std::format("{} C", dbc::frontLeftInverterTempStatus::flIgbtTemp->get()))
                                         .widthGrow()
                                         .heightFit()
                                         .textSizeSet(largeFontSize)
@@ -267,7 +267,7 @@ class SharedElements {
                                         .textSizeSet(smallFontSize)
                                         .alignTextTop()
                                         .alignTextCenter(),
-                                    ui::text(std::format("{} C", dbc::rearInverterTempStatus::igbtTemp->get()))
+                                    ui::text(std::format("{} C", dbc::rearInverterTempStatus::bIgbtTemp->get()))
                                         .widthGrow()
                                         .heightFit()
                                         .textSizeSet(largeFontSize)
@@ -286,7 +286,7 @@ class SharedElements {
                                         .heightFit()
                                         .textSizeSet(smallFontSize)
                                         .alignTextCenter(),
-                                    ui::text(std::format("{} C", dbc::frontRightInverterTempStatus::igbtTemp->get()))
+                                    ui::text(std::format("{} C", dbc::frontRightInverterTempStatus::frIgbtTemp->get()))
                                         .widthGrow()
                                         .heightFit()
                                         .textSizeSet(largeFontSize)

@@ -14,11 +14,12 @@ class CarState {
 
     static bool driveFaultPresent() {
         const int errorCode = 0x03;
-        bool driveFaultError = dbc::frontRightInverterFaultStatus::faultCode->get() == errorCode ||
-                               dbc::frontLeftInverterFaultStatus::faultCode->get() == errorCode ||
-                               dbc::rearInverterFaultStatus::faultCode->get() == errorCode;
+        bool driveFaultPresent =
+            dbc::frontRightInverterFaultStatus::frFaultCode->get() == errorCode ||
+            dbc::frontLeftInverterFaultStatus::flFaultCode->get() == errorCode ||
+            dbc::rearInverterFaultStatus::bFaultCode->get() == errorCode;
 
-        return driveFaultError;
+        return driveFaultPresent;
     }
 
     static bool hardFaultPresent() {
@@ -37,7 +38,7 @@ class CarState {
         if (hardFaultPresent())
             return "FAULT";
 
-        switch (dbc::ecuDriveStatus::driveState->get()) {
+        switch (dbc::vcuDriveStatus::driveState->get()) {
             case 0:
                 return "IDLE";
             case 1:
@@ -55,7 +56,7 @@ class CarState {
         if (hardFaultPresent())
             return glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-        switch (dbc::ecuDriveStatus::driveState->get()) {
+        switch (dbc::vcuDriveStatus::driveState->get()) {
             case 0:
                 return colors::fromHex(0x219EEBFF);
             case 1:

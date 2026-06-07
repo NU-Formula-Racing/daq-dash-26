@@ -26,4 +26,3 @@ python "$CAN_GEN_PY" --min-max --meta -c camelCase -o "$OUTPUT_FILE" "$CAN_DBC"
 
 # deactivate the virtual environment
 deactivate
-

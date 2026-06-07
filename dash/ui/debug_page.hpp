@@ -95,69 +95,69 @@ class DebugPage : public IPage {
             ui::h2("Drive/Driver Interface"),
             keyValuePair(
                 "Drive Status",
-                dbc::ecuDriveStatus::driveState->get()
+                dbc::vcuDriveStatus::driveState->get()
             ),
             keyValuePair(
                 "APPS1",
-                dbc::ecuThrottle::apps1Throttle->get()
+                dbc::vcuThrottle::apps1Throttle->get()
             ),
             keyValuePair(
                 "APPS2",
-                dbc::ecuThrottle::apps2Throttle->get()
+                dbc::vcuThrottle::apps2Throttle->get()
             ),
             keyValuePair(
                 "Font Brake Pressure",
-                dbc::ecuBrake::frontBrakePressure->get()
+                dbc::vcuBrake::frontBrakePressure->get()
             ),
             keyValuePair(
                 "Rear Brake Pressure",
-                dbc::ecuBrake::rearBrakePressure->get()
+                dbc::vcuBrake::rearBrakePressure->get()
             ),
             keyValuePair(
                 "Brake Pressed",
-                dbc::ecuBrake::brakePressed->get()
+                dbc::vcuBrake::brakePressed->get()
             ),
 
             ui::vspacer(10),
             ui::h2("Commands"),
             keyValuePair(
                 "Set Current (Rear)",
-                dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get()
+                dbc::vcuSetCurrentRearInverter::setCurrentRearInverter->get()
             ),
             keyValuePair(
                 "Set Current (Left)",
-                dbc::ecuSetCurrentFrontLeftInverter::setCurrentFrontLeftInverter->get()
+                dbc::vcuSetCurrentFrontLeftInverter::setCurrentFrontLeftInverter->get()
             ),
             keyValuePair(
                 "Set Current (Right)",
-                dbc::ecuSetCurrentBrakeFrontRightInverter::setCurrentBrakeFrontRightInverter->get()
+                dbc::vcuSetCurrentBrakeFrontRightInverter::setCurrentBrakeFrontRightInverter->get()
             ),
             keyValuePair(
                 "BMS Command",
-                dbc::ecuBmsCommandMessage::bmsCommand->get()
+                dbc::vcuBmsCommandMessage::bmsCommand->get()
             ),
 
             ui::vspacer(10),
             ui::h2("VCU Implausibilities"),
             keyErrorValuePair(
                 "Implausibility Present",
-                dbc::ecuImplausibility::implausibilityPresent->get()
+                dbc::vcuImplausibility::implausibilityPresent->get()
             ),
             keyErrorValuePair(
                 "APPS Disagreement",
-                dbc::ecuImplausibility::appssDisagreementImp->get()
+                dbc::vcuImplausibility::appssDisagreementImp->get()
             ),
             keyErrorValuePair(
                 "BPPC Implausibility",
-                dbc::ecuImplausibility::bppcImp->get()
+                dbc::vcuImplausibility::bppcImp->get()
             ),
             keyErrorValuePair(
                 "Brake Invalid",
-                dbc::ecuImplausibility::brakeInvalidImp->get()
+                dbc::vcuImplausibility::brakeInvalidImp->get()
             ),
             keyErrorValuePair(
                 "APPS Invalid",
-                dbc::ecuImplausibility::appssInvalidImp->get()
+                dbc::vcuImplausibility::appssInvalidImp->get()
             )
         );
         // clang-format off
@@ -238,56 +238,56 @@ class DebugPage : public IPage {
             ui::h2("Rear Motor Status"),
             keyValuePair(
                 "RPM",
-                dbc::rearInverterMotorStatus::rpm->get()
+                dbc::rearInverterMotorStatus::bRpm->get()
             ),
             keyValuePair(
                 "Motor Current",
-                dbc::rearInverterMotorStatus::motorCurrent->get()
+                dbc::rearInverterMotorStatus::bMotorCurrent->get()
             ),
             keyValuePair(
                 "DC Voltage",
-                dbc::rearInverterMotorStatus::dcVoltage->get()
+                dbc::rearInverterMotorStatus::bDcVoltage->get()
             ),
             keyValuePair(
                 "DC Current",
-                dbc::rearInverterMotorStatus::dcCurrent->get()
+                dbc::rearInverterMotorStatus::bDcCurrent->get()
             ),
 
             ui::vspacer(10),
             ui::h2("Rear Temperature"),
             keyValuePair(
                 "IGBT Temp",
-                dbc::rearInverterTempStatus::igbtTemp->get()
+                dbc::rearInverterTempStatus::bIgbtTemp->get()
             ),
             keyValuePair(
                 "Motor Temp",
-                dbc::rearInverterTempStatus::motorTemp->get()
+                dbc::rearInverterTempStatus::bMotorTemp->get()
             ),
 
             ui::vspacer(10),
             ui::h2("Rear Power"),
             keyValuePair(
                 "Ah Drawn",
-                dbc::rearInverterCurrentDraw::ahDrawn->get()
+                dbc::rearInverterCurrentDraw::bAhDrawn->get()
             ),
             keyValuePair(
                 "Ah Charged",
-                dbc::rearInverterCurrentDraw::ahCharged->get()
+                dbc::rearInverterCurrentDraw::bAhCharged->get()
             ),
             keyValuePair(
                 "Wh Drawn",
-                dbc::rearInverterPowerDraw::whDrawn->get()
+                dbc::rearInverterPowerDraw::bWhDrawn->get()
             ),
             keyValuePair(
                 "Wh Charged",
-                dbc::rearInverterPowerDraw::whCharged->get()
+                dbc::rearInverterPowerDraw::bWhCharged->get()
             ),
 
             ui::vspacer(10),
             ui::h2("Rear Inverter"),
             keyValuePair(
                 "Fault Code",
-                dbc::rearInverterFaultStatus::faultCode->get()
+                dbc::rearInverterFaultStatus::bFaultCode->get()
             )
         );
         // clang-format on
@@ -338,27 +338,27 @@ class DebugPage : public IPage {
             ui::h2("BSPD"),
             keyErrorValuePair(
                 "High Current",
-                dbc::ecuBspdStatus::highCurrent->get()
+                dbc::vcuBspdStatus::highCurrent->get()
             ),
             keyErrorValuePair(
                 "Hard Brake",
-                dbc::ecuBspdStatus::hardBrake->get()
+                dbc::vcuBspdStatus::hardBrake->get()
             ),
             keyErrorValuePair(
                 "Brake Error",
-                dbc::ecuBspdStatus::brakeError->get()
+                dbc::vcuBspdStatus::brakeError->get()
             ),
             keyErrorValuePair(
                 "Current Error",
-                dbc::ecuBspdStatus::currentError->get()
+                dbc::vcuBspdStatus::currentError->get()
             ),
             keyErrorValuePair(
                 "BSPD Error",
-                dbc::ecuBspdStatus::bspdErrorB->get()
+                dbc::vcuBspdStatus::bspdErrorB->get()
             ),
             keyErrorValuePair(
                 "BSPD Sensor Error",
-                dbc::ecuBspdStatus::bspdSensErrorB->get()
+                dbc::vcuBspdStatus::bspdSensErrorB->get()
             )
         );
         // clang-format on

@@ -55,179 +55,179 @@ static constexpr float coolant3VoltMin{0.0};
 
 namespace frontRightInverterMotorStatus {
 
-inline CAN_Signal_INT16 rpm = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
-inline CAN_Signal_INT16 motorCurrent = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 dcVoltage = MakeSignalSigned(int16_t, 32, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 dcCurrent = MakeSignalSigned(int16_t, 48, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 frRpm = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 frMotorCurrent = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 frDcVoltage = MakeSignalSigned(int16_t, 32, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 frDcCurrent = MakeSignalSigned(int16_t, 48, 16, 0.1, 0.0, false);
 inline RX_CAN_Message(4) message{
-    driveBus, 0x28B, false, 8, rpm, motorCurrent, dcVoltage, dcCurrent};
+    driveBus, 0x28B, false, 8, frRpm, frMotorCurrent, frDcVoltage, frDcCurrent};
 
-static constexpr int16_t rpmMin{0};
-static constexpr int16_t motorCurrentMin{0};
-static constexpr int16_t dcVoltageMin{0};
-static constexpr int16_t dcCurrentMin{0};
+static constexpr int16_t frRpmMin{0};
+static constexpr int16_t frMotorCurrentMin{0};
+static constexpr int16_t frDcVoltageMin{0};
+static constexpr int16_t frDcCurrentMin{0};
 
 };  // namespace frontRightInverterMotorStatus
 
 namespace frontRightInverterTempStatus {
 
-inline CAN_Signal_INT16 igbtTemp = MakeSignalSigned(int16_t, 0, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 motorTemp = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
-inline RX_CAN_Message(2) message{driveBus, 0x28C, false, 4, igbtTemp, motorTemp};
+inline CAN_Signal_INT16 frIgbtTemp = MakeSignalSigned(int16_t, 0, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 frMotorTemp = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
+inline RX_CAN_Message(2) message{driveBus, 0x28C, false, 4, frIgbtTemp, frMotorTemp};
 
-static constexpr int16_t igbtTempMin{0};
-static constexpr int16_t motorTempMin{0};
+static constexpr int16_t frIgbtTempMin{0};
+static constexpr int16_t frMotorTempMin{0};
 
 };  // namespace frontRightInverterTempStatus
 
 namespace frontRightInverterCurrentDraw {
 
-inline CAN_Signal_UINT32 ahDrawn = MakeSignalExp(uint32_t, 0, 16, 0.0001, 0.0);
-inline CAN_Signal_UINT32 ahCharged = MakeSignalExp(uint32_t, 32, 32, 0.0001, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x28D, false, 8, ahDrawn, ahCharged};
+inline CAN_Signal_UINT32 frAhDrawn = MakeSignalExp(uint32_t, 0, 16, 0.0001, 0.0);
+inline CAN_Signal_UINT32 frAhCharged = MakeSignalExp(uint32_t, 32, 32, 0.0001, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x28D, false, 8, frAhDrawn, frAhCharged};
 
-static constexpr uint32_t ahDrawnMin{0};
-static constexpr uint32_t ahChargedMin{0};
+static constexpr uint32_t frAhDrawnMin{0};
+static constexpr uint32_t frAhChargedMin{0};
 
 };  // namespace frontRightInverterCurrentDraw
 
 namespace frontRightInverterPowerDraw {
 
-inline CAN_Signal_UINT32 whDrawn = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
-inline CAN_Signal_UINT32 whCharged = MakeSignalExp(uint32_t, 32, 32, 0.001, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x28E, false, 8, whDrawn, whCharged};
+inline CAN_Signal_UINT32 frWhDrawn = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
+inline CAN_Signal_UINT32 frWhCharged = MakeSignalExp(uint32_t, 32, 32, 0.001, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x28E, false, 8, frWhDrawn, frWhCharged};
 
-static constexpr uint32_t whDrawnMin{0};
-static constexpr uint32_t whChargedMin{0};
+static constexpr uint32_t frWhDrawnMin{0};
+static constexpr uint32_t frWhChargedMin{0};
 
 };  // namespace frontRightInverterPowerDraw
 
 namespace frontRightInverterFaultStatus {
 
-inline CAN_Signal_UINT8 faultCode = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
-inline RX_CAN_Message(1) message{driveBus, 0x28A, false, 1, faultCode};
+inline CAN_Signal_UINT8 frFaultCode = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline RX_CAN_Message(1) message{driveBus, 0x28A, false, 1, frFaultCode};
 
-static constexpr uint8_t faultCodeMin{0};
+static constexpr uint8_t frFaultCodeMin{0};
 
 };  // namespace frontRightInverterFaultStatus
 
 namespace frontLeftInverterMotorStatus {
 
-inline CAN_Signal_INT16 rpm = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
-inline CAN_Signal_INT16 motorCurrent = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 dcVoltage = MakeSignalSigned(int16_t, 32, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 dcCurrent = MakeSignalSigned(int16_t, 48, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 flRpm = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 flMotorCurrent = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 flDcVoltage = MakeSignalSigned(int16_t, 32, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 flDcCurrent = MakeSignalSigned(int16_t, 48, 16, 0.1, 0.0, false);
 inline RX_CAN_Message(4) message{
-    driveBus, 0x286, false, 8, rpm, motorCurrent, dcVoltage, dcCurrent};
+    driveBus, 0x286, false, 8, flRpm, flMotorCurrent, flDcVoltage, flDcCurrent};
 
-static constexpr int16_t rpmMin{0};
-static constexpr int16_t motorCurrentMin{0};
-static constexpr int16_t dcVoltageMin{0};
-static constexpr int16_t dcCurrentMin{0};
+static constexpr int16_t flRpmMin{0};
+static constexpr int16_t flMotorCurrentMin{0};
+static constexpr int16_t flDcVoltageMin{0};
+static constexpr int16_t flDcCurrentMin{0};
 
 };  // namespace frontLeftInverterMotorStatus
 
 namespace frontLeftInverterTempStatus {
 
-inline CAN_Signal_INT16 igbtTemp = MakeSignalSigned(int16_t, 0, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 motorTemp = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
-inline RX_CAN_Message(2) message{driveBus, 0x287, false, 4, igbtTemp, motorTemp};
+inline CAN_Signal_INT16 flIgbtTemp = MakeSignalSigned(int16_t, 0, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 flMotorTemp = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
+inline RX_CAN_Message(2) message{driveBus, 0x287, false, 4, flIgbtTemp, flMotorTemp};
 
-static constexpr int16_t igbtTempMin{0};
-static constexpr int16_t motorTempMin{0};
+static constexpr int16_t flIgbtTempMin{0};
+static constexpr int16_t flMotorTempMin{0};
 
 };  // namespace frontLeftInverterTempStatus
 
 namespace frontLeftInverterCurrentDraw {
 
-inline CAN_Signal_UINT32 ahDrawn = MakeSignalExp(uint32_t, 0, 16, 0.0001, 0.0);
-inline CAN_Signal_UINT32 ahCharged = MakeSignalExp(uint32_t, 32, 32, 0.0001, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x288, false, 8, ahDrawn, ahCharged};
+inline CAN_Signal_UINT32 flAhDrawn = MakeSignalExp(uint32_t, 0, 16, 0.0001, 0.0);
+inline CAN_Signal_UINT32 flAhCharged = MakeSignalExp(uint32_t, 32, 32, 0.0001, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x288, false, 8, flAhDrawn, flAhCharged};
 
-static constexpr uint32_t ahDrawnMin{0};
-static constexpr uint32_t ahChargedMin{0};
+static constexpr uint32_t flAhDrawnMin{0};
+static constexpr uint32_t flAhChargedMin{0};
 
 };  // namespace frontLeftInverterCurrentDraw
 
 namespace frontLeftInverterPowerDraw {
 
-inline CAN_Signal_UINT32 whDrawn = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
-inline CAN_Signal_UINT32 whCharged = MakeSignalExp(uint32_t, 32, 32, 0.001, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x289, false, 8, whDrawn, whCharged};
+inline CAN_Signal_UINT32 flWhDrawn = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
+inline CAN_Signal_UINT32 flWhCharged = MakeSignalExp(uint32_t, 32, 32, 0.001, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x289, false, 8, flWhDrawn, flWhCharged};
 
-static constexpr uint32_t whDrawnMin{0};
-static constexpr uint32_t whChargedMin{0};
+static constexpr uint32_t flWhDrawnMin{0};
+static constexpr uint32_t flWhChargedMin{0};
 
 };  // namespace frontLeftInverterPowerDraw
 
 namespace frontLeftInverterFaultStatus {
 
-inline CAN_Signal_UINT8 faultCode = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
-inline RX_CAN_Message(1) message{driveBus, 0x285, false, 1, faultCode};
+inline CAN_Signal_UINT8 flFaultCode = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline RX_CAN_Message(1) message{driveBus, 0x285, false, 1, flFaultCode};
 
-static constexpr uint8_t faultCodeMin{0};
+static constexpr uint8_t flFaultCodeMin{0};
 
 };  // namespace frontLeftInverterFaultStatus
 
 namespace rearInverterMotorStatus {
 
-inline CAN_Signal_INT16 rpm = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
-inline CAN_Signal_INT16 motorCurrent = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 dcVoltage = MakeSignalSigned(int16_t, 32, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 dcCurrent = MakeSignalSigned(int16_t, 48, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 bRpm = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 bMotorCurrent = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 bDcVoltage = MakeSignalSigned(int16_t, 32, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 bDcCurrent = MakeSignalSigned(int16_t, 48, 16, 0.1, 0.0, false);
 inline RX_CAN_Message(4) message{
-    driveBus, 0x281, false, 8, rpm, motorCurrent, dcVoltage, dcCurrent};
+    driveBus, 0x281, false, 8, bRpm, bMotorCurrent, bDcVoltage, bDcCurrent};
 
-static constexpr int16_t rpmMin{0};
-static constexpr int16_t motorCurrentMin{0};
-static constexpr int16_t dcVoltageMin{0};
-static constexpr int16_t dcCurrentMin{0};
+static constexpr int16_t bRpmMin{0};
+static constexpr int16_t bMotorCurrentMin{0};
+static constexpr int16_t bDcVoltageMin{0};
+static constexpr int16_t bDcCurrentMin{0};
 
 };  // namespace rearInverterMotorStatus
 
 namespace rearInverterTempStatus {
 
-inline CAN_Signal_INT16 igbtTemp = MakeSignalSigned(int16_t, 0, 16, 0.1, 0.0, false);
-inline CAN_Signal_INT16 motorTemp = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
-inline RX_CAN_Message(2) message{driveBus, 0x282, false, 4, igbtTemp, motorTemp};
+inline CAN_Signal_INT16 bIgbtTemp = MakeSignalSigned(int16_t, 0, 16, 0.1, 0.0, false);
+inline CAN_Signal_INT16 bMotorTemp = MakeSignalSigned(int16_t, 16, 16, 0.1, 0.0, false);
+inline RX_CAN_Message(2) message{driveBus, 0x282, false, 4, bIgbtTemp, bMotorTemp};
 
-static constexpr int16_t igbtTempMin{0};
-static constexpr int16_t motorTempMin{0};
+static constexpr int16_t bIgbtTempMin{0};
+static constexpr int16_t bMotorTempMin{0};
 
 };  // namespace rearInverterTempStatus
 
 namespace rearInverterCurrentDraw {
 
-inline CAN_Signal_UINT32 ahDrawn = MakeSignalExp(uint32_t, 0, 16, 0.0001, 0.0);
-inline CAN_Signal_UINT32 ahCharged = MakeSignalExp(uint32_t, 32, 32, 0.0001, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x283, false, 8, ahDrawn, ahCharged};
+inline CAN_Signal_UINT32 bAhDrawn = MakeSignalExp(uint32_t, 0, 16, 0.0001, 0.0);
+inline CAN_Signal_UINT32 bAhCharged = MakeSignalExp(uint32_t, 32, 32, 0.0001, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x283, false, 8, bAhDrawn, bAhCharged};
 
-static constexpr uint32_t ahDrawnMin{0};
-static constexpr uint32_t ahChargedMin{0};
+static constexpr uint32_t bAhDrawnMin{0};
+static constexpr uint32_t bAhChargedMin{0};
 
 };  // namespace rearInverterCurrentDraw
 
 namespace rearInverterPowerDraw {
 
-inline CAN_Signal_UINT32 whDrawn = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
-inline CAN_Signal_UINT32 whCharged = MakeSignalExp(uint32_t, 32, 32, 0.001, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x284, false, 8, whDrawn, whCharged};
+inline CAN_Signal_UINT32 bWhDrawn = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
+inline CAN_Signal_UINT32 bWhCharged = MakeSignalExp(uint32_t, 32, 32, 0.001, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x284, false, 8, bWhDrawn, bWhCharged};
 
-static constexpr uint32_t whDrawnMin{0};
-static constexpr uint32_t whChargedMin{0};
+static constexpr uint32_t bWhDrawnMin{0};
+static constexpr uint32_t bWhChargedMin{0};
 
 };  // namespace rearInverterPowerDraw
 
 namespace rearInverterFaultStatus {
 
-inline CAN_Signal_UINT8 faultCode = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
-inline RX_CAN_Message(1) message{driveBus, 0x280, false, 1, faultCode};
+inline CAN_Signal_UINT8 bFaultCode = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
+inline RX_CAN_Message(1) message{driveBus, 0x280, false, 1, bFaultCode};
 
-static constexpr uint8_t faultCodeMin{0};
+static constexpr uint8_t bFaultCodeMin{0};
 
 };  // namespace rearInverterFaultStatus
 
-namespace ecuSetCurrentFrontLeftInverter {
+namespace vcuSetCurrentFrontLeftInverter {
 
 inline CAN_Signal_INT32 setCurrentFrontLeftInverter =
     MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
@@ -235,9 +235,9 @@ inline RX_CAN_Message(1) message{driveBus, 0x20D, false, 4, setCurrentFrontLeftI
 
 static constexpr int32_t setCurrentFrontLeftInverterMin{0};
 
-};  // namespace ecuSetCurrentFrontLeftInverter
+};  // namespace vcuSetCurrentFrontLeftInverter
 
-namespace ecuSetCurrentBrakeFrontLeftInverter {
+namespace vcuSetCurrentBrakeFrontLeftInverter {
 
 inline CAN_Signal_INT32 setCurrentBrakeFrontLeftInverter =
     MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
@@ -245,9 +245,9 @@ inline RX_CAN_Message(1) message{driveBus, 0x20E, false, 4, setCurrentBrakeFront
 
 static constexpr int32_t setCurrentBrakeFrontLeftInverterMin{0};
 
-};  // namespace ecuSetCurrentBrakeFrontLeftInverter
+};  // namespace vcuSetCurrentBrakeFrontLeftInverter
 
-namespace ecuSetCurrentFrontRightInverter {
+namespace vcuSetCurrentFrontRightInverter {
 
 inline CAN_Signal_INT32 setCurrentFrontRightInverter =
     MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
@@ -255,9 +255,9 @@ inline RX_CAN_Message(1) message{driveBus, 0x20F, false, 4, setCurrentFrontRight
 
 static constexpr int32_t setCurrentFrontRightInverterMin{0};
 
-};  // namespace ecuSetCurrentFrontRightInverter
+};  // namespace vcuSetCurrentFrontRightInverter
 
-namespace ecuSetCurrentBrakeFrontRightInverter {
+namespace vcuSetCurrentBrakeFrontRightInverter {
 
 inline CAN_Signal_INT32 setCurrentBrakeFrontRightInverter =
     MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
@@ -265,9 +265,9 @@ inline RX_CAN_Message(1) message{driveBus, 0x210, false, 4, setCurrentBrakeFront
 
 static constexpr int32_t setCurrentBrakeFrontRightInverterMin{0};
 
-};  // namespace ecuSetCurrentBrakeFrontRightInverter
+};  // namespace vcuSetCurrentBrakeFrontRightInverter
 
-namespace ecuSetCurrentRearInverter {
+namespace vcuSetCurrentRearInverter {
 
 inline CAN_Signal_INT32 setCurrentRearInverter =
     MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
@@ -275,9 +275,9 @@ inline RX_CAN_Message(1) message{driveBus, 0x200, false, 4, setCurrentRearInvert
 
 static constexpr int32_t setCurrentRearInverterMin{0};
 
-};  // namespace ecuSetCurrentRearInverter
+};  // namespace vcuSetCurrentRearInverter
 
-namespace ecuSetCurrentBrakeRearInverter {
+namespace vcuSetCurrentBrakeRearInverter {
 
 inline CAN_Signal_INT32 setCurrentBrakeRearInverter =
     MakeSignalSigned(int32_t, 0, 32, 0.001, 0.0, false);
@@ -285,9 +285,9 @@ inline RX_CAN_Message(1) message{driveBus, 0x201, false, 4, setCurrentBrakeRearI
 
 static constexpr int32_t setCurrentBrakeRearInverterMin{0};
 
-};  // namespace ecuSetCurrentBrakeRearInverter
+};  // namespace vcuSetCurrentBrakeRearInverter
 
-namespace ecuThrottle {
+namespace vcuThrottle {
 
 inline CAN_Signal_INT16 apps1Throttle = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
 inline CAN_Signal_INT16 apps2Throttle = MakeSignalSigned(int16_t, 16, 16, 1.0, 0.0, false);
@@ -296,9 +296,9 @@ inline RX_CAN_Message(2) message{driveBus, 0x202, false, 4, apps1Throttle, apps2
 static constexpr int16_t apps1ThrottleMin{0};
 static constexpr int16_t apps2ThrottleMin{0};
 
-};  // namespace ecuThrottle
+};  // namespace vcuThrottle
 
-namespace ecuBrake {
+namespace vcuBrake {
 
 inline CAN_Signal_INT16 frontBrakePressure = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
 inline CAN_Signal_INT16 rearBrakePressure = MakeSignalSigned(int16_t, 16, 16, 1.0, 0.0, false);
@@ -309,9 +309,9 @@ inline RX_CAN_Message(3) message{
 static constexpr int16_t frontBrakePressureMin{0};
 static constexpr int16_t rearBrakePressureMin{0};
 
-};  // namespace ecuBrake
+};  // namespace vcuBrake
 
-namespace ecuImplausibility {
+namespace vcuImplausibility {
 
 inline CAN_Signal_BOOL implausibilityPresent = MakeSignalSigned(bool, 0, 8, 1.0, 0.0, false);
 inline CAN_Signal_BOOL appssDisagreementImp = MakeSignalSigned(bool, 8, 8, 1.0, 0.0, false);
@@ -328,37 +328,34 @@ inline RX_CAN_Message(5) message{driveBus,
     brakeInvalidImp,
     appssInvalidImp};
 
-};  // namespace ecuImplausibility
+};  // namespace vcuImplausibility
 
-namespace ecuBmsCommandMessage {
+namespace vcuBmsCommandMessage {
 
 inline CAN_Signal_UINT8 bmsCommand = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
 inline RX_CAN_Message(1) message{driveBus, 0x205, false, 1, bmsCommand};
 
 static constexpr uint8_t bmsCommandMin{0};
 
-};  // namespace ecuBmsCommandMessage
+};  // namespace vcuBmsCommandMessage
 
-namespace ecuDriveStatus {
+namespace vcuDriveStatus {
 
 inline CAN_Signal_UINT8 driveState = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
 inline RX_CAN_Message(1) message{driveBus, 0x206, false, 1, driveState};
 
 static constexpr uint8_t driveStateMin{0};
 
-};  // namespace ecuDriveStatus
+};  // namespace vcuDriveStatus
 
-namespace ecuActiveAeroCommand {
+namespace vcuActiveAeroCommand {
 
-inline CAN_Signal_BOOL activeAeroState = MakeSignalSigned(bool, 0, 1, 1.0, 0.0, false);
-inline CAN_Signal_INT16 activeAeroPosition = MakeSignalSigned(int16_t, 1, 16, 1.0, 0.0, false);
-inline RX_CAN_Message(2) message{driveBus, 0x208, false, 3, activeAeroState, activeAeroPosition};
+inline CAN_Signal_BOOL activeAeroState = MakeSignalSigned(bool, 0, 8, 1.0, 0.0, false);
+inline RX_CAN_Message(1) message{driveBus, 0x208, false, 1, activeAeroState};
 
-static constexpr int16_t activeAeroPositionMin{0};
+};  // namespace vcuActiveAeroCommand
 
-};  // namespace ecuActiveAeroCommand
-
-namespace ecuPumpFanCommand {
+namespace vcuPumpFanCommand {
 
 inline CAN_Signal_UINT8 frontPumpDutyCycle = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
 inline CAN_Signal_UINT8 rearPumpDutyCycle = MakeSignalExp(uint8_t, 8, 8, 1.0, 0.0);
@@ -378,18 +375,18 @@ static constexpr uint8_t rearPumpDutyCycleMin{0};
 static constexpr uint8_t frontFanDutyCycleMin{0};
 static constexpr uint8_t rearFanDutyCycleMin{0};
 
-};  // namespace ecuPumpFanCommand
+};  // namespace vcuPumpFanCommand
 
-namespace ecuLutResponse {
+namespace vcuLutResponse {
 
 inline CAN_Signal_UINT8 accelLutIdResponse = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
 inline RX_CAN_Message(1) message{driveBus, 0x20A, false, 1, accelLutIdResponse};
 
 static constexpr uint8_t accelLutIdResponseMin{0};
 
-};  // namespace ecuLutResponse
+};  // namespace vcuLutResponse
 
-namespace ecuTempLimitingStatus {
+namespace vcuTempLimitingStatus {
 
 inline CAN_Signal_BOOL igbtTempLimiting = MakeSignalSigned(bool, 0, 1, 1.0, 0.0, false);
 inline CAN_Signal_BOOL batteryTempLimiting = MakeSignalSigned(bool, 1, 1, 1.0, 0.0, false);
@@ -397,18 +394,18 @@ inline CAN_Signal_BOOL motorTempLimiting = MakeSignalSigned(bool, 2, 1, 1.0, 0.0
 inline RX_CAN_Message(3) message{
     driveBus, 0x20B, false, 1, igbtTempLimiting, batteryTempLimiting, motorTempLimiting};
 
-};  // namespace ecuTempLimitingStatus
+};  // namespace vcuTempLimitingStatus
 
-namespace ecuTorqueStatus {
+namespace vcuTorqueStatus {
 
 inline CAN_Signal_UINT8 torqueStatus = MakeSignalExp(uint8_t, 0, 8, 1.0, 0.0);
 inline RX_CAN_Message(1) message{driveBus, 0x20C, false, 1, torqueStatus};
 
 static constexpr uint8_t torqueStatusMin{0};
 
-};  // namespace ecuTorqueStatus
+};  // namespace vcuTorqueStatus
 
-namespace ecuBspdStatus {
+namespace vcuBspdStatus {
 
 inline CAN_Signal_UINT8 highCurrent = MakeSignalExp(uint8_t, 0, 1, 1.0, 0.0);
 inline CAN_Signal_UINT8 hardBrake = MakeSignalExp(uint8_t, 1, 1, 1.0, 0.0);
@@ -437,7 +434,7 @@ static constexpr uint8_t bspdShutdownBMin{0};
 static constexpr uint8_t bspdErrorBMin{0};
 static constexpr uint8_t bspdSensErrorBMin{0};
 
-};  // namespace ecuBspdStatus
+};  // namespace vcuBspdStatus
 
 namespace bmsPackboard {
 
@@ -483,7 +480,7 @@ inline CAN_Signal_BOOL shutdownOpen = MakeSignalSigned(bool, 33, 1, 1.0, 0.0, fa
 inline CAN_Signal_BOOL vcuTimeout = MakeSignalSigned(bool, 34, 1, 1.0, 0.0, false);
 inline CAN_Signal_BOOL inverterTimeout = MakeSignalSigned(bool, 35, 1, 1.0, 0.0, false);
 inline CAN_Signal_BOOL chargerTimeout = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL pecWarning = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL PecWarning = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
 inline CAN_Signal_UINT16 totalPecFailures = MakeSignalExp(uint16_t, 38, 16, 1.0, 0.0);
 inline RX_CAN_Message(17) message{driveBus,
     0x152,
@@ -504,7 +501,7 @@ inline RX_CAN_Message(17) message{driveBus,
     vcuTimeout,
     inverterTimeout,
     chargerTimeout,
-    pecWarning,
+    PecWarning,
     totalPecFailures};
 
 static constexpr float socMin{0.0};
@@ -1456,7 +1453,7 @@ static constexpr int16_t brHeartbeatCountMin{0};
 
 namespace brBrokerSusCalibrated {
 
-inline CAN_Signal_FLOAT brStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT brStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 0.001, 0.0, false);
 inline CAN_Signal_FLOAT brSusPotCalibrated = MakeSignalSigned(float, 32, 32, 1.0, 0.0, false);
 inline RX_CAN_Message(2) message{
     driveBus, 0x570, false, 8, brStrainGaugeCalibrated, brSusPotCalibrated};
@@ -1535,7 +1532,7 @@ static constexpr int16_t blHeartbeatCountMin{0};
 
 namespace blBrokerSusCalibrated {
 
-inline CAN_Signal_FLOAT blStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT blStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 0.001, 0.0, false);
 inline CAN_Signal_FLOAT blSusPotCalibrated = MakeSignalSigned(float, 32, 32, 1.0, 0.0, false);
 inline RX_CAN_Message(2) message{
     driveBus, 0x571, false, 8, blStrainGaugeCalibrated, blSusPotCalibrated};
@@ -1614,7 +1611,7 @@ static constexpr int16_t frHeartbeatCountMin{0};
 
 namespace frBrokerSusCalibrated {
 
-inline CAN_Signal_FLOAT frStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT frStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 0.001, 0.0, false);
 inline CAN_Signal_FLOAT frSusPotCalibrated = MakeSignalSigned(float, 32, 32, 1.0, 0.0, false);
 inline RX_CAN_Message(2) message{
     driveBus, 0x572, false, 8, frStrainGaugeCalibrated, frSusPotCalibrated};
@@ -1693,7 +1690,7 @@ static constexpr int16_t flHeartbeatCountMin{0};
 
 namespace flBrokerSusCalibrated {
 
-inline CAN_Signal_FLOAT flStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT flStrainGaugeCalibrated = MakeSignalSigned(float, 0, 32, 0.001, 0.0, false);
 inline CAN_Signal_FLOAT flSusPotCalibrated = MakeSignalSigned(float, 32, 32, 1.0, 0.0, false);
 inline RX_CAN_Message(2) message{
     driveBus, 0x573, false, 8, flStrainGaugeCalibrated, flSusPotCalibrated};
@@ -1792,10 +1789,12 @@ namespace imuPresTemp {
 
 inline CAN_Signal_FLOAT temperature = MakeSignalSigned(float, 0, 21, 0.00012208, 0.0, false);
 inline CAN_Signal_FLOAT pressure = MakeSignalSigned(float, 21, 21, 0.00012208, 0.0, false);
-inline RX_CAN_Message(2) message{driveBus, 0x556, false, 6, temperature, pressure};
+inline CAN_Signal_FLOAT deltaTime = MakeSignalSigned(float, 42, 21, 0.00012208, 0.0, false);
+inline RX_CAN_Message(3) message{driveBus, 0x556, false, 8, temperature, pressure, deltaTime};
 
 static constexpr float temperatureMin{-40.0};
 static constexpr float pressureMin{0.0};
+static constexpr float deltaTimeMin{0.0};
 
 };  // namespace imuPresTemp
 
@@ -1855,6 +1854,7 @@ inline RX_CAN_Message(7) message{driveBus,
     utcSeconds,
     utcMilliseconds};
 
+static constexpr int8_t utcYearMin{0};
 static constexpr uint8_t utcMonthMin{0};
 static constexpr uint8_t utcDayMin{0};
 static constexpr uint8_t utcHourMin{0};
@@ -1866,9 +1866,11 @@ static constexpr uint16_t utcMillisecondsMin{0};
 
 namespace imuDeltaVel {
 
-inline CAN_Signal_FLOAT xAxisDeltaVelocity = MakeSignalSigned(float, 0, 21, 0.0005, 0.0, false);
-inline CAN_Signal_FLOAT yAxisDeltaVelocity = MakeSignalSigned(float, 21, 21, 0.0005, 0.0, false);
-inline CAN_Signal_FLOAT zAxisDeltaVelocity = MakeSignalSigned(float, 42, 21, 0.0005, 0.0, false);
+inline CAN_Signal_FLOAT xAxisDeltaVelocity = MakeSignalSigned(float, 0, 21, 0.00048832, 0.0, false);
+inline CAN_Signal_FLOAT yAxisDeltaVelocity =
+    MakeSignalSigned(float, 21, 21, 0.00048832, 0.0, false);
+inline CAN_Signal_FLOAT zAxisDeltaVelocity =
+    MakeSignalSigned(float, 42, 21, 0.00048832, 0.0, false);
 inline RX_CAN_Message(3) message{
     driveBus, 0x55A, false, 8, xAxisDeltaVelocity, yAxisDeltaVelocity, zAxisDeltaVelocity};
 
@@ -1911,7 +1913,7 @@ static constexpr uint8_t rtcWeekdayMin{1};
 
 namespace telemetryOdometer {
 
-inline CAN_Signal_FLOAT milesDriven = MakeSignalSigned(float, 0, 32, 1.0, 0.0, false);
+inline CAN_Signal_FLOAT milesDriven = MakeSignalSigned(float, 0, 32, 0.001, 0.0, false);
 inline RX_CAN_Message(1) message{driveBus, 0x522, false, 4, milesDriven};
 
 static constexpr float milesDrivenMin{0.0};
@@ -2480,7 +2482,7 @@ inline RX_CAN_Message(51) message{driveBus,
 
 namespace bmsChargerCurrent {
 
-inline CAN_Signal_UINT16 chargerCurrentSet = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
+inline CAN_Signal_UINT16 chargerCurrentSet = MakeSignalExp(uint16_t, 0, 16, 0.1, 0.0);
 inline RX_CAN_Message(1) message{driveBus, 0x130, false, 2, chargerCurrentSet};
 
 static constexpr uint16_t chargerCurrentSetMin{0};
@@ -2508,23 +2510,23 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x283, "Rear_Inverter_Current_Draw"},
     {0x284, "Rear_Inverter_Power_Draw"},
     {0x280, "Rear_Inverter_Fault_Status"},
-    {0x20D, "ECU_Set_Current_Front_Left_Inverter"},
-    {0x20E, "ECU_Set_Current_Brake_Front_Left_Inverter"},
-    {0x20F, "ECU_Set_Current_Front_Right_Inverter"},
-    {0x210, "ECU_Set_Current_Brake_Front_Right_Inverter"},
-    {0x200, "ECU_Set_Current_Rear_Inverter"},
-    {0x201, "ECU_Set_Current_Brake_Rear_Inverter"},
-    {0x202, "ECU_Throttle"},
-    {0x203, "ECU_Brake"},
-    {0x204, "ECU_Implausibility"},
-    {0x205, "ECU_BMS_Command_Message"},
-    {0x206, "ECU_Drive_Status"},
-    {0x208, "ECU_Active_Aero_Command"},
-    {0x209, "ECU_Pump_Fan_Command"},
-    {0x20A, "ECU_LUT_Response"},
-    {0x20B, "ECU_Temp_Limiting_Status"},
-    {0x20C, "ECU_Torque_Status"},
-    {0x211, "ECU_BSPD_Status"},
+    {0x20D, "VCU_Set_Current_Front_Left_Inverter"},
+    {0x20E, "VCU_Set_Current_Brake_Front_Left_Inverter"},
+    {0x20F, "VCU_Set_Current_Front_Right_Inverter"},
+    {0x210, "VCU_Set_Current_Brake_Front_Right_Inverter"},
+    {0x200, "VCU_Set_Current_Rear_Inverter"},
+    {0x201, "VCU_Set_Current_Brake_Rear_Inverter"},
+    {0x202, "VCU_Throttle"},
+    {0x203, "VCU_Brake"},
+    {0x204, "VCU_Implausibility"},
+    {0x205, "VCU_BMS_Command_Message"},
+    {0x206, "VCU_Drive_Status"},
+    {0x208, "VCU_Active_Aero_Command"},
+    {0x209, "VCU_Pump_Fan_Command"},
+    {0x20A, "VCU_LUT_Response"},
+    {0x20B, "VCU_Temp_Limiting_Status"},
+    {0x20C, "VCU_Torque_Status"},
+    {0x211, "VCU_BSPD_Status"},
     {0x150, "BMS_Packboard"},
     {0x151, "BMS_Daughterboard"},
     {0x152, "BMS_Status"},
@@ -2631,39 +2633,39 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x2A3, 0}, "Coolant_1_Volt"},
     {{0x2A3, 1}, "Coolant_2_Volt"},
     {{0x2A3, 2}, "Coolant_3_Volt"},
-    {{0x28B, 0}, "RPM"},
-    {{0x28B, 1}, "Motor_Current"},
-    {{0x28B, 2}, "DC_Voltage"},
-    {{0x28B, 3}, "DC_Current"},
-    {{0x28C, 0}, "IGBT_Temp"},
-    {{0x28C, 1}, "Motor_Temp"},
-    {{0x28D, 0}, "Ah_Drawn"},
-    {{0x28D, 1}, "Ah_Charged"},
-    {{0x28E, 0}, "Wh_Drawn"},
-    {{0x28E, 1}, "Wh_Charged"},
-    {{0x28A, 0}, "Fault_Code"},
-    {{0x286, 0}, "RPM"},
-    {{0x286, 1}, "Motor_Current"},
-    {{0x286, 2}, "DC_Voltage"},
-    {{0x286, 3}, "DC_Current"},
-    {{0x287, 0}, "IGBT_Temp"},
-    {{0x287, 1}, "Motor_Temp"},
-    {{0x288, 0}, "Ah_Drawn"},
-    {{0x288, 1}, "Ah_Charged"},
-    {{0x289, 0}, "Wh_Drawn"},
-    {{0x289, 1}, "Wh_Charged"},
-    {{0x285, 0}, "Fault_Code"},
-    {{0x281, 0}, "RPM"},
-    {{0x281, 1}, "Motor_Current"},
-    {{0x281, 2}, "DC_Voltage"},
-    {{0x281, 3}, "DC_Current"},
-    {{0x282, 0}, "IGBT_Temp"},
-    {{0x282, 1}, "Motor_Temp"},
-    {{0x283, 0}, "Ah_Drawn"},
-    {{0x283, 1}, "Ah_Charged"},
-    {{0x284, 0}, "Wh_Drawn"},
-    {{0x284, 1}, "Wh_Charged"},
-    {{0x280, 0}, "Fault_Code"},
+    {{0x28B, 0}, "FR_RPM"},
+    {{0x28B, 1}, "FR_Motor_Current"},
+    {{0x28B, 2}, "FR_DC_Voltage"},
+    {{0x28B, 3}, "FR_DC_Current"},
+    {{0x28C, 0}, "FR_IGBT_Temp"},
+    {{0x28C, 1}, "FR_Motor_Temp"},
+    {{0x28D, 0}, "FR_Ah_Drawn"},
+    {{0x28D, 1}, "FR_Ah_Charged"},
+    {{0x28E, 0}, "FR_Wh_Drawn"},
+    {{0x28E, 1}, "FR_Wh_Charged"},
+    {{0x28A, 0}, "FR_Fault_Code"},
+    {{0x286, 0}, "FL_RPM"},
+    {{0x286, 1}, "FL_Motor_Current"},
+    {{0x286, 2}, "FL_DC_Voltage"},
+    {{0x286, 3}, "FL_DC_Current"},
+    {{0x287, 0}, "FL_IGBT_Temp"},
+    {{0x287, 1}, "FL_Motor_Temp"},
+    {{0x288, 0}, "FL_Ah_Drawn"},
+    {{0x288, 1}, "FL_Ah_Charged"},
+    {{0x289, 0}, "FL_Wh_Drawn"},
+    {{0x289, 1}, "FL_Wh_Charged"},
+    {{0x285, 0}, "FL_Fault_Code"},
+    {{0x281, 0}, "B_RPM"},
+    {{0x281, 1}, "B_Motor_Current"},
+    {{0x281, 2}, "B_DC_Voltage"},
+    {{0x281, 3}, "B_DC_Current"},
+    {{0x282, 0}, "B_IGBT_Temp"},
+    {{0x282, 1}, "B_Motor_Temp"},
+    {{0x283, 0}, "B_Ah_Drawn"},
+    {{0x283, 1}, "B_Ah_Charged"},
+    {{0x284, 0}, "B_Wh_Drawn"},
+    {{0x284, 1}, "B_Wh_Charged"},
+    {{0x280, 0}, "B_Fault_Code"},
     {{0x20D, 0}, "Set_Current_Front_Left_Inverter"},
     {{0x20E, 0}, "Set_Current_Brake_Front_Left_Inverter"},
     {{0x20F, 0}, "Set_Current_Front_Right_Inverter"},
@@ -2683,7 +2685,6 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x205, 0}, "BMS_Command"},
     {{0x206, 0}, "Drive_State"},
     {{0x208, 0}, "Active_Aero_State"},
-    {{0x208, 1}, "Active_Aero_Position"},
     {{0x209, 0}, "Front_Pump_Duty_Cycle"},
     {{0x209, 1}, "Rear_Pump_Duty_Cycle"},
     {{0x209, 2}, "Front_Fan_Duty_Cycle"},
@@ -3025,6 +3026,7 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x555, 2}, "Z_Axis_Magnetometer"},
     {{0x556, 0}, "Temperature"},
     {{0x556, 1}, "Pressure"},
+    {{0x556, 2}, "Delta_Time"},
     {{0x557, 0}, "No_G_X_Axis_Acceleration"},
     {{0x557, 1}, "No_G_Y_Axis_Acceleration"},
     {{0x557, 2}, "No_G_Z_Axis_Acceleration"},

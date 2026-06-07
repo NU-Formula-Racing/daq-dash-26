@@ -89,7 +89,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             }
         }
 
-        dbc::ecuDriveStatus::message.attach_rx_callback([this]() {
+        dbc::vcuDriveStatus::message.attach_rx_callback([this]() {
             onECUDriveStatus();
         });
         dbc::telemetryOdometer::message.attach_rx_callback([this]() {
@@ -168,18 +168,22 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float period = (imdError) ? imdPeriod : hardFaultPeriod;
         float brightness = static_cast<int>(floor(time / period)) % 2;
 
-        glm::vec4 color = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);  // default to orange
+        glm::vec4 color = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);  // default to orange
 
         if (CarState::hardFaultPresent()) {  // only change to red IF it's a hard fault present
-            color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        }
+            glm::vec4 color = glm::vec4(1.0f, 0.8f, 0.0f, 1.0f);  // default to orange
 
-        color *= brightness;
+            if (CarState::hardFaultPresent()) {  // only change to red IF it's a hard fault present
+                color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+            }
 
-        // set the colors
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < getBar(i).numPixels(); j++) {
-                getBar(i).setColor(j, color);
+            color *= brightness;
+
+            // set the colors
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < getBar(i).numPixels(); j++) {
+                    getBar(i).setColor(j, color);
+                }
             }
         }
     }
@@ -210,7 +214,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             return;
         }
 
-        uint8_t state = dbc::ecuDriveStatus::driveState->get();
+        uint8_t state = dbc::vcuDriveStatus::driveState->get();
 
         if (errorReset == false && state == currentState)
             return;
@@ -503,7 +507,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
             glm::vec4 partialColor =
                 glm::mix(color2, color, (batteryPercentage * getBar(1).numPixels() - numFull));
             // glm::vec4 partialColor = (color * (batteryPercentage * getBar(1).numPixels() -
-            // numFull)) + (color2 * (1 - (batteryPercentage * getBar(1).numPixels() - numFull)));
+            // numFull)) + (color2 * (1 - (batteryPercentage * getBar(1).numPixels() -
+            // numFull)));
             getBar(1).setColor(numFull,
                 partialColor);  // index numFull is the LED that needs to be partially colored
         }
@@ -513,7 +518,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                 for (int j = 0; j < getBar(1).numPixels(); j++) {
                     if (j == numFull) {
                         glm::vec4 partialColor =
-                            (color * (batteryPercentage * getBar(1).numPixels() - numFull)) + (green
+                            (color * (batteryPercentage * getBar(1).numPixels() - numFull)) +
+           (green
            * (1 - (batteryPercentage * getBar(1).numPixels() - numFull))); getBar(1).setColor(j,
            partialColor);
                     }
@@ -526,7 +532,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         float upperBound = 120.0;
 
         float tempPercentage =
-            (static_cast<float>(dbc::rearInverterTempStatus::igbtTemp->get()) - lowerBound) /
+            (static_cast<float>(dbc::rearInverterTempStatus::bIgbtTemp->get()) - lowerBound) /
             (upperBound - lowerBound);
 
         if (tempPercentage > 1.0) {
@@ -618,7 +624,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         glm::vec4 black = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
         float prechargePercentage =
-            static_cast<float>(dbc::rearInverterMotorStatus::dcVoltage->get()) /
+            static_cast<float>(dbc::rearInverterMotorStatus::bDcVoltage->get()) /
             static_cast<float>(dbc::bmsDaughterboard::batteryVoltage->get());
         for (int i = 0; i < 5; i++) {
             // probably something here
@@ -639,7 +645,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
         const float blinkTime = 500;
         const int numBlinks = 3;
 
-        bool bppc = dbc::ecuImplausibility::bppcImp->get();
+        bool bppc = dbc::vcuImplausibility::bppcImp->get();
 
         if (time < blinkTime * 2 * numBlinks) {
             // we are still blinking
@@ -687,7 +693,7 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
             // we are now in throttle light mode
             const float currentMax = 235;
-            int32_t rawCurrent = dbc::ecuSetCurrentRearInverter::setCurrentRearInverter->get();
+            int32_t rawCurrent = dbc::vcuSetCurrentRearInverter::setCurrentRearInverter->get();
             int32_t rawThrottle = rawCurrent > currentMax ? currentMax : rawCurrent;
             float throttlePercentage = static_cast<float>(rawThrottle) / currentMax;
             glm::vec4 botColor = colorFromHex(0x00FF00);
@@ -701,8 +707,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
                 for (int j = 0; j < numFull; j++) {
                     glm::vec4 color = glm::mix(
-                        botColor, topColor, static_cast<float>(j) / static_cast<float>(numPixels));
-                    getBar(i).setColor(j, color);
+                        botColor, topColor, static_cast<float>(j) /
+            static_cast<float>(numPixels)); getBar(i).setColor(j, color);
                 }
             }
 
@@ -714,8 +720,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
 
                 for (int j = 0; j < numFull; j++) {
                     glm::vec4 color = glm::mix(
-                        botColor, topColor, static_cast<float>(j) / static_cast<float>(numPixels));
-                    getBar(i).setColor(j, color);
+                        botColor, topColor, static_cast<float>(j) /
+            static_cast<float>(numPixels)); getBar(i).setColor(j, color);
                 }
 
                 // turn off the rest of the pixels
@@ -725,9 +731,8 @@ class NeopixelManager : public okay::System<okay::SystemScope::GAME> {
                             topColor,
                             static_cast<float>(j) / static_cast<float>(numPixels));
                         // set it to partial brightness to make a smoother transition
-                        glm::vec4 partialColor = color * (throttlePercentage * numPixels - numFull);
-                        getBar(i).setColor(j, partialColor);
-                        continue;
+                        glm::vec4 partialColor = color * (throttlePercentage * numPixels -
+            numFull); getBar(i).setColor(j, partialColor); continue;
                     }
 
                     getBar(i).setColor(j, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));

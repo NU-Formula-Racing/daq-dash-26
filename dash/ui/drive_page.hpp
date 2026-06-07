@@ -95,7 +95,7 @@ class DrivePage : public IPage {
         const float MAX_SPEED_MPH = 85.0f;
 
         float motorRpm =
-            static_cast<float>(std::max<int16_t>(dbc::rearInverterMotorStatus::rpm->get(), 0));
+            static_cast<float>(std::max<int16_t>(dbc::rearInverterMotorStatus::bRpm->get(), 0));
 
         float wheelRpm = motorRpm / GEAR_RATIO;
 

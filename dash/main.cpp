@@ -84,6 +84,10 @@ int main() {
         input::rightButton.onDown([]() {
             okay::Engine.systems.getSystemChecked<PageManager>()->switchPageRight();
         });
+
+        input::encoderButton.onDown([]() {
+            CarConfig::get().enableLaunchControl = !CarConfig::get().enableLaunchControl;
+        });
     });
 
     // kinda gross, but I don't feel like adding a timer system

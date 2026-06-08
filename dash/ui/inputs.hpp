@@ -15,6 +15,7 @@ inline dash::Button rightButton{12};
 inline dash::Button centerButton{23};
 
 inline dash::Encoder encoder{6, 5};
+inline dash::Button encoderButton{24};
 
 };  // namespace input
 

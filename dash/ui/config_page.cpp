@@ -53,7 +53,7 @@ void ConfigPage::initializeCallbacks() {
 
     input::encoder.onRight([this]() {
         SliderSettings& slider = _sliders[_selectedItem];
-        slider.setValue(std::clamp((std::uint16_t)(slider.currentValue + slider.increment),
+        slider.setValue(std::clamp((std::uint32_t)(slider.currentValue + slider.increment),
             slider.minValue,
             slider.maxValue));
     });
@@ -63,7 +63,7 @@ void ConfigPage::initializeCallbacks() {
         if (slider.increment > slider.currentValue) {
             slider.setValue(0);
         } else {
-            slider.setValue(std::clamp((std::uint16_t)(slider.currentValue - slider.increment),
+            slider.setValue(std::clamp((std::uint32_t)(slider.currentValue - slider.increment),
                 slider.minValue,
                 slider.maxValue));
         }
@@ -85,10 +85,11 @@ okay::UIElement ConfigPage::buildConfig() {
             .minValue = 0,
             .maxValue = 360,
             .increment = 10,
-            .currentValue = CarConfig::get().maxCurrentRequest,
+            .currentValue = CarConfig::get().maxCurrentRequestRear,
             .setValue =
-                [](uint16_t value) {
-                    CarConfig::get().maxCurrentRequest = value;
+                [](uint32_t value) {
+                    CarConfig::get().maxCurrentRequestRear = value;
+                    CarConfig::get().save();
                 }
         },
         // Kp
@@ -99,8 +100,9 @@ okay::UIElement ConfigPage::buildConfig() {
             .increment = 250,
             .currentValue = CarConfig::get().launchControlKP,
             .setValue =
-                [](uint16_t value) {
+                [](uint32_t value) {
                     CarConfig::get().launchControlKP = value;
+                    CarConfig::get().save();
                 }
         },
         // Kd
@@ -111,8 +113,9 @@ okay::UIElement ConfigPage::buildConfig() {
             .increment = 10,
             .currentValue = CarConfig::get().launchControlKD,
             .setValue =
-                [](uint16_t value) {
+                [](uint32_t value) {
                     CarConfig::get().launchControlKD = value;
+                    CarConfig::get().save();
                 }
         }
     };

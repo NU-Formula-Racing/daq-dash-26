@@ -2,6 +2,7 @@
 
 #include <okay/okay.hpp>
 
+#include <can/can_dbc.hpp>
 #include <filesystem>
 #include <fstream>
 #include <vendor/json.hpp>
@@ -39,7 +40,9 @@ void CarConfig::loadFromFile() {
     try {
         Json data = Json::parse(file);
 
-        maxCurrentRequest = data.value("maxCurrentRequest", maxCurrentRequest);
+        maxCurrentRequestRear = data.value("maxCurrentRequestRear", maxCurrentRequestRear);
+        maxCurrentRequestRear = data.value("maxCurrentRequestFL", maxCurrentRequestFL);
+        maxCurrentRequestRear = data.value("maxCurrentRequestFR", maxCurrentRequestFR);
         launchControlKD = data.value("launchControlKD", launchControlKD);
         launchControlKP = data.value("launchControlKP", launchControlKP);
 
@@ -51,7 +54,9 @@ void CarConfig::loadFromFile() {
 void CarConfig::saveToFile() {
     Json data;
 
-    data["maxCurrentRequest"] = maxCurrentRequest;
+    data["maxCurrentRequestRear"] = maxCurrentRequestRear;
+    data["maxCurrentRequestFL"] = maxCurrentRequestFL;
+    data["maxCurrentRequestFR"] = maxCurrentRequestFR;
     data["launchControlKD"] = launchControlKD;
     data["launchControlKP"] = launchControlKP;
 
@@ -62,6 +67,31 @@ void CarConfig::saveToFile() {
     }
 
     file << data.dump(4);
+}
+
+void CarConfig::transmitConfig() {
+    const uint8_t validTranmissionValue = 26;  // hehe, like the car
+
+    dbc::dashMaxCurrentRequestRear::maxCurrent->set(maxCurrentRequestRear);
+    dbc::dashMaxCurrentRequestRear::useMax->set(validTranmissionValue);
+
+    dbc::dashMaxCurrentRequestFl::maxCurrent->set(maxCurrentRequestFL);
+    dbc::dashMaxCurrentRequestFl::useMax->set(validTranmissionValue);
+
+    dbc::dashMaxCurrentRequestFr::maxCurrent->set(maxCurrentRequestFR);
+    dbc::dashMaxCurrentRequestFr::useMax->set(validTranmissionValue);
+
+    dbc::dashLaunchControlConfig::lcKp->set(launchControlKP);
+    dbc::dashLaunchControlConfig::lcKd->set(launchControlKD);
+    dbc::dashLaunchControlConfig::lcEnable->set(enableLaunchControl);
+    dbc::dashLaunchControlConfig::useConfigSignature->set(validTranmissionValue);
+
+    // ignore the fact that this is called drive bus
+    // this is just an artifact of NFR25 and the autogen code
+    dbc::driveBus.send(dbc::dashMaxCurrentRequestRear::message);
+    dbc::driveBus.send(dbc::dashMaxCurrentRequestFl::message);
+    dbc::driveBus.send(dbc::dashMaxCurrentRequestFr::message);
+    dbc::driveBus.send(dbc::dashLaunchControlConfig::message);
 }
 
 }  // namespace dash

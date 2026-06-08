@@ -451,7 +451,7 @@ inline CAN_Signal_UINT16 lcKp = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
 inline CAN_Signal_UINT16 lcKd = MakeSignalExp(uint16_t, 16, 16, 1.0, 0.0);
 inline CAN_Signal_BOOL lcEnable = MakeSignalSigned(bool, 32, 8, 1.0, 0.0, false);
 inline CAN_Signal_UINT8 useConfigSignature = MakeSignalExp(uint8_t, 48, 8, 1.0, 0.0);
-inline RX_CAN_Message(4) message{
+inline TX_CAN_Message(4) message{
     driveBus, 0x510, false, 7, lcKp, lcKd, lcEnable, useConfigSignature};
 
 static constexpr uint16_t lcKpMin{5000};
@@ -464,7 +464,7 @@ namespace dashMaxCurrentRequestRear {
 
 inline CAN_Signal_UINT32 maxCurrent = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
 inline CAN_Signal_UINT8 useMax = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x511, false, 5, maxCurrent, useMax};
+inline TX_CAN_Message(2) message{driveBus, 0x511, false, 5, maxCurrent, useMax};
 
 static constexpr uint32_t maxCurrentMin{0};
 static constexpr uint8_t useMaxMin{0};
@@ -475,7 +475,7 @@ namespace dashMaxCurrentRequestFl {
 
 inline CAN_Signal_UINT32 maxCurrent = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
 inline CAN_Signal_UINT8 useMax = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x512, false, 5, maxCurrent, useMax};
+inline TX_CAN_Message(2) message{driveBus, 0x512, false, 5, maxCurrent, useMax};
 
 static constexpr uint32_t maxCurrentMin{0};
 static constexpr uint8_t useMaxMin{0};
@@ -486,7 +486,7 @@ namespace dashMaxCurrentRequestFr {
 
 inline CAN_Signal_UINT32 maxCurrent = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
 inline CAN_Signal_UINT8 useMax = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
-inline RX_CAN_Message(2) message{driveBus, 0x513, false, 5, maxCurrent, useMax};
+inline TX_CAN_Message(2) message{driveBus, 0x513, false, 5, maxCurrent, useMax};
 
 static constexpr uint32_t maxCurrentMin{0};
 static constexpr uint8_t useMaxMin{0};

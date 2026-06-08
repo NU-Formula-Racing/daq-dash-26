@@ -13,11 +13,11 @@ class ConfigPage : public IPage {
 
     struct SliderSettings {
         const char* sliderName;
-        uint16_t minValue;
-        uint16_t maxValue;
-        uint16_t increment;
-        uint16_t currentValue;
-        std::function<void(uint16_t)> setValue;
+        uint32_t minValue;
+        uint32_t maxValue;
+        uint32_t increment;
+        uint32_t currentValue;
+        std::function<void(uint32_t)> setValue;
     };
 
     void initializePage();

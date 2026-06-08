@@ -10,11 +10,15 @@ class CarConfig {
 
     static CarConfig& get();
 
-    uint16_t maxCurrentRequest{360};
+    uint32_t maxCurrentRequestRear{360};
+    uint32_t maxCurrentRequestFL{50};
+    uint32_t maxCurrentRequestFR{50};
     uint16_t launchControlKP{8000};
     uint16_t launchControlKD{160};
+    bool enableLaunchControl{false};
 
     void save();
+    void transmitConfig();
 
    private:
     CarConfig();

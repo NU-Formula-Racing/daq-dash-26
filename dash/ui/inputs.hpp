@@ -2,6 +2,7 @@
 #define __INPUTS_H__
 
 #include <platform/button.hpp>
+#include <platform/encoder.hpp>
 
 namespace dash {
 
@@ -12,6 +13,8 @@ inline dash::Button downButton{20};
 inline dash::Button leftButton{16};
 inline dash::Button rightButton{12};
 inline dash::Button centerButton{23};
+
+inline dash::Encoder encoder{6, 5};
 
 };  // namespace input
 

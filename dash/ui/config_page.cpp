@@ -50,6 +50,24 @@ void ConfigPage::initializeCallbacks() {
             _selectedItem--;
         }
     });
+
+    input::encoder.onRight([this]() {
+        SliderSettings& slider = _sliders[_selectedItem];
+        slider.setValue(std::clamp((std::uint16_t)(slider.currentValue + slider.increment),
+            slider.minValue,
+            slider.maxValue));
+    });
+
+    input::encoder.onLeft([this]() {
+        SliderSettings& slider = _sliders[_selectedItem];
+        if (slider.increment > slider.currentValue) {
+            slider.setValue(0);
+        } else {
+            slider.setValue(std::clamp((std::uint16_t)(slider.currentValue - slider.increment),
+                slider.minValue,
+                slider.maxValue));
+        }
+    });
 }
 
 void ConfigPage::closePage() {
@@ -70,7 +88,6 @@ okay::UIElement ConfigPage::buildConfig() {
             .currentValue = CarConfig::get().maxCurrentRequest,
             .setValue =
                 [](uint16_t value) {
-                    okay::Engine.logger.debug("Setting value to {}", value);
                     CarConfig::get().maxCurrentRequest = value;
                 }
         },
@@ -83,7 +100,6 @@ okay::UIElement ConfigPage::buildConfig() {
             .currentValue = CarConfig::get().launchControlKP,
             .setValue =
                 [](uint16_t value) {
-                    okay::Engine.logger.debug("Setting value to {}", value);
                     CarConfig::get().launchControlKP = value;
                 }
         },
@@ -96,7 +112,6 @@ okay::UIElement ConfigPage::buildConfig() {
             .currentValue = CarConfig::get().launchControlKD,
             .setValue =
                 [](uint16_t value) {
-                    okay::Engine.logger.debug("Setting value to {}", value);
                     CarConfig::get().launchControlKD = value;
                 }
         }

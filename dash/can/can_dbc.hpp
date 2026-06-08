@@ -436,6 +436,63 @@ static constexpr uint8_t bspdSensErrorBMin{0};
 
 };  // namespace vcuBspdStatus
 
+namespace vcuLaunchControl {
+
+inline CAN_Signal_UINT16 lcKp = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
+inline RX_CAN_Message(1) message{driveBus, 0x212, false, 2, lcKp};
+
+static constexpr uint16_t lcKpMin{5000};
+
+};  // namespace vcuLaunchControl
+
+namespace dashLaunchControlConfig {
+
+inline CAN_Signal_UINT16 lcKp = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
+inline CAN_Signal_UINT16 lcKd = MakeSignalExp(uint16_t, 16, 16, 1.0, 0.0);
+inline CAN_Signal_BOOL lcEnable = MakeSignalSigned(bool, 32, 8, 1.0, 0.0, false);
+inline CAN_Signal_UINT8 useConfigSignature = MakeSignalExp(uint8_t, 48, 8, 1.0, 0.0);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x510, false, 7, lcKp, lcKd, lcEnable, useConfigSignature};
+
+static constexpr uint16_t lcKpMin{5000};
+static constexpr uint16_t lcKdMin{50};
+static constexpr uint8_t useConfigSignatureMin{0};
+
+};  // namespace dashLaunchControlConfig
+
+namespace dashMaxCurrentRequestRear {
+
+inline CAN_Signal_UINT32 maxCurrent = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
+inline CAN_Signal_UINT8 useMax = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x511, false, 5, maxCurrent, useMax};
+
+static constexpr uint32_t maxCurrentMin{0};
+static constexpr uint8_t useMaxMin{0};
+
+};  // namespace dashMaxCurrentRequestRear
+
+namespace dashMaxCurrentRequestFl {
+
+inline CAN_Signal_UINT32 maxCurrent = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
+inline CAN_Signal_UINT8 useMax = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x512, false, 5, maxCurrent, useMax};
+
+static constexpr uint32_t maxCurrentMin{0};
+static constexpr uint8_t useMaxMin{0};
+
+};  // namespace dashMaxCurrentRequestFl
+
+namespace dashMaxCurrentRequestFr {
+
+inline CAN_Signal_UINT32 maxCurrent = MakeSignalExp(uint32_t, 0, 32, 0.001, 0.0);
+inline CAN_Signal_UINT8 useMax = MakeSignalExp(uint8_t, 32, 8, 1.0, 0.0);
+inline RX_CAN_Message(2) message{driveBus, 0x513, false, 5, maxCurrent, useMax};
+
+static constexpr uint32_t maxCurrentMin{0};
+static constexpr uint8_t useMaxMin{0};
+
+};  // namespace dashMaxCurrentRequestFr
+
 namespace bmsPackboard {
 
 inline CAN_Signal_FLOAT batteryCurrent = MakeSignalSigned(float, 0, 32, 0.0001, -100.0, false);
@@ -480,7 +537,7 @@ inline CAN_Signal_BOOL shutdownOpen = MakeSignalSigned(bool, 33, 1, 1.0, 0.0, fa
 inline CAN_Signal_BOOL vcuTimeout = MakeSignalSigned(bool, 34, 1, 1.0, 0.0, false);
 inline CAN_Signal_BOOL inverterTimeout = MakeSignalSigned(bool, 35, 1, 1.0, 0.0, false);
 inline CAN_Signal_BOOL chargerTimeout = MakeSignalSigned(bool, 36, 1, 1.0, 0.0, false);
-inline CAN_Signal_BOOL PecWarning = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
+inline CAN_Signal_BOOL pecWarning = MakeSignalSigned(bool, 37, 1, 1.0, 0.0, false);
 inline CAN_Signal_UINT16 totalPecFailures = MakeSignalExp(uint16_t, 38, 16, 1.0, 0.0);
 inline RX_CAN_Message(17) message{driveBus,
     0x152,
@@ -501,7 +558,7 @@ inline RX_CAN_Message(17) message{driveBus,
     vcuTimeout,
     inverterTimeout,
     chargerTimeout,
-    PecWarning,
+    pecWarning,
     totalPecFailures};
 
 static constexpr float socMin{0.0};
@@ -2527,6 +2584,11 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x20B, "VCU_Temp_Limiting_Status"},
     {0x20C, "VCU_Torque_Status"},
     {0x211, "VCU_BSPD_Status"},
+    {0x212, "VCU_Launch_Control"},
+    {0x510, "Dash_Launch_Control_Config"},
+    {0x511, "Dash_Max_Current_Request_Rear"},
+    {0x512, "Dash_Max_Current_Request_FL"},
+    {0x513, "Dash_Max_Current_Request_FR"},
     {0x150, "BMS_Packboard"},
     {0x151, "BMS_Daughterboard"},
     {0x152, "BMS_Status"},
@@ -2701,6 +2763,17 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x211, 4}, "bspd_shutdown_b"},
     {{0x211, 5}, "bspd_error_b"},
     {{0x211, 6}, "bspd_sens_error_b"},
+    {{0x212, 0}, "LC_Kp"},
+    {{0x510, 0}, "LC_Kp"},
+    {{0x510, 1}, "LC_Kd"},
+    {{0x510, 2}, "LC_Enable"},
+    {{0x510, 3}, "Use_Config_Signature"},
+    {{0x511, 0}, "Max_Current"},
+    {{0x511, 1}, "Use_Max"},
+    {{0x512, 0}, "Max_Current"},
+    {{0x512, 1}, "Use_Max"},
+    {{0x513, 0}, "Max_Current"},
+    {{0x513, 1}, "Use_Max"},
     {{0x150, 0}, "Battery_Current"},
     {{0x150, 1}, "Packboard_Voltage"},
     {{0x151, 0}, "Battery_Voltage"},

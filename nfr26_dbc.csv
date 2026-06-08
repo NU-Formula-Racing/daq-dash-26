@@ -177,6 +177,19 @@ Message ID,Message Name,Sender,Signal Name,Start Bit,Size (bits),Factor,Offset,M
 1: Present",,uint8_t
 ,VCU_BSPD_Status,VCU,bspd_sens_error_b,6,1,1,0,0,1,"0: Absent
 1: Present",,uint8_t
+0x212,VCU_Launch_Control,VCU,LC_Kp,0,16,1,0,5000,12000,,,uint16_t
+,,VCU,LC_Kd,16,16,1,0,50,300,,,uint16_t
+,,VCU,LC_Enabled,32,8,1,0,,,,,bool
+0x510,Dash_Launch_Control_Config,DAQ-Dashboard,LC_Kp,0,16,1,0,5000,12000,,,uint16_t
+,Dash_Launch_Control_Config,DAQ-Dashboard,LC_Kd,16,16,1,0,50,300,,,uint16_t
+,Dash_Launch_Control_Config,DAQ-Dashboard,LC_Enable,32,8,1,0,,,,,bool
+,Dash_Launch_Control_Config,DAQ-Dashboard,Use_Config_Signature,48,8,1,0,0,26,"If == 26, use config else fallback",,uint8_t
+0x511,Dash_Max_Current_Request_Rear,DAQ-Dashboard,Max_Current,0,32,0.001,0,0,360,A,,uint32_t
+,Dash_Max_Current_Request_Rear,DAQ-Dashboard,Use_Max,32,8,1,0,0,26,"If == 26, use config else fallback",,uint8_t
+0x512,Dash_Max_Current_Request_FL,DAQ-Dashboard,Max_Current,0,32,0.001,0,0,50,A,,uint32_t
+,Dash_Max_Current_Request_FL,DAQ-Dashboard,Use_Max,32,8,1,0,0,26,"If == 26, use config else fallback",,uint8_t
+0x513,Dash_Max_Current_Request_FR,DAQ-Dashboard,Max_Current,0,32,0.001,0,0,50,A,,uint32_t
+,Dash_Max_Current_Request_FR,DAQ-Dashboard,Use_Max,32,8,1,0,0,26,"If == 26, use config else fallback",,uint8_t
 0x150,BMS_Packboard,BMS,Battery_Current,0,32,0.0001,-100,-75,300,A,20,unsigned_float
 ,BMS_Packboard,BMS,Packboard_Voltage,32,32,0.0001,0,0,500,V,20,unsigned_float
 0x151,BMS_Daughterboard,BMS,Battery_Voltage,0,16,0.01,0,0,500,V,20,unsigned_float

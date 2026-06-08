@@ -28,9 +28,9 @@ static constexpr glm::vec4 northwesternPurple = fromHex(0x4E2A84FF);
 
 namespace fonts {
 
-okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBlack{
+inline okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBlack{
     "fonts/Lato-Black.ttf"};
-okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{
+inline okay::GameAssetRef<okay::FontManager::FontHandle, okay::FontLoadOptions> latoBold{
     "fonts/Lato-Bold.ttf"};
 
 };  // namespace fonts

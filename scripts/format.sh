@@ -9,6 +9,10 @@ if ! command -v clang-format >/dev/null 2>&1; then
 fi
 
 find "$TARGET_DIR" \
-    -type d \( -path "*/dash/drivers" -o -path "*/.okay" \) -prune \
+    -type d \( \
+        -path "*/dash/drivers" \
+        -o -path "*/.okay" \
+        -o -path "*/vendor" \
+    \) -prune \
     -o -type f \( -name "*.cpp" -o -name "*.hpp" \) -print0 |
 xargs -0 clang-format -i

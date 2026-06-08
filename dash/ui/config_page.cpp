@@ -1,5 +1,6 @@
 #include "config_page.hpp"
 
+#include "car_config.hpp"
 #include "inputs.hpp"
 #include "materials/bat_percent.hpp"
 #include "page.hpp"
@@ -35,7 +36,7 @@ void ConfigPage::initializePage() {
 void ConfigPage::initializeCallbacks() {
     input::downButton.onDown([this]() {
         okay::Engine.logger.debug("Down button pushed! moving items");
-        if (_selectedItem >= _numItems - 1) {
+        if (_selectedItem >= _sliders.size() - 1) {
             _selectedItem = 0;
         } else {
             _selectedItem++;
@@ -44,7 +45,7 @@ void ConfigPage::initializeCallbacks() {
 
     input::upButton.onDown([this]() {
         if (_selectedItem == 0) {
-            _selectedItem = _numItems - 1;
+            _selectedItem = _sliders.size() - 1;
         } else {
             _selectedItem--;
         }
@@ -59,48 +60,62 @@ void ConfigPage::closePage() {
 
 okay::UIElement ConfigPage::buildConfig() {
     // clang-format off
+    _sliders = {
+        // Max Current Request
+        (SliderSettings) {
+            .sliderName = "Max Current Request",
+            .minValue = 0,
+            .maxValue = 360,
+            .increment = 10,
+            .currentValue = CarConfig::get().maxCurrentRequest,
+            .setValue =
+                [](uint16_t value) {
+                    okay::Engine.logger.debug("Setting value to {}", value);
+                    CarConfig::get().maxCurrentRequest = value;
+                }
+        },
+        // Kp
+        (SliderSettings) {
+            .sliderName = "Launch Control K_P",
+            .minValue = 5000,
+            .maxValue = 12000,
+            .increment = 250,
+            .currentValue = CarConfig::get().launchControlKP,
+            .setValue =
+                [](uint16_t value) {
+                    okay::Engine.logger.debug("Setting value to {}", value);
+                    CarConfig::get().launchControlKP = value;
+                }
+        },
+        // Kd
+        (SliderSettings) {
+            .sliderName = "Launch Control K_D",
+            .minValue = 50,
+            .maxValue = 300,
+            .increment = 10,
+            .currentValue = CarConfig::get().launchControlKD,
+            .setValue =
+                [](uint16_t value) {
+                    okay::Engine.logger.debug("Setting value to {}", value);
+                    CarConfig::get().launchControlKD = value;
+                }
+        }
+    };
+    // clang-format on
+
+    // clang-format off
     return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)
         .axisSet(okay::UIAxis::Vertical)
         .leftMarginSet(40)
         .rightMarginSet(40)
         .childSpacingSet(10) (
             ui::spacer(),
-            // Max current request
-            buildSlider(SliderSettings {
-               .sliderName = "Max Current Request",
-               .minValue = 0,
-               .maxValue = 360,
-               .increment = 10,
-               .currentValue = 360,
-               .setValue = [](uint64_t value) {
-                   okay::Engine.logger.debug("Setting value to {}", value);
-               }
-            }, _selectedItem == 0),
-
-            // K_P
-            buildSlider(SliderSettings {
-               .sliderName = "Launch Control K_P",
-               .minValue = 5000,
-               .maxValue = 12000,
-               .increment = 250,
-               .currentValue = 8000,
-               .setValue = [](uint64_t value) {
-                   okay::Engine.logger.debug("Setting value to {}", value);
-               }
-            }, _selectedItem == 1),
-
-            // K_D
-            buildSlider(SliderSettings {
-               .sliderName = "Launch Control K_D",
-               .minValue = 50,
-               .maxValue = 300,
-               .increment = 10,
-               .currentValue = 270,
-               .setValue = [](uint64_t value) {
-                   okay::Engine.logger.debug("Setting value to {}", value);
-               }
-            }, _selectedItem == 2),
-
+            ui::range(_sliders.size(), [this](std::int32_t index) {
+                return buildSlider(
+                    _sliders[index],
+                    index == _selectedItem
+                );
+            }),
             ui::spacer()
         );
     // clang-format on

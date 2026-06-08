@@ -10,10 +10,9 @@ class CarConfig {
 
     static CarConfig& get();
 
-    uint64_t maxCurrentRequest{360};
-    float launchControlKD{0.1f};
-    float launchControlKP{0.5f};
-    float launchControlSlipRatio{0.5f};
+    uint16_t maxCurrentRequest{360};
+    uint16_t launchControlKP{8000};
+    uint16_t launchControlKD{160};
 
     void save();
 

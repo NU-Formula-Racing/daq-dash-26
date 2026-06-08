@@ -42,7 +42,6 @@ void CarConfig::loadFromFile() {
         maxCurrentRequest = data.value("maxCurrentRequest", maxCurrentRequest);
         launchControlKD = data.value("launchControlKD", launchControlKD);
         launchControlKP = data.value("launchControlKP", launchControlKP);
-        launchControlSlipRatio = data.value("launchControlSlipRatio", launchControlSlipRatio);
 
     } catch (const std::exception& e) {
         okay::Engine.logger.debug("Failed to parse car config: {}", e.what());
@@ -55,7 +54,6 @@ void CarConfig::saveToFile() {
     data["maxCurrentRequest"] = maxCurrentRequest;
     data["launchControlKD"] = launchControlKD;
     data["launchControlKP"] = launchControlKP;
-    data["launchControlSlipRatio"] = launchControlSlipRatio;
 
     std::ofstream file{SAVE_FILE};
     if (!file.is_open()) {

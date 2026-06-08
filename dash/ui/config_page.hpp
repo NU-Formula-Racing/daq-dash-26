@@ -15,6 +15,7 @@ class ConfigPage : public IPage {
         const std::string& sliderName;
         uint64_t minValue;
         uint64_t maxValue;
+        uint64_t increment;
         uint64_t currentValue;
         std::function<void(uint64_t)> setValue;
     };
@@ -40,7 +41,7 @@ class ConfigPage : public IPage {
     okay::ShaderHandle _sliderShaderHandle{};
 
     std::size_t _selectedItem{0};
-    const std::size_t _numItems{4};
+    const std::size_t _numItems{3};
 
     bool _initializedCallbacks{false};
 };

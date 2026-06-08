@@ -70,44 +70,36 @@ okay::UIElement ConfigPage::buildConfig() {
                .sliderName = "Max Current Request",
                .minValue = 0,
                .maxValue = 360,
-               .currentValue = 0,
+               .increment = 10,
+               .currentValue = 360,
                .setValue = [](uint64_t value) {
                    okay::Engine.logger.debug("Setting value to {}", value);
                }
             }, _selectedItem == 0),
 
-            // K_D
+            // K_P
             buildSlider(SliderSettings {
-               .sliderName = "Launch Control K_D",
-               .minValue = 0,
-               .maxValue = 100,
-               .currentValue = 50,
+               .sliderName = "Launch Control K_P",
+               .minValue = 5000,
+               .maxValue = 12000,
+               .increment = 250,
+               .currentValue = 8000,
                .setValue = [](uint64_t value) {
                    okay::Engine.logger.debug("Setting value to {}", value);
                }
             }, _selectedItem == 1),
 
-            // K_P
+            // K_D
             buildSlider(SliderSettings {
-               .sliderName = "Launch Control K_P",
-               .minValue = 0,
-               .maxValue = 100,
-               .currentValue = 100,
+               .sliderName = "Launch Control K_D",
+               .minValue = 50,
+               .maxValue = 300,
+               .increment = 10,
+               .currentValue = 270,
                .setValue = [](uint64_t value) {
                    okay::Engine.logger.debug("Setting value to {}", value);
                }
             }, _selectedItem == 2),
-
-            // Slip Ratio
-            buildSlider(SliderSettings {
-               .sliderName = "Slip Ratio",
-               .minValue = 0,
-               .maxValue = 100,
-               .currentValue = 75,
-               .setValue = [](uint64_t value) {
-                   okay::Engine.logger.debug("Setting value to {}", value);
-               }
-            }, _selectedItem == 3),
 
             ui::spacer()
         );

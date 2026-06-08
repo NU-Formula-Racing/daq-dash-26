@@ -13,12 +13,18 @@ struct EncoderState {
 };
 
 static EncoderState s_encoderState;
+static GLFWscrollfun s_previousScrollCallback = nullptr;
 
 static GLFWwindow* getWindow() {
     return (GLFWwindow*)okay::Engine.systems.getSystemChecked<okay::Renderer>()->getSurfaceWindow();
 }
 
 static void encoderScrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    // Preserve any callback that was already installed before us
+    if (s_previousScrollCallback) {
+        s_previousScrollCallback(window, xoffset, yoffset);
+    }
+
     if (yoffset > 0.0) {
         if (s_encoderState.onRight) {
             s_encoderState.onRight();
@@ -34,7 +40,7 @@ static void ensureEncoderScrollCallbackInstalled() {
     static bool installed = false;
 
     if (!installed) {
-        glfwSetScrollCallback(getWindow(), encoderScrollCallback);
+        s_previousScrollCallback = glfwSetScrollCallback(getWindow(), encoderScrollCallback);
         installed = true;
     }
 }

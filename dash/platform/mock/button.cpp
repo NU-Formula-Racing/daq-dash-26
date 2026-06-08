@@ -75,9 +75,7 @@ static void ensureButtonKeyCallbackInstalled() {
 }
 
 Button::Button(uint8_t gpioPin)
-    : _buttonID(gpioPin), _gpio(std::make_unique<GPIO>(gpioPin, false)) {
-    s_buttonContexts.try_emplace(_buttonID);
-}
+    : _buttonID(gpioPin), _gpio(std::make_unique<GPIO>(gpioPin, false)) {}
 
 Button::~Button() = default;
 

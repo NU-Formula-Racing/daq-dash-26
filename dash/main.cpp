@@ -1,4 +1,5 @@
 #include "ui/brokers_debug_page.hpp"
+#include "ui/car_config.hpp"
 #include "ui/car_state.hpp"
 #include "ui/components/rotate.hpp"
 #include "ui/config_page.hpp"
@@ -20,6 +21,7 @@
 #include <platform/neopixel_manager.hpp>
 
 static void __exitSignal(int sig);
+static std::uint32_t s_lastCANUpdate;
 
 static okay::ECSEntity s_performanceUIEntity;
 
@@ -82,6 +84,17 @@ int main() {
         input::rightButton.onDown([]() {
             okay::Engine.systems.getSystemChecked<PageManager>()->switchPageRight();
         });
+    });
+
+    // kinda gross, but I don't feel like adding a timer system
+    // for this single task
+    s_lastCANUpdate = okay::Engine.time->timeSinceStartMs();
+    game.onUpdate([]() {
+        uint32_t now = okay::Engine.time->timeSinceStartMs();
+        if (now - s_lastCANUpdate > 1000) {
+            s_lastCANUpdate = now;
+            CarConfig::get().transmitConfig();
+        }
     });
 
     okay::registerBuiltinComponentsAndSystems();

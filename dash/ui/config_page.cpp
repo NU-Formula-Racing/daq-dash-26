@@ -123,17 +123,46 @@ okay::UIElement ConfigPage::buildConfig() {
 
     // clang-format off
     return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)
-        .axisSet(okay::UIAxis::Vertical)
-        .leftMarginSet(40)
-        .rightMarginSet(40)
-        .childSpacingSet(10) (
+        .axisSet(okay::UIAxis::Horizontal)
+        .topMarginSet(100) (
             ui::spacer(),
-            ui::range(_sliders.size(), [this](std::int32_t index) {
-                return buildSlider(
-                    _sliders[index],
-                    index == _selectedItem
-                );
-            }),
+            ui::image(*_configBg)
+                .axisSet(okay::UIAxis::Vertical)
+                .leftPaddingSet(25)
+                .topPaddingSet(10)
+                .childSpacingSet(10) (
+                    ui::h1("Configuration")
+                        .textSizeSet(28)
+                        .fontSet(*fonts::latoBlack),
+                    ui::vspacer(5),
+                    ui::range(_sliders.size(), [this](std::int32_t index) {
+                        return buildSlider(
+                            _sliders[index],
+                            index == _selectedItem
+                        );
+                    }),
+                    ui::spacer()
+            ),
+            ui::hspacer(10),
+            ui::image(*_vcuBg)
+                .axisSet(okay::UIAxis::Vertical)
+                .leftPaddingSet(25)
+                .rightPaddingSet(25)
+                .topPaddingSet(10) (
+                    ui::h1("VCU")
+                        .textSizeSet(28)
+                        .fontSet(*fonts::latoBlack),
+                    ui::vspacer(5),
+                    ui::h3("These are values reported from VCU and are"),
+                    ui::h3("actually being used to configure launch control"),
+                    ui::vspacer(10),
+
+                    keyValuePair("LC Enabled", dbc::vcuLaunchControl::lcEnabled->get()),
+                    keyValuePair("LC Kp", dbc::vcuLaunchControl::lcKp->get()),
+                    keyValuePair("LC Kd", dbc::vcuLaunchControl::lcKd->get()),
+
+                    ui::spacer()
+            ),
             ui::spacer()
         );
     // clang-format on
@@ -190,7 +219,7 @@ okay::UIElement ConfigPage::buildSlider(SliderSettings settings, bool isActive) 
                         .topPaddingSet(4)
                         .bottomPaddingSet(4) (
                             ui::h1(std::format("{}", settings.currentValue))
-                                .widthFixed(147)
+                                .widthFixed(120)
                                 .heightGrow()
                                 .alignTextMiddle(),
                             ui::box()

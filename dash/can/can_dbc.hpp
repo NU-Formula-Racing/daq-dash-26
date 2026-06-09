@@ -439,7 +439,9 @@ static constexpr uint8_t bspdSensErrorBMin{0};
 namespace vcuLaunchControl {
 
 inline CAN_Signal_UINT16 lcKp = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
-inline RX_CAN_Message(1) message{driveBus, 0x212, false, 2, lcKp};
+inline CAN_Signal_UINT16 lcKd = MakeSignalExp(uint16_t, 16, 16, 1.0, 0.0);
+inline CAN_Signal_BOOL lcEnabled = MakeSignalExp(bool, 32, 8, 1.0, 0.0);
+inline RX_CAN_Message(3) message{driveBus, 0x212, false, 5, lcKp, lcKd, lcEnabled};
 
 static constexpr uint16_t lcKpMin{5000};
 
@@ -2764,7 +2766,9 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x211, 5}, "bspd_error_b"},
     {{0x211, 6}, "bspd_sens_error_b"},
     {{0x212, 0}, "LC_Kp"},
-    {{0x510, 0}, "LC_Kp"},
+    {{0x212, 0}, "LC_Kd"},
+    {{0x212, 1}, "LC_Enabled"},
+    {{0x510, 2}, "LC_Kp"},
     {{0x510, 1}, "LC_Kd"},
     {{0x510, 2}, "LC_Enable"},
     {{0x510, 3}, "Use_Config_Signature"},

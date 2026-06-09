@@ -5,6 +5,8 @@
 
 #include <okay/okay.hpp>
 
+namespace ui = okay::ui;
+
 namespace dash {
 
 class ConfigPage : public IPage {
@@ -28,6 +30,18 @@ class ConfigPage : public IPage {
     okay::UIElement buildConfig();
     okay::UIElement buildSlider(SliderSettings settings, bool isActive);
 
+    template <typename T>
+    inline okay::UIElement keyValuePair(const std::string& key, const T& value) {
+        // clang-format off
+        return ui::slot(okay::UIAxis::Horizontal)
+            .widthGrow() (
+                ui::h1(key),
+                ui::spacer(),
+                ui::h1(std::format("{}", value))
+            );
+        // clang-format on
+    }
+
     std::vector<okay::ECSEntity> _entities;
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> _sliderBgUnslected{
         "textures/slider_bg.png"};
@@ -35,6 +49,10 @@ class ConfigPage : public IPage {
         "textures/slider_bg_selected.png"};
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> sliderTop{
         "textures/slider_top.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> _configBg{
+        "textures/config_bg.png"};
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> _vcuBg{
+        "textures/config_vcu_bg.png"};
 
     std::unordered_map<std::string, okay::MaterialHandle> _sliderMaterials;
     okay::GameAssetRef<okay::Shader> _sliderShader{"shaders/battery"};

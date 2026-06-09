@@ -3,12 +3,17 @@
 
 #include <okay/okay.hpp>
 
+#include <mutex>
+#include <thread>
+
 namespace dash {
 
 class CANManager : public okay::System<okay::SystemScope::GAME> {
    public:
     virtual void initialize();
     virtual void tick();
+
+    std::mutex busLock;
 };
 
 };  // namespace dash

@@ -2,6 +2,7 @@
 
 #include <can/can_dbc.hpp>
 #include <chrono>
+#include <mutex>
 #include <nfr_can/CAN_interface.hpp>
 #include <nfr_can/MCP2515.hpp>
 #include <platform/can.hpp>
@@ -38,6 +39,7 @@ void CANManager::initialize() {
         okay::Engine.logger.debug("CANManager::initialize() finished!");
 
         while (true) {
+            std::lock_guard<std::mutex> guard(busLock);
             GPIOManager::instance().tick();
             InputManager::instance().tick();
             dbc::driveBus.tick_bus();

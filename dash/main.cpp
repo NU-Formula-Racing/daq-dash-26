@@ -16,6 +16,7 @@
 #include <csignal>
 #include <math.h>
 #include <memory>
+#include <mutex>
 #include <platform/can.hpp>
 #include <platform/interfaces.hpp>
 #include <platform/neopixel_manager.hpp>
@@ -96,6 +97,8 @@ int main() {
     game.onUpdate([]() {
         uint32_t now = okay::Engine.time->timeSinceStartMs();
         if (now - s_lastCANUpdate > 1000) {
+            std::lock_guard<std::mutex> guard(
+                okay::Engine.systems.getSystemChecked<CANManager>()->busLock);
             s_lastCANUpdate = now;
             CarConfig::get().transmitConfig();
         }

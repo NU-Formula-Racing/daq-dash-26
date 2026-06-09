@@ -41,10 +41,10 @@ int main() {
     };
 
     std::unique_ptr<PageManager> pageManager = std::make_unique<PageManager>(
-        // Config page
-        PageEntry::create(std::make_unique<ConfigPage>()).withPriority(0).withPageNumber(0),
         // Drive Page
-        PageEntry::create(std::make_unique<DrivePage>()).withPriority(0).withPageNumber(1),
+        PageEntry::create(std::make_unique<DrivePage>()).withPriority(0).withPageNumber(0),
+        // Config page
+        PageEntry::create(std::make_unique<ConfigPage>()).withPriority(0).withPageNumber(1),
         // Debug/Error Page
         PageEntry::create(std::make_unique<DebugPage>())
             .forceOverrideWhen([]() {

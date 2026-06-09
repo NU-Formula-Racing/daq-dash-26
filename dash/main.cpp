@@ -41,24 +41,24 @@ int main() {
 
     std::unique_ptr<PageManager> pageManager = std::make_unique<PageManager>(
         // Config page
-        PageEntry::create(std::make_unique<ConfigPage>()).withPriority(1).withPageNumber(0),
+        PageEntry::create(std::make_unique<ConfigPage>()).withPriority(0).withPageNumber(0),
         // Drive Page
-        PageEntry::create(std::make_unique<DrivePage>()).withPriority(0).withPageNumber(0),
+        PageEntry::create(std::make_unique<DrivePage>()).withPriority(0).withPageNumber(1),
         // Debug/Error Page
         PageEntry::create(std::make_unique<DebugPage>())
             .forceOverrideWhen([]() {
                 return CarState::hardFaultPresent();
             })
             .withPriority(1)
-            .withPageNumber(1),
+            .withPageNumber(2),
         // Inveter page
-        PageEntry::create(std::make_unique<InverterPage>()).withPriority(0).withPageNumber(2),
+        PageEntry::create(std::make_unique<InverterPage>()).withPriority(0).withPageNumber(3),
         // Brokers Page
-        PageEntry::create(std::make_unique<BrokersDebugPage>()).withPriority(0).withPageNumber(3),
-        // Misc LV Page
+        PageEntry::create(std::make_unique<BrokersDebugPage>()).withPriority(0).withPageNumber(4),
+        // Misc LV Paged
         PageEntry::create(std::make_unique<IMUPDMTLMDebugPage>())
             .withPriority(0)
-            .withPageNumber(4));
+            .withPageNumber(5));
 
     // attach an interrupt to exit the program on ctrl c
     std::signal(SIGINT, __exitSignal);

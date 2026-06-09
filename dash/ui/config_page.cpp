@@ -26,9 +26,10 @@ void ConfigPage::initializePage() {
     }
 
     _entities = {
-        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
-        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
-        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
+        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 3),
+        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 3),
+        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 2),
+        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildLaunchControlIndicator), 1),
         okay::ecs::uiEntity(BIND_TO_THIS(buildConfig), 3),
     };
 }
@@ -82,6 +83,7 @@ okay::UIElement ConfigPage::buildConfig() {
         // Max Current Request
         (SliderSettings) {
             .sliderName = "Max Current Request",
+            .units = "A",
             .minValue = 0,
             .maxValue = 360,
             .increment = 10,
@@ -95,6 +97,7 @@ okay::UIElement ConfigPage::buildConfig() {
         // Kp
         (SliderSettings) {
             .sliderName = "Launch Control K_P",
+            .units = "",
             .minValue = 5000,
             .maxValue = 12000,
             .increment = 250,
@@ -108,6 +111,7 @@ okay::UIElement ConfigPage::buildConfig() {
         // Kd
         (SliderSettings) {
             .sliderName = "Launch Control K_D",
+            .units = "",
             .minValue = 50,
             .maxValue = 300,
             .increment = 10,
@@ -218,7 +222,7 @@ okay::UIElement ConfigPage::buildSlider(SliderSettings settings, bool isActive) 
                         .widthGrow()
                         .topPaddingSet(4)
                         .bottomPaddingSet(4) (
-                            ui::h1(std::format("{}", settings.currentValue))
+                            ui::h1(std::format("{} {}", settings.currentValue, settings.units))
                                 .widthFixed(120)
                                 .heightGrow()
                                 .alignTextMiddle(),

@@ -15,6 +15,7 @@ class ConfigPage : public IPage {
 
     struct SliderSettings {
         const char* sliderName;
+        const char* units;
         uint32_t minValue;
         uint32_t maxValue;
         uint32_t increment;

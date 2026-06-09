@@ -3,6 +3,7 @@
 
 #include "car_state.hpp"
 #include "materials/bat_percent.hpp"
+#include "materials/launch_control.hpp"
 #include "okay/core/ui/element.hpp"
 #include "style.hpp"
 
@@ -44,6 +45,17 @@ class SharedElements {
 
         batPercentMaterial = okay::materialHandle(
             okay::shaderHandle(*batPercentShader), std::move(batPercentProperties));
+
+        auto launchControlIndicatorProperties = std::make_unique<LaunchControlMaterial>();
+        launchControlIndicatorProperties->vignetteOuterColor = colors::northwesternPurple;
+        launchControlIndicatorProperties->vignetteInnerColor = colors::fromHex(0xA304FFFF);
+        launchControlIndicatorProperties->color = colors::white;
+        launchControlIndicatorProperties->isTransparent = true;
+        launchControlIndicatorProperties->useScreenspaceCoords = true;
+
+        launchControlIndicatorMaterial =
+            okay::materialHandle(okay::shaderHandle(*launchControlIndicatorShader),
+                std::move(launchControlIndicatorProperties));
     }
 
     okay::UIElement buildTopHud() {
@@ -318,7 +330,14 @@ class SharedElements {
                             .numRenderItems()))));
     }
 
+    okay::UIElement buildLaunchControlIndicator() {
+        return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)
+            .backgroundColorSet(colors::white)
+            .backgroundMaterialOverrideSet(launchControlIndicatorMaterial);
+    }
+
     okay::MaterialHandle skyboxMaterial;
+    okay::MaterialHandle launchControlIndicatorMaterial;
 
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> bgTexture{
         "textures/bg_pattern.png"};
@@ -336,6 +355,9 @@ class SharedElements {
         "textures/bat_percent_over.png"};
 
     okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> tempFull{"textures/temp_full.png"};
+
+    // Launch control
+    okay::GameAssetRef<okay::Shader> launchControlIndicatorShader{"shaders/launch_control"};
 };
 
 };  // namespace dash

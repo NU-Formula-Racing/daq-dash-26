@@ -16,9 +16,10 @@ void InverterPage::initializePage() {
         SharedElements::get().skyboxMaterial);
     okay::UIStyle::main().setMainFont(*fonts::latoBold);
 
-    _entities = {okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
-        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
-        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
+    _entities = {okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 3),
+        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 3),
+        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 2),
+        okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildLaunchControlIndicator), 1),
         okay::ecs::uiEntity(BIND_TO_THIS(buildDebug), 3)};
 }
 

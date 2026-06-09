@@ -35,9 +35,10 @@ class BrokersDebugPage : public IPage {
         okay::UIStyle::main().setMainFont(*fonts::latoBold);
 
         _entities = {
-            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 2),
-            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 2),
-            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 1),
+            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildTopHud), 3),
+            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildBotHud), 3),
+            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildDriveStatus), 2),
+            okay::ecs::uiEntity(LAMBDA_WRAP(SharedElements::get().buildLaunchControlIndicator), 1),
             okay::ecs::uiEntity(BIND_TO_THIS(buildBrokersDebug), 3),
         };
     }
@@ -228,10 +229,10 @@ class BrokersDebugPage : public IPage {
             keyValuePair(
                 "Sus Pot Calibrated",
                 dbc::frBrokerSusCalibrated::frSusPotCalibrated->get()
-            )  
+            )
         );
         // clang-format off
-    } 
+    }
 
 
     okay::UIElement buildBackLeftBroker() {
@@ -301,10 +302,10 @@ class BrokersDebugPage : public IPage {
             keyValuePair(
                 "Sus Pot Calibrated",
                 dbc::blBrokerSusCalibrated::blSusPotCalibrated->get()
-            )  
+            )
         );
         // clang-format off
-    } 
+    }
 
     okay::UIElement buildBackRightBroker() {
         // clang-format off
@@ -376,7 +377,7 @@ class BrokersDebugPage : public IPage {
             )
         );
         // clang-format off
-    } 
+    }
 
     template <typename T>
     inline okay::UIElement keyValuePair(const std::string& key, const T& value) {

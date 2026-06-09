@@ -336,6 +336,10 @@ class SharedElements {
             return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f);
         }
 
+        if (dbc::vcuDriveStatus::driveState->get() != 3) {
+            return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f);
+        }
+
         glm::vec4 outerColor = colors::fromHex(0xA304FFFF);
         glm::vec4 innerColor = colors::northwesternPurple;
         float thickness = 2.0f;

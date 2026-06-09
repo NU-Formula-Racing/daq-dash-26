@@ -1,7 +1,36 @@
 #include <okay/okay.hpp>
 
+#include <chrono>
+#include <cstdint>
+#include <functional>
 #include <gpiod.hpp>
+#include <memory>
 #include <platform/rpi/gpio_manager.hpp>
+#include <thread>
+
+namespace {
+
+template <typename Fn>
+bool retryGpioRequest(Fn&& fn) {
+    constexpr int maxAttempts = 50;
+    constexpr auto delay = std::chrono::milliseconds(100);
+
+    for (int attempt = 0; attempt < maxAttempts; ++attempt) {
+        try {
+            fn();
+            return true;
+        } catch (const std::exception& e) {
+            okay::Engine.logger.error(
+                "GPIO line request failed: {}. Attempt {}/{}", e.what(), attempt + 1, maxAttempts);
+        }
+
+        std::this_thread::sleep_for(delay);
+    }
+
+    return false;
+}
+
+}  // namespace
 
 namespace dash {
 
@@ -27,16 +56,12 @@ bool GPIOManager::registerPin(uint8_t offset, gpiod::line_settings settings) {
 }
 
 void GPIOManager::releasePin(uint8_t offset) {
-    if (_settings.find(offset) != _settings.end()) {
-        _settings.erase(offset);
-    }
+    _settings.erase(offset);
+    _risingCallbacks.erase(offset);
+    _fallingCallbacks.erase(offset);
 
-    if (_risingCallbacks.find(offset) != _risingCallbacks.end()) {
-        _risingCallbacks.erase(offset);
-    }
-
-    if (_fallingCallbacks.find(offset) != _fallingCallbacks.end()) {
-        _fallingCallbacks.erase(offset);
+    if (_request) {
+        rebuildRequest();
     }
 }
 
@@ -53,6 +78,39 @@ void GPIOManager::registerInterrupt(uint8_t offset,
     if (edge == GPIO::EdgeType::RISING || edge == GPIO::EdgeType::BOTH) {
         _risingCallbacks[offset] = callback;
     }
+
+    if (_request) {
+        rebuildRequest();
+    }
+}
+
+void GPIOManager::rebuildRequest() {
+    _request.reset();  // releases old GPIO request first
+
+    if (_settings.empty()) {
+        _started = false;
+        return;
+    }
+
+    bool success = retryGpioRequest([this]() {
+        gpiod::line_config line_cfg;
+
+        for (auto const& [offset, settings] : _settings) {
+            line_cfg.add_line_settings(offset, settings);
+        }
+
+        _request = std::make_unique<gpiod::line_request>(
+            _chip->prepare_request().set_consumer("dash").set_line_config(line_cfg).do_request());
+    });
+
+    if (!success) {
+        okay::Engine.logger.error("GPIO request failed after retries");
+        _request.reset();
+        _started = false;
+        return;
+    }
+
+    _started = true;
 }
 
 void GPIOManager::start() {
@@ -61,12 +119,20 @@ void GPIOManager::start() {
     }
 
     rebuildRequest();
+
+    if (!_request) {
+        okay::Engine.logger.error("GPIOManager failed to start");
+    }
 }
 
 bool GPIOManager::gpioWritePin(uint8_t offset, GpioLevel level) {
     if (!_request) {
         start();
         _started = true;
+    }
+
+    if (!_request) {
+        return false;
     }
 
     gpiod::line::value val =
@@ -78,6 +144,7 @@ bool GPIOManager::gpioWritePin(uint8_t offset, GpioLevel level) {
         okay::Engine.logger.error("Failed to write GPIO {}: {}", offset, e.what());
         return false;
     }
+
     return true;
 }
 
@@ -87,8 +154,18 @@ bool GPIOManager::gpioReadPin(uint8_t offset, GpioLevel& out) {
         _started = true;
     }
 
-    gpiod::line::value val = _request->get_value(offset);
-    out = (val == gpiod::line::value::ACTIVE ? GpioLevel::G_HIGH : GpioLevel::G_LOW);
+    if (!_request) {
+        return false;
+    }
+
+    try {
+        gpiod::line::value val = _request->get_value(offset);
+        out = (val == gpiod::line::value::ACTIVE ? GpioLevel::G_HIGH : GpioLevel::G_LOW);
+    } catch (const std::exception& e) {
+        okay::Engine.logger.error("Failed to read GPIO {}: {}", offset, e.what());
+        return false;
+    }
+
     return true;
 }
 
@@ -107,9 +184,9 @@ void GPIOManager::tick() {
     }
 
     gpiod::edge_event_buffer buffer(64);
-    std::size_t num_events = _request->read_edge_events(buffer);
+    std::size_t numEvents = _request->read_edge_events(buffer);
 
-    for (std::size_t i = 0; i < num_events; i++) {
+    for (std::size_t i = 0; i < numEvents; i++) {
         const auto& event = buffer.get_event(i);
         uint8_t offset = static_cast<uint8_t>(event.line_offset());
 

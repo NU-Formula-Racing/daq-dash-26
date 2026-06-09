@@ -41,8 +41,8 @@ void CarConfig::loadFromFile() {
         Json data = Json::parse(file);
 
         maxCurrentRequestRear = data.value("maxCurrentRequestRear", maxCurrentRequestRear);
-        maxCurrentRequestRear = data.value("maxCurrentRequestFL", maxCurrentRequestFL);
-        maxCurrentRequestRear = data.value("maxCurrentRequestFR", maxCurrentRequestFR);
+        maxCurrentRequestFL = data.value("maxCurrentRequestFL", maxCurrentRequestFL);
+        maxCurrentRequestFR = data.value("maxCurrentRequestFR", maxCurrentRequestFR);
         launchControlKD = data.value("launchControlKD", launchControlKD);
         launchControlKP = data.value("launchControlKP", launchControlKP);
 

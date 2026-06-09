@@ -22,8 +22,6 @@
 #include <platform/neopixel_manager.hpp>
 
 static void __exitSignal(int sig);
-static std::uint32_t s_lastCANUpdate;
-
 static okay::ECSEntity s_performanceUIEntity;
 
 using namespace dash;
@@ -93,19 +91,10 @@ int main() {
 
     // kinda gross, but I don't feel like adding a timer system
     // for this single task
-    s_lastCANUpdate = okay::Engine.time->timeSinceStartMs();
     game.onUpdate([]() {
         // if the car status is not drive, disable launch control
         if (dbc::vcuDriveStatus::driveState->get() != 3) {
             CarConfig::get().enableLaunchControl = false;
-        }
-
-        uint32_t now = okay::Engine.time->timeSinceStartMs();
-        if (now - s_lastCANUpdate > 1000) {
-            std::lock_guard<std::mutex> guard(
-                okay::Engine.systems.getSystemChecked<CANManager>()->busLock);
-            s_lastCANUpdate = now;
-            CarConfig::get().transmitConfig();
         }
     });
 

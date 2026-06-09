@@ -1,3 +1,5 @@
+#include "ui/car_config.hpp"
+
 #include <okay/okay.hpp>
 
 #include <can/can_dbc.hpp>
@@ -16,6 +18,7 @@ namespace dash {
 static SPI s_canSpi;
 static GPIO s_canGPIO{0, true};
 static Clock s_canClock;
+static std::uint32_t s_lastCANUpdate;
 
 void CANManager::initialize() {
     std::thread workerThread([this]() {
@@ -39,13 +42,18 @@ void CANManager::initialize() {
         okay::Engine.logger.debug("CANManager::initialize() finished!");
 
         while (true) {
-            std::lock_guard<std::mutex> guard(busLock);
             GPIOManager::instance().tick();
             InputManager::instance().tick();
             dbc::driveBus.tick_bus();
 
             MCP2515* driver = static_cast<MCP2515*>(dbc::driveBus.get_driver());
             driver->updateMissCounter();
+
+            uint32_t now = okay::Engine.time->timeSinceStartMs();
+            if (now - s_lastCANUpdate > 1000) {
+                s_lastCANUpdate = now;
+                CarConfig::get().transmitConfig();
+            }
         }
     });
 

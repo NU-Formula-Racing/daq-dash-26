@@ -1,6 +1,7 @@
 #ifndef __SHARED_ELEMENTS_H__
 #define __SHARED_ELEMENTS_H__
 
+#include "car_config.hpp"
 #include "car_state.hpp"
 #include "materials/bat_percent.hpp"
 #include "materials/launch_control.hpp"
@@ -331,6 +332,27 @@ class SharedElements {
     }
 
     okay::UIElement buildLaunchControlIndicator() {
+        if (!CarConfig::get().enableLaunchControl && !dbc::vcuLaunchControl::lcEnabled->get()) {
+            return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f);
+        }
+
+        glm::vec4 outerColor = colors::fromHex(0xA304FFFF);
+        glm::vec4 innerColor = colors::northwesternPurple;
+        float thickness = 2.0f;
+
+        if (!dbc::vcuLaunchControl::lcEnabled->get()) {
+            outerColor = colors::fromHex(0x9C9C9CFF);
+            innerColor = colors::white;
+            thickness = 1.5;
+        }
+
+        if (auto* props = dynamic_cast<LaunchControlMaterial*>(
+                launchControlIndicatorMaterial->properties().get())) {
+            props->vignetteInnerColor = innerColor;
+            props->vignetteOuterColor = outerColor;
+            props->speedLineThickness = thickness;
+        }
+
         return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)
             .backgroundColorSet(colors::white)
             .backgroundMaterialOverrideSet(launchControlIndicatorMaterial);

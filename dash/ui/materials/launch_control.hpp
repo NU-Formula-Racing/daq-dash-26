@@ -11,12 +11,14 @@ struct LaunchControlMaterial : public okay::UIRectProperties,
                                okay::OkayMaterialProperties<LaunchControlMaterial> {
    public:
     // Smaller radius = longer spikes reaching farther toward the center
-    okay::UniformProperty<float, okay::FixedString("u_speedLineRadius")> speedLineRadius{0.025f};
+    okay::UniformProperty<float, okay::FixedString("u_speedLineRadius")> speedLineRadius{0.05f};
     okay::UniformProperty<float, okay::FixedString("u_speedLineScale")> speedLineScale{50.0f};
     okay::UniformProperty<float, okay::FixedString("u_speedLineSpeed")> speedLineSpeed{2.0f};
     okay::UniformProperty<float, okay::FixedString("u_speedLineEdge")> speedLineEdge{0.25f};
     okay::UniformProperty<float, okay::FixedString("u_speedLineThickness")> speedLineThickness{
         2.0f};
+    okay::UniformProperty<float, okay::FixedString("u_speedLineInnerRadius")> speedLineInnerRadius{
+        0.2f};
 
     okay::UniformProperty<glm::vec4, okay::FixedString("u_vignetteInnerColor")> vignetteInnerColor{
         glm::vec4(1.0f, 0.9f, 0.2f, 1.0f)};
@@ -34,6 +36,7 @@ struct LaunchControlMaterial : public okay::UIRectProperties,
                 speedLineSpeed,
                 speedLineEdge,
                 speedLineThickness,
+                speedLineInnerRadius,
                 vignetteInnerColor,
                 vignetteOuterColor,
                 bgAlpha,
@@ -48,6 +51,7 @@ struct LaunchControlMaterial : public okay::UIRectProperties,
                 speedLineSpeed,
                 speedLineEdge,
                 speedLineThickness,
+                speedLineInnerRadius,
                 vignetteInnerColor,
                 vignetteOuterColor,
                 bgAlpha,

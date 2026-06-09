@@ -18,6 +18,7 @@ uniform float u_speedLineScale;
 uniform float u_speedLineSpeed;
 uniform float u_speedLineEdge;
 uniform float u_speedLineThickness;
+uniform float u_speedLineInnerRadius;
 
 uniform vec4 u_vignetteInnerColor;
 uniform vec4 u_vignetteOuterColor;
@@ -73,12 +74,15 @@ float simplex3d(vec3 p) {
 }
 
 float speedLineMask(vec2 uv) {
-    vec2 centered = uv - vec2(0.5);
+    vec2 centered = uv - vec2(0.4, 0.5);
 
     float len = length(centered);
     if (len <= 0.00001) {
         return 0.0;
     }
+
+    float innerRadius = max(u_speedLineInnerRadius, 0.0);
+    float innerFade = smoothstep(innerRadius, innerRadius + 0.08, len);
 
     float time = (u_timeMs * 0.001) * u_speedLineSpeed;
     float radius = max(u_speedLineRadius, 0.0001);
@@ -107,7 +111,7 @@ float speedLineMask(vec2 uv) {
             noise * stepped * thickness
         );
 
-    return finalMask;
+    return finalMask * innerFade;
 }
 
 float vignetteAmount(vec2 uv) {

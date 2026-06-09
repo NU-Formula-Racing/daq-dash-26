@@ -95,6 +95,11 @@ int main() {
     // for this single task
     s_lastCANUpdate = okay::Engine.time->timeSinceStartMs();
     game.onUpdate([]() {
+        // if the car status is not drive, disable launch control
+        if (dbc::vcuDriveStatus::driveState->get() != 3) {
+            CarConfig::get().enableLaunchControl = false;
+        }
+
         uint32_t now = okay::Engine.time->timeSinceStartMs();
         if (now - s_lastCANUpdate > 1000) {
             std::lock_guard<std::mutex> guard(

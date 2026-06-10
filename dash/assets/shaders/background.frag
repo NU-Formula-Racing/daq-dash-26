@@ -30,8 +30,8 @@ void main()
     vec4 texColor = texture(u_albedo, sampleUV);
     vec3 baseColor = v_color * texColor.rgb;
 
-    vec4 bgA = vec4(0.2941f, 0.2706f, 0.2667f, 1.0f);
-    vec4 bgB = vec4(0.1725f, 0.1569f, 0.1529f, 1.0f);
+    vec4 bgA = vec4(0.2941f, 0.2706f, 0.2667f, 1.0f) * 0.9f;
+    vec4 bgB = vec4(0.1725f, 0.1569f, 0.1529f, 1.0f) * 0.95f;
 
     vec2 dir = normalize(vec2(1.0, -1.0));
     float s = dot(v_uv - vec2(0.0, 1.0), dir)

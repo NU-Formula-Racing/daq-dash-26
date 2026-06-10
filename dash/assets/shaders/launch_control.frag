@@ -74,7 +74,7 @@ float simplex3d(vec3 p) {
 }
 
 float speedLineMask(vec2 uv) {
-    vec2 centered = uv - vec2(0.4, 0.5);
+    vec2 centered = uv - vec2(0.675, 0.5);
 
     float len = length(centered);
     if (len <= 0.00001) {
@@ -115,7 +115,7 @@ float speedLineMask(vec2 uv) {
 }
 
 float vignetteAmount(vec2 uv) {
-    vec2 centered = uv - vec2(0.5);
+    vec2 centered = uv - vec2(0.675, 0.5);
     float r = clamp(length(centered) / 0.70710678, 0.0, 1.0);
     return pow(r, max(u_vignettePower, 0.0001));
 }
@@ -128,9 +128,11 @@ vec4 vignetteColor(vec2 uv) {
 void main() {
     vec4 texColor = texture(u_albedo, v_uv);
 
-    float lines = speedLineMask(v_uv);
-    float vignette = vignetteAmount(v_uv);
-    vec4 vig = vignetteColor(v_uv);
+    // hack to make vignette go to circle
+    vec2 uv = v_uv * vec2(800.0f / 480.0f, 1);
+    float lines = speedLineMask(uv);
+    float vignette = vignetteAmount(uv);
+    vec4 vig = vignetteColor(uv);
 
     float bgAlpha = u_bgAlpha * vignette;
     float lineAlpha = u_lineAlpha * vignette;

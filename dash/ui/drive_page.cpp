@@ -58,7 +58,7 @@ void DrivePage::initializePage() {
                 glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.2f), glm::identity<glm::quat>())
             .addComponent<okay::MeshRendererComponent>(
                 centerMesh, objectMaterial, static_cast<uint8_t>(255))
-            .addComponent<RotateComponent>(0.25f),
+            .addComponent<RotateComponent>(1.0f, glm::radians(-200.0f), glm::radians(-160.0f)),
         okay::ecs::entity()
             .addComponent<okay::TransformComponent>(glm::vec3{0.0f, 0.0f, 30.0f})
             .addComponent<okay::CameraComponent>(

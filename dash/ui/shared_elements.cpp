@@ -292,24 +292,6 @@ okay::UIElement SharedElements::buildTemperatureElement() {
     // clang-format on
 }
 
-okay::UIElement SharedElements::buildPerformanceUI() {
-    return ui::frame(10, 10, 200, 100)(ui::flexbox()
-            .marginSet(10)
-            .paddingSet(10)
-            .rightPaddingSet(20)
-            .backgroundColorSet(glm::vec4{0.05f, 0.0f, 0.05f, 0.5f})
-            .borderColorSet(glm::vec4{1.0f, 1.0f, 1.0f, 0.8f})
-            .borderRadiusSet(10)
-            .borderWidthSet(1)(ui::h2("Performance"),
-                ui::vspacer(2),
-                ui::h3(std::format("FPS: {:2f}", okay::Engine.time->fps())),
-                ui::h3(std::format("ECS Entity count: {}", okay::ecs::entityCount())),
-                ui::h3(std::format("Renderer Entity count: {}",
-                    okay::Engine.systems.getSystemChecked<okay::Renderer>()
-                        ->world()
-                        .numRenderItems()))));
-}
-
 okay::UIElement SharedElements::buildLaunchControlIndicator() {
     if (!CarConfig::get().enableLaunchControl && !dbc::vcuLaunchControl::lcEnabled->get()) {
         return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f);

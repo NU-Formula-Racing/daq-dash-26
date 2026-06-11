@@ -30,7 +30,6 @@ class SharedElements {
     okay::UIElement buildBotHud();
     okay::UIElement buildDriveStatus();
     okay::UIElement buildTemperatureElement();
-    okay::UIElement buildPerformanceUI();
     okay::UIElement buildLaunchControlIndicator();
 
     okay::MaterialHandle skyboxMaterial;

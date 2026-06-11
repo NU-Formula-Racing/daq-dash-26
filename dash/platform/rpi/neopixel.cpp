@@ -26,6 +26,9 @@ namespace dash {
 #define EN_L 27
 #define EN_U 17
 
+static GPIO s_enL{EN_L, true};
+static GPIO s_enU{EN_U, true};
+
 #define TARGET_FREQ 800000
 #define DMA 10
 #define STRIP_TYPE WS2811_STRIP_GBR  // WS2812/SK6812RGB integrated chip+leds
@@ -359,12 +362,6 @@ void NeopixelStrip::init(const int& pin, const int& numLeds) {
             "Unable to initialize neopixels : {}", ws2811_get_return_t_str(code));
     }
 
-    gpiod::line_settings outputSettings;
-    outputSettings.set_direction(gpiod::line::direction::OUTPUT);
-    outputSettings.set_output_value(gpiod::line::value::INACTIVE);
-    GPIOManager::instance().registerPin(EN_L, outputSettings);
-    GPIOManager::instance().registerPin(EN_U, outputSettings);
-
     s_hasInitialized = true;
 }
 
@@ -389,13 +386,13 @@ void NeopixelStrip::show() {
 
     if (_impl->pin == GPIO_L) {
         okay::Engine.logger.debug("Enabling Left");
-        GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_HIGH);
-        GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_LOW);
+        s_enL.gpio_write(GpioLevel::G_HIGH);
+        s_enU.gpio_write(GpioLevel::G_LOW);
     } else if (_impl->pin == GPIO_U) {
         // set EN_U high and EN_L low -> go to upper side
         okay::Engine.logger.debug("Enabling Up");
-        GPIOManager::instance().gpioWritePin(EN_U, GpioLevel::G_HIGH);
-        GPIOManager::instance().gpioWritePin(EN_L, GpioLevel::G_LOW);
+        s_enU.gpio_write(GpioLevel::G_HIGH);
+        s_enL.gpio_write(GpioLevel::G_LOW);
     }
 
     if (channel->gpionum != _impl->pin) {  // Be better to check if the thing is greater than

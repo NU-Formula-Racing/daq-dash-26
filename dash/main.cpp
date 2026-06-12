@@ -85,6 +85,11 @@ int main() {
         });
 
         input::encoderButton.onDown([]() {
+            // only allow switch in neutral
+            if (dbc::vcuDriveStatus::driveState->get() != 2) {
+                return;
+            }
+
             CarConfig::get().enableLaunchControl = !CarConfig::get().enableLaunchControl;
         });
     });
@@ -92,8 +97,9 @@ int main() {
     // kinda gross, but I don't feel like adding a timer system
     // for this single task
     game.onUpdate([]() {
-        // if the car status is not drive, disable launch control
-        if (dbc::vcuDriveStatus::driveState->get() != 3) {
+        // if the car status is not drive or neutral, disable launch control
+        if (!(dbc::vcuDriveStatus::driveState->get() == 2 ||
+                dbc::vcuDriveStatus::driveState->get() == 3)) {
             CarConfig::get().enableLaunchControl = false;
         }
     });

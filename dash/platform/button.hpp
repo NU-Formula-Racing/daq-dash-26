@@ -25,6 +25,8 @@ class Button {
    private:
     uint8_t _buttonID;
     std::unique_ptr<GPIO> _gpio;
+    std::uint32_t _lastDown{0};
+    std::uint32_t _lastUp{0};
 };
 
 }  // namespace dash

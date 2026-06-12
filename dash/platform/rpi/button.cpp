@@ -1,21 +1,36 @@
+#include <okay/okay.hpp>
+
 #include <platform/button.hpp>
 #include <platform/input_manager.hpp>
 #include <platform/interfaces.hpp>
 
 namespace dash {
 
+inline const std::uint32_t BUTTON_DEBOUNCE_TIME = 100;
+
 Button::Button(uint8_t gpioPin)
     : _buttonID(gpioPin), _gpio(std::make_unique<GPIO>(gpioPin, false)) {
     InputManager::instance().registerButton(_buttonID);
 
     _gpio->attachInterrupt(
-        [id = _buttonID]() {
+        [this, id = _buttonID]() {
+            std::uint32_t now = okay::Engine.time->timeSinceStartMs();
+            if (now - _lastUp < BUTTON_DEBOUNCE_TIME)
+                return;
+
+            _lastUp = now;
+
             InputManager::instance().executeUpCallbacks(id);
         },
         GPIO::EdgeType::FALLING);
 
     _gpio->attachInterrupt(
-        [id = _buttonID]() {
+        [this, id = _buttonID]() {
+            std::uint32_t now = okay::Engine.time->timeSinceStartMs();
+            if (now - _lastDown < BUTTON_DEBOUNCE_TIME)
+                return;
+
+            _lastDown = now;
             InputManager::instance().executeDownCallbacks(id);
         },
         GPIO::EdgeType::RISING);

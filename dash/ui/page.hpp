@@ -108,14 +108,8 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
             okay::TweenConfig<float> tweenConfig{
                 .start = 1.0f,
                 .end = 0.0f,
-                .durationMs = 1000,
+                .durationMs = 2000,
                 .easingFn = okay::easing::cubicIn,
-                .onEnd =
-                    [this]() {
-                        _splashScreenUI.update(okay::ui::box());
-                        _splashScreenUI.render(glm::vec2{}, SPLASH_UI_LAYER);
-                        // _splashScreenUI.cleanup();
-                    },
             };
 
             _splashAlphaTween = okay::Tween<float>::create(tweenConfig);
@@ -127,6 +121,8 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
 
     void preTick() {
         if (!_splashAlphaTween || _splashAlphaTween->isFinished()) {
+            _splashScreenUI.update(okay::ui::box());
+            _splashScreenUI.render(glm::vec2{}, SPLASH_UI_LAYER);
             return;
         }
 

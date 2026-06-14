@@ -1,10 +1,14 @@
 #ifndef __PAGE_H__
 #define __PAGE_H__
 
+#include "okay/core/renderer/renderer.hpp"
+#include "okay/core/tween/tween_easing.hpp"
+
 #include <okay/okay.hpp>
 
 #include <functional>
 #include <memory>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -88,12 +92,49 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
     void initialize() {
         _currentPage = findActivePage();
 
+        _splashScreenUI = okay::UI(okay::ui::image(*_splashScreenTex));
+        _splashScreenUI.render(glm::vec2{}, SPLASH_UI_LAYER);
+
+        // ABSOLUTE HACK WE REALLY NEED AN ASYNC/JOB SYSTEM
+        okay::Renderer* r = okay::Engine.systems.getSystemChecked<okay::Renderer>();
+        r->preTick();
+        r->tick();
+        r->postTick();
+
         if (hasCurrentPage()) {
             okay::Engine.logger.debug("Creating page enties");
             _pages[_currentPage].page->initializePage();
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            okay::TweenConfig<float> tweenConfig{
+                .start = 1.0f,
+                .end = 0.0f,
+                .durationMs = 500,
+                .easingFn = okay::easing::cubicIn,
+                .onEnd =
+                    [this]() {
+                        _splashScreenUI.update(okay::ui::box());
+                        _splashScreenUI.render(glm::vec2{}, SPLASH_UI_LAYER);
+                        // _splashScreenUI.cleanup();
+                    },
+            };
+
+            _splashAlphaTween = okay::Tween<float>::create(tweenConfig);
+            _splashAlphaTween->start();
         }
 
         okay::Engine.logger.debug("Current page {}", _currentPage);
+    }
+
+    void preTick() {
+        if (!_splashAlphaTween || _splashAlphaTween->isFinished()) {
+            return;
+        }
+
+        _splashScreenUI.update(okay::ui::image(*_splashScreenTex)
+                .backgroundColorSet(glm::vec4(1.0f, 1.0f, 1.0f, _splashAlphaTween->value())));
+
+        _splashScreenUI.render(glm::vec2{}, SPLASH_UI_LAYER);
     }
 
     void tick() {
@@ -158,13 +199,6 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
     }
 
    private:
-    static constexpr std::size_t NO_PAGE = static_cast<std::size_t>(-1);
-
-    std::vector<PageEntry> _pages;
-    std::size_t _currentPage{NO_PAGE};
-    std::size_t _currentNumberedPage{0};
-    std::size_t _numNumberedPages{0};
-
     void recountNumberedPages() {
         _numNumberedPages = 0;
 
@@ -245,6 +279,19 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
 
         return bestPage;
     }
+
+    static constexpr std::size_t NO_PAGE = static_cast<std::size_t>(-1);
+    static constexpr std::uint8_t SPLASH_UI_LAYER = 5;
+
+    std::vector<PageEntry> _pages;
+    std::size_t _currentPage{NO_PAGE};
+    std::size_t _currentNumberedPage{0};
+    std::size_t _numNumberedPages{0};
+
+    std::shared_ptr<okay::Tween<float>> _splashAlphaTween;
+    okay::UI _splashScreenUI;
+    okay::GameAssetRef<okay::Texture, okay::TextureLoadSettings> _splashScreenTex{
+        "textures/splash.png"};
 };
 
 }  // namespace dash

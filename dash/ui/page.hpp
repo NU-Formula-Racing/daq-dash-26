@@ -104,12 +104,11 @@ class PageManager : public okay::System<okay::SystemScope::GAME> {
         if (hasCurrentPage()) {
             okay::Engine.logger.debug("Creating page enties");
             _pages[_currentPage].page->initializePage();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
 
             okay::TweenConfig<float> tweenConfig{
                 .start = 1.0f,
                 .end = 0.0f,
-                .durationMs = 500,
+                .durationMs = 1000,
                 .easingFn = okay::easing::cubicIn,
                 .onEnd =
                     [this]() {

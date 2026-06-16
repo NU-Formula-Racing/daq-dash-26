@@ -93,8 +93,16 @@ okay::UIElement DebugPage::buildVCU() {
             dbc::vcuThrottle::apps1Throttle->get()
         ),
         keyValuePair(
+            "APPS1 Raw",
+            dbc::vcuThrottle::apps1ThrottleRaw->get()
+        ),
+        keyValuePair(
             "APPS2",
             dbc::vcuThrottle::apps2Throttle->get()
+        ),
+        keyValuePair(
+            "APPS2 Raw",
+            dbc::vcuThrottle::apps1ThrottleRaw->get()
         ),
         keyValuePair(
             "Font Brake Pressure",
@@ -104,12 +112,12 @@ okay::UIElement DebugPage::buildVCU() {
             "Rear Brake Pressure",
             dbc::vcuBrake::rearBrakePressure->get()
         ),
-        keyValuePair(
-            "Brake Pressed",
-            dbc::vcuBrake::brakePressed->get()
-        ),
+        // keyValuePair(
+        //     "Brake Pressed",
+        //     dbc::vcuBrake::brakePressed->get()
+        // ),
 
-        ui::vspacer(10),
+        ui::vspacer(5),
         ui::h2("Commands"),
         keyValuePair(
             "Set Current (Rear)",
@@ -128,7 +136,7 @@ okay::UIElement DebugPage::buildVCU() {
             dbc::vcuBmsCommandMessage::bmsCommand->get()
         ),
 
-        ui::vspacer(10),
+        ui::vspacer(5),
         ui::h2("VCU Implausibilities"),
         keyErrorValuePair(
             "Implausibility Present",

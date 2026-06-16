@@ -291,7 +291,10 @@ namespace vcuThrottle {
 
 inline CAN_Signal_INT16 apps1Throttle = MakeSignalSigned(int16_t, 0, 16, 1.0, 0.0, false);
 inline CAN_Signal_INT16 apps2Throttle = MakeSignalSigned(int16_t, 16, 16, 1.0, 0.0, false);
-inline RX_CAN_Message(2) message{driveBus, 0x202, false, 4, apps1Throttle, apps2Throttle};
+inline CAN_Signal_INT16 apps1ThrottleRaw = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
+inline CAN_Signal_INT16 apps2ThrottleRaw = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
+inline RX_CAN_Message(4) message{
+    driveBus, 0x202, false, 4, apps1Throttle, apps2Throttle, apps1ThrottleRaw, apps2ThrottleRaw};
 
 static constexpr int16_t apps1ThrottleMin{0};
 static constexpr int16_t apps2ThrottleMin{0};

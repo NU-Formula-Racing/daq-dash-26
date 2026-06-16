@@ -23,6 +23,7 @@
 
 static void __exitSignal(int sig);
 static okay::ECSEntity s_performanceUIEntity;
+static bool s_switchedToDebug{false};
 
 using namespace dash;
 
@@ -46,7 +47,12 @@ int main() {
         // Debug/Error Page
         PageEntry::create(std::make_unique<DebugPage>())
             .forceOverrideWhen([]() {
-                return CarState::hardFaultPresent();
+                bool override = CarState::hardFaultPresent() && !s_switchedToDebug;
+                if (override) {
+                    s_switchedToDebug = true;
+                    okay::Engine.systems.getSystemChecked<PageManager>()->setNumberedPage(2);
+                }
+                return override;
             })
             .withPriority(1)
             .withPageNumber(2),
@@ -101,6 +107,10 @@ int main() {
         if (!(dbc::vcuDriveStatus::driveState->get() == 2 ||
                 dbc::vcuDriveStatus::driveState->get() == 3)) {
             CarConfig::get().enableLaunchControl = false;
+        }
+
+        if (!CarState::hardFaultPresent()) {
+            s_switchedToDebug = false;
         }
     });
 

@@ -164,6 +164,8 @@ okay::UIElement ConfigPage::buildConfig() {
                     keyValuePair("LC Enabled", dbc::vcuLaunchControl::lcEnabled->get()),
                     keyValuePair("LC Kp", dbc::vcuLaunchControl::lcKp->get()),
                     keyValuePair("LC Kd", dbc::vcuLaunchControl::lcKd->get()),
+                    ui::vspacer(10),
+                    keyValuePair("Max Current Request", dbc::vcuMaxCurrent::maxCurrentRear->get()),
 
                     ui::spacer()
             ),

@@ -102,7 +102,7 @@ okay::UIElement DebugPage::buildVCU() {
         ),
         keyValuePair(
             "APPS2 Raw",
-            dbc::vcuThrottle::apps1ThrottleRaw->get()
+            dbc::vcuThrottle::apps2ThrottleRaw->get()
         ),
         keyValuePair(
             "Font Brake Pressure",

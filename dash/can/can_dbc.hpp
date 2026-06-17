@@ -294,7 +294,7 @@ inline CAN_Signal_INT16 apps2Throttle = MakeSignalSigned(int16_t, 16, 16, 1.0, 0
 inline CAN_Signal_INT16 apps1ThrottleRaw = MakeSignalSigned(int16_t, 32, 16, 1.0, 0.0, false);
 inline CAN_Signal_INT16 apps2ThrottleRaw = MakeSignalSigned(int16_t, 48, 16, 1.0, 0.0, false);
 inline RX_CAN_Message(4) message{
-    driveBus, 0x202, false, 4, apps1Throttle, apps2Throttle, apps1ThrottleRaw, apps2ThrottleRaw};
+    driveBus, 0x202, false, 8, apps1Throttle, apps2Throttle, apps1ThrottleRaw, apps2ThrottleRaw};
 
 static constexpr int16_t apps1ThrottleMin{0};
 static constexpr int16_t apps2ThrottleMin{0};
@@ -449,6 +449,13 @@ inline RX_CAN_Message(3) message{driveBus, 0x212, false, 5, lcKp, lcKd, lcEnable
 static constexpr uint16_t lcKpMin{5000};
 
 };  // namespace vcuLaunchControl
+
+namespace vcuMaxCurrent {
+
+inline CAN_Signal_UINT16 maxCurrentRear = MakeSignalExp(uint16_t, 0, 16, 1.0, 0.0);
+inline RX_CAN_Message(1) message{driveBus, 0x213, false, 2, maxCurrentRear};
+
+};  // namespace vcuMaxCurrent
 
 namespace dashLaunchControlConfig {
 
@@ -2590,6 +2597,7 @@ static const std::map<uint32_t, const char*> messageIdToName = {
     {0x20C, "VCU_Torque_Status"},
     {0x211, "VCU_BSPD_Status"},
     {0x212, "VCU_Launch_Control"},
+    {0x213, "VCU_Max_Current"},
     {0x510, "Dash_Launch_Control_Config"},
     {0x511, "Dash_Max_Current_Request_Rear"},
     {0x512, "Dash_Max_Current_Request_FL"},
@@ -2741,6 +2749,8 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x201, 0}, "Set_Current_Brake_Rear_Inverter"},
     {{0x202, 0}, "APPS1_Throttle"},
     {{0x202, 1}, "APPS2_Throttle"},
+    {{0x202, 2}, "APPS1_Throttle_Raw"},
+    {{0x202, 3}, "APPS2_Throttle_Raw"},
     {{0x203, 0}, "Front_Brake_Pressure"},
     {{0x203, 1}, "Rear_Brake_Pressure"},
     {{0x203, 2}, "Brake_Pressed"},
@@ -2771,6 +2781,7 @@ static const std::map<std::pair<uint32_t, uint8_t>, const char*> signalIdToName 
     {{0x212, 0}, "LC_Kp"},
     {{0x212, 1}, "LC_Kd"},
     {{0x212, 2}, "LC_Enabled"},
+    {{0x213, 0}, "Max_Current_Rear"},
     {{0x510, 2}, "LC_Kp"},
     {{0x510, 1}, "LC_Kd"},
     {{0x510, 2}, "LC_Enable"},

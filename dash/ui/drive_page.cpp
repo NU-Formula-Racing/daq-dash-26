@@ -29,7 +29,7 @@ void DrivePage::initializePage() {
 
     okay::UIStyle::main().setMainFont(*fonts::latoBold);
 
-    if (!speedometerMaterial.isValid()) {
+    if (speedometerMaterial.isNone()) {
         auto speedometerProperties = std::make_unique<SpeedometerMaterial>();
         speedometerProperties->isTransparent = true;
         speedometerProperties->useScreenspaceCoords = true;

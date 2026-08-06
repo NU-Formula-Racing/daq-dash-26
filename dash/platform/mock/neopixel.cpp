@@ -183,6 +183,7 @@ void NeopixelStrip::setColor(const int& ledIndex, const glm::vec4& color) {
 }
 
 void NeopixelStrip::show() {
+    return;
     constexpr float windowWidth = 315.0f;
     constexpr float windowHeight = 265.0f;
 

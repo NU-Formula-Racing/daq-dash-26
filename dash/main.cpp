@@ -21,13 +21,12 @@
 #include <platform/interfaces.hpp>
 #include <platform/neopixel_manager.hpp>
 
-static void __exitSignal(int sig);
 static okay::ECSEntity s_performanceUIEntity;
 static bool s_switchedToDebug{false};
 
 using namespace dash;
 
-int main() {
+extern "C" OKAY_EXPORT void create(okay::Game* game, int argc, char* args[]) {
     okay::SurfaceConfig surfaceConfig;
     surfaceConfig.width = 800;
     surfaceConfig.height = 480;
@@ -36,7 +35,7 @@ int main() {
     okay::RendererSettings rendererSettings{
         .surfaceConfig = surfaceConfig,
         .pipeline = okay::RenderPipeline::create(std::make_unique<okay::ScenePass>()),
-        .enableIMGUI = true,
+        .enableIMGUI = false,
     };
 
     std::unique_ptr<PageManager> pageManager = std::make_unique<PageManager>(
@@ -65,13 +64,8 @@ int main() {
             .withPriority(0)
             .withPageNumber(5));
 
-    // attach an interrupt to exit the program on ctrl c
-    std::signal(SIGINT, __exitSignal);
-
-    auto game = okay::Game::create().addSystems(
-        std::make_unique<okay::Renderer>(std::move(rendererSettings)),
+    game->addSystems(std::make_unique<okay::Renderer>(std::move(rendererSettings)),
         std::make_unique<NeopixelManager>(),
-        std::make_unique<okay::AssetManager>(),
         std::make_unique<okay::TweenEngine>(),
         std::make_unique<CANManager>(),
         std::make_unique<okay::ECS>(),
@@ -81,7 +75,7 @@ int main() {
     // IMGUI overrides glfwcallbacks in the native build
     // this is a hack until okay engine get it's own
     // input system
-    game.onInitialize([]() {
+    game->onInitialize([]() {
         input::leftButton.onDown([]() {
             okay::Engine.systems.getSystemChecked<PageManager>()->switchPageLeft();
         });
@@ -102,7 +96,7 @@ int main() {
 
     // kinda gross, but I don't feel like adding a timer system
     // for this single task
-    game.onUpdate([]() {
+    game->onUpdate([]() {
         // if the car status is not drive or neutral, disable launch control
         if (!(dbc::vcuDriveStatus::driveState->get() == 2 ||
                 dbc::vcuDriveStatus::driveState->get() == 3)) {
@@ -118,12 +112,4 @@ int main() {
     okay::ecs::registerComponent<RotateComponent>();
     okay::ecs::registerSystem(std::make_unique<RotateSystem>());
     dbc::bmsStatus::imdState->set(1);
-
-    game.run();
-    return 0;
-}
-
-static void __exitSignal(int sig) {
-    okay::Engine.logger.info("Exit signal received: {}", sig);
-    okay::Engine.shutdown();
 }

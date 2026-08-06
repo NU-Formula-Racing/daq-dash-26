@@ -14,7 +14,7 @@
 namespace dash {
 
 void CANManager::initialize() {
-    dbc::driveBus.set_driver(std::make_unique<CAN_IMGUI>());
+    // dbc::driveBus.set_driver(std::make_unique<CAN_IMGUI>());
 
     BaudRate baud500k = BaudRate::kBaud500K;
     if (!dbc::driveBus.init(baud500k)) {
@@ -27,7 +27,7 @@ void CANManager::initialize() {
 }
 
 void CANManager::tick() {
-    dbc::driveBus.tick_bus();
+    // dbc::driveBus.tick_bus();
 }
 
 }  // namespace dash

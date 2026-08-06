@@ -34,37 +34,20 @@ void DebugPage::closePage() {
 }
 
 okay::UIElement DebugPage::buildDebug() {
-    // clang-format off
     return ui::relFrame(0.0f, 0.0f, 1.0f, 1.0f)
-        .axisSet(okay::UIAxis::Vertical)(
-            ui::spacer(),
+        .axisSet(okay::UIAxis::Vertical)(ui::spacer(),
             ui::box()
                 .axisSet(okay::UIAxis::Horizontal)
                 .childSpacingSet(10)
                 .widthGrow()
                 .marginSet(10)
-                .bottomMarginSet(20) (
-                    ui::spacer(),
-                    buildContainer()(
-                        ui::h1("VCU"),
-                        buildVCU()
-                    ),
-                    buildContainer()(
-                        ui::h1("BMS"),
-                        buildBMS()
-                    ),
-                    buildContainer()(
-                        ui::h1("INVERTER"),
-                        buildInverter()
-                    ),
-                    buildContainer()(
-                        ui::h1("FAULTS"),
-                        buildFaults()
-                    ),
-                    ui::spacer()
-                ),
-            ui::spacer()
-        );
+                .bottomMarginSet(20)(ui::spacer(),
+                    buildContainer()(ui::h1("VCU"), buildVCU()),
+                    buildContainer()(ui::h1("BMS"), buildBMS()),
+                    buildContainer()(ui::h1("INVERTER"), buildInverter()),
+                    buildContainer()(ui::h1("FAULTS"), buildFaults()),
+                    ui::spacer()),
+            ui::spacer());
     // clang-format on
 }
 

@@ -179,7 +179,7 @@ okay::UIElement ConfigPage::buildSlider(SliderSettings settings, bool isActive) 
     if (_sliderMaterials.contains(settings.sliderName)) {
         sliderMaterial = _sliderMaterials.at(settings.sliderName);
     } else {
-        if (!_sliderShaderHandle.isValid()) {
+        if (_sliderShaderHandle.isNone()) {
             _sliderShaderHandle = okay::shaderHandle(*_sliderShader);
         }
 

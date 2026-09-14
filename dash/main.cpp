@@ -35,7 +35,7 @@ extern "C" OKAY_EXPORT void create(okay::Game* game, int argc, char* args[]) {
     okay::RendererSettings rendererSettings{
         .surfaceConfig = surfaceConfig,
         .pipeline = okay::RenderPipeline::create(std::make_unique<okay::ScenePass>()),
-        .enableIMGUI = false,
+        .enableIMGUI = true,
     };
 
     std::unique_ptr<PageManager> pageManager = std::make_unique<PageManager>(

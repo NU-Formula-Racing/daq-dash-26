@@ -49,6 +49,7 @@ bool CAN_IMGUI::recv(CAN_Frame& msg) {
     ICAN_Message* message{dbc::driveBus.get_message_from_id(info.messageID)};
     ICAN_Signal* signal{message->get_signal(info.signalNum)};
 
+    // Encode message into frame based on type
     switch (info.changedSignal.type) {
         case SignalType::INT8:
             signal->set(info.changedSignal.type, &info.changedSignal.value.s8);
@@ -84,9 +85,7 @@ bool CAN_IMGUI::recv(CAN_Frame& msg) {
 
     message->encode_to_frame(msg);
 
-    timeSinceStartup += okay::Engine.time->deltaTimeMs();
-
-    return false;
+    return true;
 }
 
 okay::Option<CAN_IMGUI::MessageChangeInfo> CAN_IMGUI::drawUI() {

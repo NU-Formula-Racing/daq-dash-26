@@ -1,7 +1,7 @@
-
 <div align="center">
     <img src="docs/img/dash_crop.jpg" height="200"/>
     <img src="docs/img/dashboard_controller_real.jpg" height="200"/>
+    <img height="200" alt="mainscreen" src="https://github.com/user-attachments/assets/1f9fa347-76fc-43c5-ae6f-364596614ce1" />
 </div>
 
 # daq-dash-26
@@ -71,3 +71,11 @@ source ./rpi_update.sh
 ```
 
 This will take your current version of `daq-dash` code, copy it over, then recompile the project. It should also reboot the controller board for a cold start.
+
+## Video Demo
+https://github.com/user-attachments/assets/35f099b0-c9f9-4bd3-b2c3-5e8811f3801b
+
+
+
+
+

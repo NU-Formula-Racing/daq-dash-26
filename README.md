@@ -12,7 +12,7 @@ Software for `NFR26` dashboard, built upon `Okay Engine` and a custom `Raspberry
 
 ### Prerequisites
 
-* [okay-engine](https://github.com/Evan-Bertis-Sample/okay-engine), and all of it's prerequisites
+* [okay-engine (NFR 26 Fork)](https://github.com/NU-Formula-Racing/okay-engine), and all of it's prerequisites
 
 ### Steps
 
@@ -74,8 +74,3 @@ This will take your current version of `daq-dash` code, copy it over, then recom
 
 ## Video Demo
 https://github.com/user-attachments/assets/35f099b0-c9f9-4bd3-b2c3-5e8811f3801b
-
-
-
-
-
